@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${CLIENT} — ${NAME}</title>
+<meta name="description" content="${DESCRIPTION}">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍪</text></svg>">
+<link rel="stylesheet" href="${ROOT_PREFIX}assets/css/styles.css">
+</head>
+<body>
+${NAV}
+<div class="wrap project-head">
+  <a class="backlink" href="${ROOT_PREFIX}gallery.html">← All projects</a>
+  <p class="kicker">${CLIENT}</p>
+  <h1>${PTITLE}</h1>
+  <p class="facts">${FACTS}</p>
+  <p class="desc">${DESCRIPTION}</p>
+</div>
+<section style="padding-top:32px">
+  <div class="wrap">
+${VIDEO_SECTION}
+${PHOTO_SECTION}
+  </div>
+</section>
+<section>
+  <div class="wrap">
+    <h2>Like what you see?</h2>
+    <p class="lede"><a href="${ROOT_PREFIX}contact.html">Get in touch →</a></p>
+  </div>
+</section>
+<div class="lightbox" id="lightbox"><img src="" alt=""></div>
+${FOOTER}

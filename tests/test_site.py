@@ -75,8 +75,11 @@ class TestSiteGenerated(unittest.TestCase):
 
     def test_no_absolute_root_paths(self):
         """Root-relative paths (/assets/...) break on the github.io subpath."""
+        # 404.html is the one page allowed root-absolute paths: GitHub Pages
+        # serves it only at the domain root, so "/assets/..." and "/" are correct there.
+        skip = {"404.html"}
         for page in generated_pages():
-            if not page.exists():
+            if not page.exists() or page.name in skip:
                 continue
             text = page.read_text()
             hits = re.findall(r'(?:href|src|poster)="/(?!/)', text)

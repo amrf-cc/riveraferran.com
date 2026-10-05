@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${NAME} — ${TITLE}</title>
+<meta name="description" content="${META_DESCRIPTION}">
+<meta property="og:title" content="${NAME} — ${TITLE}">
+<meta property="og:description" content="${META_DESCRIPTION}">
+<meta property="og:image" content="${ROOT_PREFIX}${HERO_IMAGE}">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍪</text></svg>">
+<link rel="stylesheet" href="${ROOT_PREFIX}assets/css/styles.css">
+</head>
+<body>
+${NAV}
+<div class="hero">
+  <img class="hero-bg" src="${ROOT_PREFIX}${HERO_IMAGE}" alt="${HERO_CAPTION}">
+  <div class="wrap">
+    <h1>${NAME}</h1>
+    <p class="title">${TITLE}</p>
+    <p class="based">${BASED}</p>
+    <p class="caption">${HERO_CAPTION}</p>
+  </div>
+</div>
+<section class="about" id="about">
+  <div class="wrap">
+    <p class="kicker">About</p>
+    <h2>Food first. Always.</h2>
+    ${BIO_PARAGRAPHS}
+    <p class="cta">${CTA}</p>
+  </div>
+</section>
+<section id="work">
+  <div class="wrap">
+    <p class="kicker">Selected Work</p>
+    <h2>Clients & projects</h2>
+    <p class="lede">Restaurant menus, product launches, and social video — stills and motion.</p>
+    <div class="grid">
+${FEATURED_CARDS}
+    </div>
+    <p style="margin-top:32px"><a href="${ROOT_PREFIX}gallery.html">See the full gallery →</a></p>
+  </div>
+</section>
+<section>
+  <div class="wrap">
+    <p class="kicker">What I do</p>
+    <h2>Services</h2>
+    <div class="services">
+      <div><h3>Food & Beverage Photography</h3><p>Menu shots, product stills, editorial. Styled, shot, retouched.</p></div>
+      <div><h3>Social Video</h3><p>Reels, reveals, and launches — shot and cut for how people actually scroll.</p></div>
+      <div><h3>Menu & Product Systems</h3><p>Full menu coverage with consistent light and framing, delivered organized.</p></div>
+      <div><h3>Brand Campaigns</h3><p>Activations and collaborations, stills + motion in one pass.</p></div>
+    </div>
+  </div>
+</section>
+<section id="contact">
+  <div class="wrap">
+    <p class="kicker">Contact</p>
+    <h2>Let's talk</h2>
+    <p class="lede">Bookings, full-time roles, or just to say hello.</p>
+${CONTACT_FORM}
+  </div>
+</section>
+${FOOTER}

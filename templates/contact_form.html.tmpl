@@ -1,0 +1,12 @@
+    <form class="contact" id="contact-form" data-endpoint="${FORMSPREE_ENDPOINT}" data-email="${EMAIL}" action="#" method="POST">
+      <label for="cf-name">Name</label>
+      <input id="cf-name" type="text" name="name" required autocomplete="name">
+      <label for="cf-email">Email</label>
+      <input id="cf-email" type="email" name="email" required autocomplete="email">
+      <label for="cf-message">Message</label>
+      <textarea id="cf-message" name="message" required></textarea>
+      <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+      <input type="hidden" name="_subject" value="Portfolio inquiry — riveraferran.com">
+      <button type="submit">Send message</button>
+      <p class="form-status" role="status"></p>
+    </form>
