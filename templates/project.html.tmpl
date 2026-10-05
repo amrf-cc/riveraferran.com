@@ -5,19 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${CLIENT} — ${NAME}</title>
 <meta name="description" content="${DESCRIPTION}">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍪</text></svg>">
+<meta property="og:type" content="article">
+<meta property="og:title" content="${CLIENT} — ${NAME}">
+<meta property="og:description" content="${DESCRIPTION}">
+<meta property="og:image" content="${ROOT_PREFIX}assets/img/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f7f5f0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231B4DFF'/><text x='50' y='54' font-family='Georgia,serif' font-size='62' fill='%23fff' text-anchor='middle' dominant-baseline='middle'>A</text></svg>">
+<link rel="preload" as="font" type="font/woff2" href="${ROOT_PREFIX}assets/fonts/fraunces-latin.woff2" crossorigin>
+<link rel="stylesheet" href="${ROOT_PREFIX}assets/css/fonts.css">
 <link rel="stylesheet" href="${ROOT_PREFIX}assets/css/styles.css">
 </head>
 <body>
 ${NAV}
+<main>
 <div class="wrap project-head">
   <a class="backlink" href="${ROOT_PREFIX}gallery.html">← All projects</a>
-  <p class="kicker">${CLIENT}</p>
+  <p class="kicker" style="margin-top:24px">${CLIENT}</p>
   <h1>${PTITLE}</h1>
   <p class="facts">${FACTS}</p>
   <p class="desc">${DESCRIPTION}</p>
 </div>
-<section style="padding-top:32px">
+<section style="padding-top:40px">
   <div class="wrap">
 ${VIDEO_SECTION}
 ${PHOTO_SECTION}
@@ -25,9 +36,15 @@ ${PHOTO_SECTION}
 </section>
 <section>
   <div class="wrap">
-    <h2>Like what you see?</h2>
-    <p class="lede"><a href="${ROOT_PREFIX}contact.html">Get in touch →</a></p>
+    <div class="sec-head" style="margin-bottom:0">
+      <div>
+        <span class="kicker">Next</span>
+        <h2>Like what you see?</h2>
+      </div>
+      <p class="lede"><a class="link-arrow" href="${ROOT_PREFIX}contact.html">Start a project</a></p>
+    </div>
   </div>
 </section>
+</main>
 <div class="lightbox" id="lightbox"><img src="" alt=""></div>
 ${FOOTER}

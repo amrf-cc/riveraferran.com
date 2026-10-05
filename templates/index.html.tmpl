@@ -5,60 +5,101 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${NAME} — ${TITLE}</title>
 <meta name="description" content="${META_DESCRIPTION}">
+<meta property="og:type" content="website">
 <meta property="og:title" content="${NAME} — ${TITLE}">
 <meta property="og:description" content="${META_DESCRIPTION}">
-<meta property="og:image" content="${ROOT_PREFIX}${HERO_IMAGE}">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍪</text></svg>">
+<meta property="og:image" content="${ROOT_PREFIX}assets/img/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f7f5f0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231B4DFF'/><text x='50' y='54' font-family='Georgia,serif' font-size='62' fill='%23fff' text-anchor='middle' dominant-baseline='middle'>A</text></svg>">
+<link rel="preload" as="font" type="font/woff2" href="${ROOT_PREFIX}assets/fonts/fraunces-latin.woff2" crossorigin>
+<link rel="stylesheet" href="${ROOT_PREFIX}assets/css/fonts.css">
 <link rel="stylesheet" href="${ROOT_PREFIX}assets/css/styles.css">
 </head>
 <body>
 ${NAV}
-<div class="hero">
-  <img class="hero-bg" src="${ROOT_PREFIX}${HERO_IMAGE}" alt="${HERO_CAPTION}">
+<main>
+<section class="hero">
   <div class="wrap">
+    <p class="eyebrow">Food &amp; Beverage Photography</p>
     <h1>${NAME}</h1>
-    <p class="title">${TITLE}</p>
-    <p class="based">${BASED}</p>
-    <p class="caption">${HERO_CAPTION}</p>
-  </div>
-</div>
-<section class="about" id="about">
-  <div class="wrap">
-    <p class="kicker">About</p>
-    <h2>Food first. Always.</h2>
-    ${BIO_PARAGRAPHS}
-    <p class="cta">${CTA}</p>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="role">${TITLE}<br>${BASED}</p>
+        <p class="lead">Menu shots, product launches, and social video for restaurants and food brands. Stills and motion, concept through delivery.</p>
+        <p class="hero-cta">
+          <a class="btn" href="#contact">Work with me</a>
+          <a class="link-arrow" href="#work">Selected work</a>
+        </p>
+      </div>
+      <figure class="hero-media">
+        <img src="${ROOT_PREFIX}${HERO_IMAGE}" alt="${HERO_CAPTION}">
+        <figcaption>${HERO_CAPTION}</figcaption>
+      </figure>
+    </div>
   </div>
 </section>
+
 <section id="work">
   <div class="wrap">
-    <p class="kicker">Selected Work</p>
-    <h2>Clients & projects</h2>
-    <p class="lede">Restaurant menus, product launches, and social video — stills and motion.</p>
-    <div class="grid">
+    <div class="sec-head">
+      <div>
+        <span class="kicker">Selected work</span>
+        <h2>Recent projects</h2>
+      </div>
+      <p class="lede">Restaurant menus, product launches, and social video for food brands in New York City and Puerto Rico.</p>
+    </div>
+${FEATURE}
+    <div class="grid grid-2">
 ${FEATURED_CARDS}
     </div>
-    <p style="margin-top:32px"><a href="${ROOT_PREFIX}gallery.html">See the full gallery →</a></p>
+    <p style="margin-top:44px"><a class="link-arrow" href="${ROOT_PREFIX}gallery.html">See the full gallery</a></p>
   </div>
 </section>
-<section>
-  <div class="wrap">
-    <p class="kicker">What I do</p>
-    <h2>Services</h2>
-    <div class="services">
-      <div><h3>Food & Beverage Photography</h3><p>Menu shots, product stills, editorial. Styled, shot, retouched.</p></div>
-      <div><h3>Social Video</h3><p>Reels, reveals, and launches — shot and cut for how people actually scroll.</p></div>
-      <div><h3>Menu & Product Systems</h3><p>Full menu coverage with consistent light and framing, delivered organized.</p></div>
-      <div><h3>Brand Campaigns</h3><p>Activations and collaborations, stills + motion in one pass.</p></div>
+
+<section class="about" id="about">
+  <div class="wrap about-grid">
+    <div>
+      <span class="kicker">About</span>
+      <h2>Food first. Always.</h2>
+    </div>
+    <div class="body">
+${BIO_PARAGRAPHS}
+      <p class="cta">${CTA}</p>
     </div>
   </div>
 </section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="kicker">What I do</span>
+        <h2>Services</h2>
+      </div>
+    </div>
+    <div class="services">
+      <div class="service"><span class="num">01</span><h3>Food &amp; beverage photography</h3><p>Menu shots, product stills, editorial. Styled, shot, retouched.</p></div>
+      <div class="service"><span class="num">02</span><h3>Social video</h3><p>Reels, reveals, and launches — shot and cut for how people actually scroll.</p></div>
+      <div class="service"><span class="num">03</span><h3>Menu &amp; product systems</h3><p>Full menu coverage with consistent light and framing, delivered organized.</p></div>
+      <div class="service"><span class="num">04</span><h3>Brand campaigns</h3><p>Activations and collaborations, stills and motion in one pass.</p></div>
+    </div>
+  </div>
+</section>
+
 <section id="contact">
   <div class="wrap">
-    <p class="kicker">Contact</p>
-    <h2>Let's talk</h2>
-    <p class="lede">Bookings, full-time roles, or just to say hello.</p>
+    <div class="sec-head">
+      <div>
+        <span class="kicker">Contact</span>
+        <h2>Let's work together</h2>
+      </div>
+      <p class="lede">Bookings, full-time roles, or just to say hello.</p>
+    </div>
 ${CONTACT_FORM}
   </div>
 </section>
+</main>
 ${FOOTER}

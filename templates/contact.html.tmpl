@@ -4,18 +4,34 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contact — ${NAME}</title>
-<meta name="description" content="Contact ${NAME}, food & beverage photographer and videographer.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍪</text></svg>">
+<meta name="description" content="Contact ${NAME}, food & beverage photographer and videographer in New York City and Puerto Rico.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Contact — ${NAME}">
+<meta property="og:description" content="Bookings, full-time roles, or just to say hello.">
+<meta property="og:image" content="${ROOT_PREFIX}assets/img/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f7f5f0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231B4DFF'/><text x='50' y='54' font-family='Georgia,serif' font-size='62' fill='%23fff' text-anchor='middle' dominant-baseline='middle'>A</text></svg>">
+<link rel="preload" as="font" type="font/woff2" href="${ROOT_PREFIX}assets/fonts/fraunces-latin.woff2" crossorigin>
+<link rel="stylesheet" href="${ROOT_PREFIX}assets/css/fonts.css">
 <link rel="stylesheet" href="${ROOT_PREFIX}assets/css/styles.css">
 </head>
 <body>
 ${NAV}
+<main>
 <section>
   <div class="wrap">
-    <p class="kicker">Contact</p>
-    <h2>Let's talk</h2>
-    <p class="lede">Bookings, full-time roles, or just to say hello. Prefer email? Write to <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>
+    <div class="sec-head">
+      <div>
+        <span class="kicker">Contact</span>
+        <h2>Let's work together</h2>
+      </div>
+      <p class="lede">Bookings, full-time roles, or just to say hello. Prefer email? Write to <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>
+    </div>
 ${CONTACT_FORM}
   </div>
 </section>
+</main>
 ${FOOTER}

@@ -67,3 +67,62 @@ document.querySelectorAll('form.contact').forEach(function (form) {
       });
   });
 });
+
+// Scroll reveal. Classes are added here (not in the HTML) so the page stays
+// fully visible if JS is off or fails. A scroll sweep backs up the observer:
+// a fast or jumped scroll can skip an element entirely, and a skipped element
+// would otherwise stay invisible forever.
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || !('IntersectionObserver' in window)) return;
+  var targets = Array.prototype.slice.call(document.querySelectorAll(
+    '.card, .feature, .hero-media, .about-grid > *, .service, .sec-head, form.contact'
+  ));
+  if (!targets.length) return;
+
+  function show(el) {
+    if (el.classList.contains('in')) return;
+    el.classList.add('in');
+    io.unobserve(el);
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (en) { if (en.isIntersecting) show(en.target); });
+  }, { rootMargin: '0px 0px -5% 0px', threshold: 0 });
+
+  targets.forEach(function (el, i) {
+    el.classList.add('reveal');
+    el.style.transitionDelay = (Math.min(i % 6, 5) * 45) + 'ms';
+    io.observe(el);
+  });
+
+  // Safety net: anything at or above the fold line gets shown on scroll,
+  // on load, and once more after a delay.
+  function sweep() {
+    var line = window.innerHeight * 0.98;
+    targets.forEach(function (el) {
+      if (el.classList.contains('in')) return;
+      var r = el.getBoundingClientRect();
+      if (r.top < line || r.bottom < 0) show(el);
+    });
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function () { sweep(); ticking = false; });
+  }, { passive: true });
+  window.addEventListener('resize', sweep);
+  window.addEventListener('load', sweep);
+  sweep();
+  window.setTimeout(sweep, 1200);
+  // Low-frequency backstop: keeps checking until everything has been shown, so
+  // a layout shift or a jump-scroll can never strand content at opacity 0.
+  var iv = window.setInterval(function () {
+    sweep();
+    if (document.querySelectorAll('.reveal:not(.in)').length === 0) {
+      window.clearInterval(iv);
+    }
+  }, 900);
+})();
+
