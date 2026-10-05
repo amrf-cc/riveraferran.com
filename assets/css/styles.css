@@ -2,8 +2,8 @@
    riveraferran.com — light editorial theme
    Ground: warm paper. Ink type. One bold accent.
    Accent swap: change --accent / --accent-press / --accent-wash.
-     cobalt  #1B4DFF / #0F35D6 / #EBEFFF   (current)
-     tomato  #E2401C / #C2300F / #FDECE7
+     tomato  #E2401C / #C2300F / #FDECE7   (current)
+     cobalt  #1B4DFF / #0F35D6 / #EBEFFF
    Type: Fraunces (display) + Inter (body), self-hosted in assets/fonts/.
    ========================================================================== */
 
@@ -16,9 +16,9 @@
   --line: #e5e1d8;
   --line-soft: #efece4;
 
-  --accent: #1b4dff;
-  --accent-press: #0f35d6;
-  --accent-wash: #ebefff;
+  --accent: #e2401c;
+  --accent-press: #c2300f;
+  --accent-wash: #fdece7;
   --on-accent: #ffffff;
 
   --font-display: "Fraunces", "Iowan Old Style", Georgia, "Times New Roman", serif;
@@ -28,9 +28,6 @@
   --wrap: 1240px;
   --gut: 28px;
   --radius: 14px;
-
-  /* Tall hero frame. Swapping the hero to a landscape shot? Set this to 3 / 2. */
-  --hero-aspect: 4 / 5;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -166,7 +163,7 @@ section + section { border-top: 1px solid var(--line-soft); }
 .hero h1 { margin-top: 18px; }
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.08fr 0.92fr;
+  grid-template-columns: 1fr 1.15fr;
   gap: 60px;
   align-items: start;
   margin-top: 48px;
@@ -178,9 +175,7 @@ section + section { border-top: 1px solid var(--line-soft); }
 .hero-media { margin: 0; }
 .hero-media img {
   width: 100%;
-  aspect-ratio: var(--hero-aspect);
-  object-fit: cover;
-  object-position: 50% 42%;
+  height: auto;
   border-radius: var(--radius);
   background: var(--line-soft);
 }

@@ -47,7 +47,7 @@ def lead_media(data):
     return None, ""
 
 
-def card_html(p, manifest, root_prefix, num):
+def card_html(p, manifest, root_prefix, num, show_number=True):
     data = manifest["projects"][p["slug"]]
     photos = data["photos"]
     videos = data["videos"]
@@ -60,17 +60,18 @@ def card_html(p, manifest, root_prefix, num):
     img = ('<div class="thumb"><img src="%s%s" alt="%s" loading="lazy"></div>'
            % (root_prefix, thumb, esc(alt))) if thumb else ""
     sub = esc(p["title"]) + ((" · " + esc(p["years"])) if p.get("years") else "")
+    num_line = ('          <span class="num">%02d</span>\n' % num) if show_number else ""
     return (
         '      <a class="card" href="%sgallery/%s.html">\n'
         '        %s\n'
         '        <div class="meta">\n'
-        '          <span class="num">%02d</span>\n'
+        '%s'
         '          <div class="client">%s</div>\n'
         '          <div class="sub">%s</div>\n'
         '          <span class="tag">%s</span>\n'
         '        </div>\n'
         '      </a>'
-        % (root_prefix, p["slug"], img, num, esc(p["client"]),
+        % (root_prefix, p["slug"], img, num_line, esc(p["client"]),
            sub, tag_text(photos, videos))
     )
 
@@ -161,11 +162,14 @@ def main():
     lead, rest = (featured[0], featured[1:]) if featured else (None, [])
     feature = feature_html(lead, manifest, "", numbers[lead["slug"]]) if lead else ""
     cards = "\n".join(card_html(p, manifest, "", numbers[p["slug"]]) for p in rest)
+    parts = config["name"].split(" ", 1)
+    name_html = esc(parts[0]) + "<br>" + esc(parts[1]) if len(parts) > 1 else esc(config["name"])
     page = render_page("index.html.tmpl", "", config, {
         "HERO_IMAGE": esc(config["hero_image"]),
         "HERO_CAPTION": esc(config["hero_caption"]),
         "META_DESCRIPTION": esc(config["title"] + " — " + config["based"]),
         "BIO_PARAGRAPHS": bio,
+        "NAME_HTML": name_html,
         "CTA": esc(config["cta"]),
         "FEATURE": feature,
         "FEATURED_CARDS": cards,
@@ -173,7 +177,7 @@ def main():
     (ROOT / "index.html").write_text(page)
 
     # gallery.html
-    all_cards = "\n".join(card_html(p, manifest, "", numbers[p["slug"]]) for p in projects)
+    all_cards = "\n".join(card_html(p, manifest, "", numbers[p["slug"]], show_number=False) for p in projects)
     page = render_page("gallery.html.tmpl", "", config, {"ALL_CARDS": all_cards},
                        page_key="gallery")
     (ROOT / "gallery.html").write_text(page)

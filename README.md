@@ -17,16 +17,17 @@ Light editorial theme: warm paper ground, ink type, one bold accent. Everything 
 driven by CSS custom properties at the top of `assets/css/styles.css`.
 
 - **Ground / type**: `--paper #F7F5F0`, `--ink #131210`, `--muted #6B6960`, hairlines `--line`.
-- **Accent**: `--accent #1B4DFF` (cobalt). To switch to tomato, change the three
-  accent values at the top of `styles.css` to `#E2401C` / `#C2300F` / `#FDECE7`.
+- **Accent**: `--accent #E2401C` (tomato). To switch to cobalt, change the three
+  accent values at the top of `styles.css` to `#1B4DFF` / `#0F35D6` / `#EBEFFF`.
 - **Fonts**: Fraunces (display) + Inter (body), self-hosted in `assets/fonts/` and
   declared in `assets/css/fonts.css`. No third-party font requests. To refresh them,
   run `python3 fetch_fonts.py`.
 - **Photos are shown at their native ratios** — cards and photo grids use CSS
   masonry (`columns`), not fixed aspect-ratio boxes, so portrait food shots are not
-  cropped. If you add a landscape hero image, set `--hero-aspect: 3 / 2`.
+  cropped. The hero photograph is now also shown uncropped at its natural ratio;
+  the `--hero-aspect` property no longer exists.
 - **Social share card**: `assets/img/og-cover.jpg` (1200×630), referenced by the
   `og:image` tags on every page. Regenerate by rendering the card at 1200×630 and
   saving over it.
-- **Favicon**: inline SVG cobalt monogram in each page `<head>`.
+- **Favicon**: inline SVG tomato monogram in each page `<head>`.
 
