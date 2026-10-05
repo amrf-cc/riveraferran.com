@@ -129,7 +129,8 @@ def main():
             size_mb = compress_video(video_src(v["src"]), ROOT / mp4)
             video_poster(video_src(v["src"]), ROOT / poster)
             entry["videos"].append({"title": v["title"], "mp4": mp4,
-                                    "poster": poster, "livid": v.get("livid", "")})
+                                    "poster": poster, "livid": v.get("livid", ""),
+                                    "ratio": v.get("ratio", "")})
             print("video  %s -> %s (%.1f MB)" % (v["src"], mp4, size_mb))
         manifest["projects"][slug] = entry
 

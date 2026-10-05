@@ -22,10 +22,10 @@
         {"src": "Lemon Berry Stack.jpg", "alt": "Lemon berry stack cookie"}
       ],
       "videos": [
-        {"title": "Product lineup", "src": "Videos/Food/chip-city-cookies-social-media-product-lineup-new-york-city-2024.mov", "livid": ""},
-        {"title": "Croissant & coffee", "src": "Videos/Food/chip-city-cookies-social-media-croissant-coffee-new-york-city-2025.mov", "livid": ""},
-        {"title": "Baklava cookie", "src": "Videos/Food/chip-city-cookies-social-media-baklava-new-york-city-2024.mov", "livid": ""},
-        {"title": "Strawberry drop", "src": "Videos/Food/chip-city-cookies-social-media-video-strawberry-new-york-city-2025.mov", "livid": ""}
+        {"title": "Product lineup", "src": "Videos/Food/chip-city-cookies-social-media-product-lineup-new-york-city-2024.mov", "livid": "https://livid.com/embed/taKj5uRgk18a", "ratio": "9 / 16"},
+        {"title": "Croissant & coffee", "src": "Videos/Food/chip-city-cookies-social-media-croissant-coffee-new-york-city-2025.mov", "livid": "https://livid.com/embed/hMafIYIca9Wa", "ratio": "9 / 16"},
+        {"title": "Baklava cookie", "src": "Videos/Food/chip-city-cookies-social-media-baklava-new-york-city-2024.mov", "livid": "https://livid.com/embed/YuiRmcAvW3kD", "ratio": "9 / 16"},
+        {"title": "Strawberry drop", "src": "Videos/Food/chip-city-cookies-social-media-video-strawberry-new-york-city-2025.mov", "livid": "https://livid.com/embed/piLmmru1u77l", "ratio": "9 / 16"}
       ]
     },
     {
@@ -51,9 +51,7 @@
         {"src": "massis-homemade-sandwiches-photographer-new-york-city-20255.jpg", "alt": "Massis homemade sandwich"},
         {"src": "massis-homemade-sandwiches-photographer-new-york-city-20259.jpg", "alt": "Massis homemade sandwich"}
       ],
-      "videos": [
-        {"title": "Massis — opening teaser", "src": "Videos/Food/Massis Opening V1.mov", "livid": ""}
-      ]
+      "videos": []
     },
     {
       "slug": "brasa-astoria",
@@ -93,7 +91,7 @@
         {"src": "sobao-cidrines-food-photographer-2021-6.jpg", "alt": "Sobao Cidrines baked good"}
       ],
       "videos": [
-        {"title": "Sobao Cidrines social", "src": "Videos/Food/sobao-cidrines-social-media-food-videographer-puerto-rico-2022.mp4", "livid": ""}
+        {"title": "Sobao Cidrines social", "src": "Videos/Food/sobao-cidrines-social-media-food-videographer-puerto-rico-2022.mp4", "livid": "https://livid.com/embed/gD-po8B9sea9", "ratio": "9 / 16"}
       ]
     },
     {
@@ -107,7 +105,7 @@
       "description": "Handheld, hungry, one-take energy — pizza social video for a Puerto Rico bodeguita.",
       "photos": [],
       "videos": [
-        {"title": "Bodeguita Manolo pizza", "src": "Videos/Food/bodeguita-manolo-food-videographer-pizza-puerto-rico-2022.mp4", "livid": ""}
+        {"title": "Bodeguita Manolo pizza", "src": "Videos/Food/bodeguita-manolo-food-videographer-pizza-puerto-rico-2022.mp4", "livid": "https://livid.com/embed/yfkNy7qrQL_5", "ratio": "16 / 9"}
       ]
     },
     {

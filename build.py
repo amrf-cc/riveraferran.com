@@ -71,8 +71,9 @@ def video_block_html(v, root_prefix):
         frame = ('<video controls preload="none" poster="%s%s" playsinline>'
                  '<source src="%s%s" type="video/mp4"></video>'
                  % (root_prefix, v["poster"], root_prefix, v["mp4"]))
-    return ('    <div class="video-block">\n      <div class="frame">%s</div>\n'
-            '      <p class="vtitle">%s</p>\n    </div>' % (frame, esc(v["title"])))
+    ratio = v.get("ratio") or "16 / 9"
+    return ('    <div class="video-block">\n      <div class="frame" style="aspect-ratio:%s">%s</div>\n'
+            '      <p class="vtitle">%s</p>\n    </div>' % (esc(ratio), frame, esc(v["title"])))
 
 
 def photo_button_html(ph, root_prefix):
