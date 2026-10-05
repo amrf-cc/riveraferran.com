@@ -28,17 +28,25 @@ def facts_line(p):
 
 def card_html(p, manifest, root_prefix):
     photos = manifest["projects"][p["slug"]]["photos"]
-    thumb = photos[0]["thumb"] if photos else None
     videos = manifest["projects"][p["slug"]]["videos"]
-    media = ""
-    if videos:
-        media = '<span class="badge">Photo + Video</span>'
-    elif thumb:
-        media = '<span class="badge">Photo</span>'
+    if photos:
+        thumb = photos[0]["thumb"]
+        alt = photos[0]["alt"]
+    elif videos:
+        thumb = videos[0]["poster"]
+        alt = videos[0]["title"]
     else:
+        thumb = None
+        alt = ""
+    media = ""
+    if photos and videos:
+        media = '<span class="badge">Photo + Video</span>'
+    elif videos:
         media = '<span class="badge">Video</span>'
+    else:
+        media = '<span class="badge">Photo</span>'
     img = ('<div class="thumb"><img src="%s%s" alt="%s" loading="lazy"></div>'
-           % (root_prefix, thumb, esc(photos[0]["alt"]))) if thumb else ""
+           % (root_prefix, thumb, esc(alt))) if thumb else ""
     return (
         '      <a class="card" href="%sgallery/%s.html">\n'
         '%s'
