@@ -64,9 +64,12 @@ class TestSiteGenerated(unittest.TestCase):
             self.assertTrue((ROOT / n).exists(), "missing %s" % n)
 
     def test_no_broken_local_links(self):
+        # 404.html uses root-absolute paths (allowed: GitHub Pages serves it
+        # only at the domain root), so its "/" links are not repo-relative.
+        skip = {"404.html"}
         broken = []
         for page in generated_pages():
-            if not page.exists():
+            if not page.exists() or page.name in skip:
                 continue
             for target in local_links(page):
                 if not target.exists():
