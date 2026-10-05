@@ -9,7 +9,11 @@
   "hero_image": "assets/img/acai-express/01.jpg",
   "hero_caption": "Açaí Express — model with an açaí bowl, Puerto Rico",
   "hero_cutout": "assets/img/masthead/front.webp",
-  "masthead_labels": ["Menu & product systems", "Social video", "Brand campaigns"],
+  "masthead_labels": [
+    "Menu & product systems",
+    "Social video",
+    "Brand campaigns"
+  ],
   "bio": [
     "I'm Adrian Rivera Ferran, a photographer and videographer based in New York City, from San Juan, Puerto Rico. I make food look like itself on its best day — menu shots, product launches, and social content for restaurants and food brands.",
     "Over the last eight years I've shot for Chip City Cookies, Massis Homemade Sandwiches, Brasa Astoria, Sobao Cidrines, Bodeguita Manolo, and Açaí Express, plus brand activations for McDonald's and Pepsi. Stills and motion, end to end — concept, capture, edit, delivery."

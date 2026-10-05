@@ -10,22 +10,72 @@
       "featured": true,
       "description": "Product launches, menu drops, and social content for NYC's cult cookie brand — crookies, thinwiches, and seasonal releases, including the Chip City × Eggo collaboration.",
       "photos": [
-        {"src": "BBC-Crookie-8.9-2.jpg", "alt": "Chip City BBC crookie"},
-        {"src": "Chip City x Eggo popping out of toaster.jpg", "alt": "Chip City x Eggo crookie popping out of a toaster"},
-        {"src": "CHURRO-7.2.25-8.jpg", "alt": "Chip City churro cookie"},
-        {"src": "Berry New Weekend-2.jpg", "alt": "Berry New Weekend cookie"},
-        {"src": "crookie-tiramisu-7.25-5.jpg", "alt": "Crookie tiramisu"},
-        {"src": "Red Velvet Cheesecake-6.24.25-5.jpg", "alt": "Red velvet cheesecake cookie"},
-        {"src": "Rainbow crookie tricolor.jpg", "alt": "Rainbow tricolor crookie"},
-        {"src": "Raspberry Ripple Cookie-2.jpg", "alt": "Raspberry ripple cookie"},
-        {"src": "PBHF Crookie 8.4-5.jpg", "alt": "PBHF crookie"},
-        {"src": "Lemon Berry Stack.jpg", "alt": "Lemon berry stack cookie"}
+        {
+          "src": "BBC-Crookie-8.9-2.jpg",
+          "alt": "Chip City BBC crookie"
+        },
+        {
+          "src": "Chip City x Eggo popping out of toaster.jpg",
+          "alt": "Chip City x Eggo crookie popping out of a toaster"
+        },
+        {
+          "src": "CHURRO-7.2.25-8.jpg",
+          "alt": "Chip City churro cookie"
+        },
+        {
+          "src": "Berry New Weekend-2.jpg",
+          "alt": "Berry New Weekend cookie"
+        },
+        {
+          "src": "crookie-tiramisu-7.25-5.jpg",
+          "alt": "Crookie tiramisu"
+        },
+        {
+          "src": "Red Velvet Cheesecake-6.24.25-5.jpg",
+          "alt": "Red velvet cheesecake cookie"
+        },
+        {
+          "src": "Rainbow crookie tricolor.jpg",
+          "alt": "Rainbow tricolor crookie"
+        },
+        {
+          "src": "Raspberry Ripple Cookie-2.jpg",
+          "alt": "Raspberry ripple cookie"
+        },
+        {
+          "src": "PBHF Crookie 8.4-5.jpg",
+          "alt": "PBHF crookie"
+        },
+        {
+          "src": "Lemon Berry Stack.jpg",
+          "alt": "Lemon berry stack cookie"
+        }
       ],
       "videos": [
-        {"title": "Product lineup", "src": "Videos/Food/chip-city-cookies-social-media-product-lineup-new-york-city-2024.mov", "livid": "https://livid.com/embed/taKj5uRgk18a", "ratio": "9 / 16"},
-        {"title": "Croissant & coffee", "src": "Videos/Food/chip-city-cookies-social-media-croissant-coffee-new-york-city-2025.mov", "livid": "https://livid.com/embed/hMafIYIca9Wa", "ratio": "9 / 16"},
-        {"title": "Baklava cookie", "src": "Videos/Food/chip-city-cookies-social-media-baklava-new-york-city-2024.mov", "livid": "https://livid.com/embed/YuiRmcAvW3kD", "ratio": "9 / 16"},
-        {"title": "Strawberry drop", "src": "Videos/Food/chip-city-cookies-social-media-video-strawberry-new-york-city-2025.mov", "livid": "https://livid.com/embed/piLmmru1u77l", "ratio": "9 / 16"}
+        {
+          "title": "Product lineup",
+          "src": "Videos/Food/chip-city-cookies-social-media-product-lineup-new-york-city-2024.mov",
+          "livid": "https://livid.com/embed/taKj5uRgk18a",
+          "ratio": "9 / 16"
+        },
+        {
+          "title": "Croissant & coffee",
+          "src": "Videos/Food/chip-city-cookies-social-media-croissant-coffee-new-york-city-2025.mov",
+          "livid": "https://livid.com/embed/hMafIYIca9Wa",
+          "ratio": "9 / 16"
+        },
+        {
+          "title": "Baklava cookie",
+          "src": "Videos/Food/chip-city-cookies-social-media-baklava-new-york-city-2024.mov",
+          "livid": "https://livid.com/embed/YuiRmcAvW3kD",
+          "ratio": "9 / 16"
+        },
+        {
+          "title": "Strawberry drop",
+          "src": "Videos/Food/chip-city-cookies-social-media-video-strawberry-new-york-city-2025.mov",
+          "livid": "https://livid.com/embed/piLmmru1u77l",
+          "ratio": "9 / 16"
+        }
       ]
     },
     {
@@ -38,18 +88,54 @@
       "featured": true,
       "description": "Full menu photography and the opening teaser for this Astoria sandwich shop — cubanos, Philly cheesesteaks, and dirty fries, shot tight and saucy.",
       "photos": [
-        {"src": "massis-homemade-sandwiches-photographer-new-york-city-20251.jpg", "alt": "Massis homemade sandwich"},
-        {"src": "CUBANO-OPEN.jpg", "alt": "Cubano sandwich, open"},
-        {"src": "CUBANO-CLOSEUP.jpg", "alt": "Cubano sandwich close-up"},
-        {"src": "PHILLY CHEESESTEAK COMBO.jpg", "alt": "Philly cheesesteak combo"},
-        {"src": "PHILLY CHEESESTEAK-OPEN.jpg", "alt": "Philly cheesesteak, open"},
-        {"src": "ITALIAN COMBO-CLOSED.jpg", "alt": "Italian combo sandwich"},
-        {"src": "EGGPLANT PARM-OPEN.jpg", "alt": "Eggplant parm sandwich, open"},
-        {"src": "VODKA CHICKEN PARM-OPEN.jpg", "alt": "Vodka chicken parm sandwich, open"},
-        {"src": "DIRTY FRIES-VODKA CHICKEN PARM-1.jpg", "alt": "Dirty fries with vodka chicken parm"},
-        {"src": "GRILLED CHICKEN AND BROCCOLI RABE-CLOSEUP-1.jpg", "alt": "Grilled chicken and broccoli rabe close-up"},
-        {"src": "massis-homemade-sandwiches-photographer-new-york-city-20255.jpg", "alt": "Massis homemade sandwich"},
-        {"src": "massis-homemade-sandwiches-photographer-new-york-city-20259.jpg", "alt": "Massis homemade sandwich"}
+        {
+          "src": "massis-homemade-sandwiches-photographer-new-york-city-20251.jpg",
+          "alt": "Massis homemade sandwich"
+        },
+        {
+          "src": "CUBANO-OPEN.jpg",
+          "alt": "Cubano sandwich, open"
+        },
+        {
+          "src": "CUBANO-CLOSEUP.jpg",
+          "alt": "Cubano sandwich close-up"
+        },
+        {
+          "src": "PHILLY CHEESESTEAK COMBO.jpg",
+          "alt": "Philly cheesesteak combo"
+        },
+        {
+          "src": "PHILLY CHEESESTEAK-OPEN.jpg",
+          "alt": "Philly cheesesteak, open"
+        },
+        {
+          "src": "ITALIAN COMBO-CLOSED.jpg",
+          "alt": "Italian combo sandwich"
+        },
+        {
+          "src": "EGGPLANT PARM-OPEN.jpg",
+          "alt": "Eggplant parm sandwich, open"
+        },
+        {
+          "src": "VODKA CHICKEN PARM-OPEN.jpg",
+          "alt": "Vodka chicken parm sandwich, open"
+        },
+        {
+          "src": "DIRTY FRIES-VODKA CHICKEN PARM-1.jpg",
+          "alt": "Dirty fries with vodka chicken parm"
+        },
+        {
+          "src": "GRILLED CHICKEN AND BROCCOLI RABE-CLOSEUP-1.jpg",
+          "alt": "Grilled chicken and broccoli rabe close-up"
+        },
+        {
+          "src": "massis-homemade-sandwiches-photographer-new-york-city-20255.jpg",
+          "alt": "Massis homemade sandwich"
+        },
+        {
+          "src": "massis-homemade-sandwiches-photographer-new-york-city-20259.jpg",
+          "alt": "Massis homemade sandwich"
+        }
       ],
       "videos": []
     },
@@ -63,13 +149,34 @@
       "featured": true,
       "description": "Moody, fire-lit food photography for a Peruvian rotisserie in Astoria.",
       "photos": [
-        {"src": "Brasa-Astoria-COMPRESSED-2.JPG", "alt": "Brasa Astoria dish"},
-        {"src": "Brasa-Astoria-COMPRESSED-3.JPG", "alt": "Brasa Astoria dish"},
-        {"src": "Brasa-Astoria-COMPRESSED-6.JPG", "alt": "Brasa Astoria dish"},
-        {"src": "Brasa-Astoria-COMPRESSED-7.JPG", "alt": "Brasa Astoria dish"},
-        {"src": "Brasa-Astoria-COMPRESSED-8.JPG", "alt": "Brasa Astoria dish"},
-        {"src": "Brasa-Astoria-COMPRESSED-9.JPG", "alt": "Brasa Astoria dish"},
-        {"src": "Brasa-Astoria-COMPRESSED-10.JPG", "alt": "Brasa Astoria dish"}
+        {
+          "src": "Brasa-Astoria-COMPRESSED-2.JPG",
+          "alt": "Brasa Astoria dish"
+        },
+        {
+          "src": "Brasa-Astoria-COMPRESSED-3.JPG",
+          "alt": "Brasa Astoria dish"
+        },
+        {
+          "src": "Brasa-Astoria-COMPRESSED-6.JPG",
+          "alt": "Brasa Astoria dish"
+        },
+        {
+          "src": "Brasa-Astoria-COMPRESSED-7.JPG",
+          "alt": "Brasa Astoria dish"
+        },
+        {
+          "src": "Brasa-Astoria-COMPRESSED-8.JPG",
+          "alt": "Brasa Astoria dish"
+        },
+        {
+          "src": "Brasa-Astoria-COMPRESSED-9.JPG",
+          "alt": "Brasa Astoria dish"
+        },
+        {
+          "src": "Brasa-Astoria-COMPRESSED-10.JPG",
+          "alt": "Brasa Astoria dish"
+        }
       ],
       "videos": []
     },
@@ -83,15 +190,38 @@
       "featured": true,
       "description": "Product photography and social video for a Puerto Rican sobao bakery.",
       "photos": [
-        {"src": "sobao-cidrines-food-photographer-2021-1.jpg", "alt": "Sobao Cidrines baked good"},
-        {"src": "sobao-cidrines-food-photographer-2021-2.jpg", "alt": "Sobao Cidrines baked good"},
-        {"src": "sobao-cidrines-food-photographer-2021-3.jpg", "alt": "Sobao Cidrines baked good"},
-        {"src": "sobao-cidrines-food-photographer-2021-4.jpg", "alt": "Sobao Cidrines baked good"},
-        {"src": "sobao-cidrines-food-photographer-2021-5.jpg", "alt": "Sobao Cidrines baked good"},
-        {"src": "sobao-cidrines-food-photographer-2021-6.jpg", "alt": "Sobao Cidrines baked good"}
+        {
+          "src": "sobao-cidrines-food-photographer-2021-1.jpg",
+          "alt": "Sobao Cidrines baked good"
+        },
+        {
+          "src": "sobao-cidrines-food-photographer-2021-2.jpg",
+          "alt": "Sobao Cidrines baked good"
+        },
+        {
+          "src": "sobao-cidrines-food-photographer-2021-3.jpg",
+          "alt": "Sobao Cidrines baked good"
+        },
+        {
+          "src": "sobao-cidrines-food-photographer-2021-4.jpg",
+          "alt": "Sobao Cidrines baked good"
+        },
+        {
+          "src": "sobao-cidrines-food-photographer-2021-5.jpg",
+          "alt": "Sobao Cidrines baked good"
+        },
+        {
+          "src": "sobao-cidrines-food-photographer-2021-6.jpg",
+          "alt": "Sobao Cidrines baked good"
+        }
       ],
       "videos": [
-        {"title": "Sobao Cidrines social", "src": "Videos/Food/sobao-cidrines-social-media-food-videographer-puerto-rico-2022.mp4", "livid": "https://livid.com/embed/gD-po8B9sea9", "ratio": "9 / 16"}
+        {
+          "title": "Sobao Cidrines social",
+          "src": "Videos/Food/sobao-cidrines-social-media-food-videographer-puerto-rico-2022.mp4",
+          "livid": "https://livid.com/embed/gD-po8B9sea9",
+          "ratio": "9 / 16"
+        }
       ]
     },
     {
@@ -105,7 +235,12 @@
       "description": "Handheld, hungry, one-take energy — pizza social video for a Puerto Rico bodeguita.",
       "photos": [],
       "videos": [
-        {"title": "Bodeguita Manolo pizza", "src": "Videos/Food/bodeguita-manolo-food-videographer-pizza-puerto-rico-2022.mp4", "livid": "https://livid.com/embed/yfkNy7qrQL_5", "ratio": "16 / 9"}
+        {
+          "title": "Bodeguita Manolo pizza",
+          "src": "Videos/Food/bodeguita-manolo-food-videographer-pizza-puerto-rico-2022.mp4",
+          "livid": "https://livid.com/embed/yfkNy7qrQL_5",
+          "ratio": "16 / 9"
+        }
       ]
     },
     {
@@ -118,11 +253,26 @@
       "featured": false,
       "description": "Bright, tropical product photography for an açaí brand in Puerto Rico.",
       "photos": [
-        {"src": "acai-express-food-photographer-puerto-rico-2019-1.jpg", "alt": "Açaí Express bowl"},
-        {"src": "acai-express-food-photographer-puerto-rico-2019-2.jpg", "alt": "Açaí Express bowl"},
-        {"src": "acai-express-food-photographer-puerto-rico-2019-3.jpg", "alt": "Açaí Express bowl"},
-        {"src": "acai-express-food-photographer-puerto-rico-2019-4.jpg", "alt": "Açaí Express bowl"},
-        {"src": "acai-express-food-photographer-puerto-rico-2019-5.jpg", "alt": "Açaí Express bowl"}
+        {
+          "src": "acai-express-food-photographer-puerto-rico-2019-1.jpg",
+          "alt": "Açaí Express bowl"
+        },
+        {
+          "src": "acai-express-food-photographer-puerto-rico-2019-2.jpg",
+          "alt": "Açaí Express bowl"
+        },
+        {
+          "src": "acai-express-food-photographer-puerto-rico-2019-3.jpg",
+          "alt": "Açaí Express bowl"
+        },
+        {
+          "src": "acai-express-food-photographer-puerto-rico-2019-4.jpg",
+          "alt": "Açaí Express bowl"
+        },
+        {
+          "src": "acai-express-food-photographer-puerto-rico-2019-5.jpg",
+          "alt": "Açaí Express bowl"
+        }
       ],
       "videos": []
     },
@@ -136,12 +286,30 @@
       "featured": false,
       "description": "Independent NYC food work — L'Industrie pizza, Bowl & Basket, and a chef collaboration with Mia Castro.",
       "photos": [
-        {"src": "lindustrie-pizza-photographer-new-york-city-2024.jpg", "alt": "L'Industrie pizza"},
-        {"src": "Bowl-basket-photographer-new-york-city-2024-1.jpg", "alt": "Bowl & Basket dish"},
-        {"src": "Bowl-basket-photographer-new-york-city-2024-2.jpg", "alt": "Bowl & Basket dish"},
-        {"src": "Bowl-basket-photographer-new-york-city-2024-3.jpg", "alt": "Bowl & Basket dish"},
-        {"src": "chef-mia-castro-food-photographer-new-york-city-2024-1.jpg", "alt": "Chef Mia Castro dish"},
-        {"src": "chef-mia-castro-food-photographer-new-york-city-2024-2.jpg", "alt": "Chef Mia Castro dish"}
+        {
+          "src": "lindustrie-pizza-photographer-new-york-city-2024.jpg",
+          "alt": "L'Industrie pizza"
+        },
+        {
+          "src": "Bowl-basket-photographer-new-york-city-2024-1.jpg",
+          "alt": "Bowl & Basket dish"
+        },
+        {
+          "src": "Bowl-basket-photographer-new-york-city-2024-2.jpg",
+          "alt": "Bowl & Basket dish"
+        },
+        {
+          "src": "Bowl-basket-photographer-new-york-city-2024-3.jpg",
+          "alt": "Bowl & Basket dish"
+        },
+        {
+          "src": "chef-mia-castro-food-photographer-new-york-city-2024-1.jpg",
+          "alt": "Chef Mia Castro dish"
+        },
+        {
+          "src": "chef-mia-castro-food-photographer-new-york-city-2024-2.jpg",
+          "alt": "Chef Mia Castro dish"
+        }
       ],
       "videos": []
     },
@@ -155,12 +323,30 @@
       "featured": false,
       "description": "Brand activation and event coverage in Puerto Rico for McDonald's and Pepsi.",
       "photos": [
-        {"src": "Mcdonalds-activation-photographer-puerto-rico-20191.jpg", "alt": "McDonald's activation, Puerto Rico"},
-        {"src": "Mcdonalds-activation-photographer-puerto-rico-20192.jpg", "alt": "McDonald's activation, Puerto Rico"},
-        {"src": "Mcdonalds-activation-photographer-puerto-rico-20193.jpg", "alt": "McDonald's activation, Puerto Rico"},
-        {"src": "pepsi-event-photographer-puerto-rico-2019-1.jpg", "alt": "Pepsi event, Puerto Rico"},
-        {"src": "pepsi-event-photographer-puerto-rico-2019-2.jpg", "alt": "Pepsi event, Puerto Rico"},
-        {"src": "pepsi-event-photographer-puerto-rico-2019-3.jpg", "alt": "Pepsi event, Puerto Rico"}
+        {
+          "src": "Mcdonalds-activation-photographer-puerto-rico-20191.jpg",
+          "alt": "McDonald's activation, Puerto Rico"
+        },
+        {
+          "src": "Mcdonalds-activation-photographer-puerto-rico-20192.jpg",
+          "alt": "McDonald's activation, Puerto Rico"
+        },
+        {
+          "src": "Mcdonalds-activation-photographer-puerto-rico-20193.jpg",
+          "alt": "McDonald's activation, Puerto Rico"
+        },
+        {
+          "src": "pepsi-event-photographer-puerto-rico-2019-1.jpg",
+          "alt": "Pepsi event, Puerto Rico"
+        },
+        {
+          "src": "pepsi-event-photographer-puerto-rico-2019-2.jpg",
+          "alt": "Pepsi event, Puerto Rico"
+        },
+        {
+          "src": "pepsi-event-photographer-puerto-rico-2019-3.jpg",
+          "alt": "Pepsi event, Puerto Rico"
+        }
       ],
       "videos": []
     }
