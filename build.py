@@ -164,12 +164,25 @@ def main():
     cards = "\n".join(card_html(p, manifest, "", numbers[p["slug"]]) for p in rest)
     parts = config["name"].split(" ", 1)
     name_html = esc(parts[0]) + "<br>" + esc(parts[1]) if len(parts) > 1 else esc(config["name"])
+    words = config["name"].split()
+    if len(words) > 1:
+        name_masthead = (" ".join('<span class="w">%s</span>' % esc(w) for w in words[:-1])
+                         + '<span class="last"> %s</span>' % esc(words[-1]))
+    else:
+        name_masthead = '<span class="w">%s</span>' % esc(config["name"])
     page = render_page("index.html.tmpl", "", config, {
         "HERO_IMAGE": esc(config["hero_image"]),
         "HERO_CAPTION": esc(config["hero_caption"]),
         "META_DESCRIPTION": esc(config["title"] + " — " + config["based"]),
         "BIO_PARAGRAPHS": bio,
         "NAME_HTML": name_html,
+        "NAME_MASTHEAD": name_masthead,
+        "HERO_CUTOUT": esc(config["hero_cutout"]),
+        "LABEL_TL": esc(config["title"]),
+        "LABEL_TR": esc(config["based"]),
+        "LABEL_B1": esc(config["masthead_labels"][0]),
+        "LABEL_B2": esc(config["masthead_labels"][1]),
+        "LABEL_B3": esc(config["masthead_labels"][2]),
         "CTA": esc(config["cta"]),
         "FEATURE": feature,
         "FEATURED_CARDS": cards,

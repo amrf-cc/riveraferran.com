@@ -76,7 +76,7 @@ document.querySelectorAll('form.contact').forEach(function (form) {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduce || !('IntersectionObserver' in window)) return;
   var targets = Array.prototype.slice.call(document.querySelectorAll(
-    '.card, .feature, .hero-media, .about-grid > *, .service, .sec-head, form.contact'
+    '.card, .feature, .about-grid > *, .service, .sec-head, form.contact'
   ));
   if (!targets.length) return;
 
@@ -124,5 +124,19 @@ document.querySelectorAll('form.contact').forEach(function (form) {
       window.clearInterval(iv);
     }
   }, 900);
+})();
+
+// Masthead: the nav rides over the photo, then turns solid past it.
+(function () {
+  var header = document.querySelector('header.site');
+  var mast = document.querySelector('.masthead');
+  if (!header || !mast) return;
+  function update() {
+    var past = window.scrollY > (mast.offsetHeight - 88);
+    header.classList.toggle('scrolled', past);
+  }
+  update();
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
 })();
 

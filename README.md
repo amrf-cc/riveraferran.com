@@ -24,8 +24,21 @@ driven by CSS custom properties at the top of `assets/css/styles.css`.
   run `python3 fetch_fonts.py`.
 - **Photos are shown at their native ratios** — cards and photo grids use CSS
   masonry (`columns`), not fixed aspect-ratio boxes, so portrait food shots are not
-  cropped. The hero photograph is now also shown uncropped at its natural ratio;
-  the `--hero-aspect` property no longer exists.
+  cropped.
+- **Masthead (homepage hero)** — a full-bleed photograph with the name passing
+  BEHIND its subject. Three layers: `assets/img/<project>/NN.jpg` as the back plate,
+  the giant name, then `assets/img/masthead/front.webp` — the subject cut out with
+  alpha — sitting ON TOP of the name (`z-index: 3`). The small labels sit above
+  everything (`z-index: 4`). Both image layers use the same `cover` geometry, so the
+  cut-out lands exactly over the subject in the back photo. To change the hero photo,
+  set `hero_image` and `hero_cutout` in `site-config.json`; the cut-out is generated
+  from the photo (ask Hermes — it uses macOS Vision, not a manual mask). The name is
+  a two-line lockup sized as `min(calc((min(1240px, 100vw) - 2 * var(--gut)) / 7.263),
+  240px)` — 7.263 is the measured width of "ADRIAN RIVERA" per 1px of font size, which
+  is what makes the line fill the measure exactly. Re-measure if the name changes.
+- **Nav over the photo** — the homepage body carries `has-masthead`; that makes the
+  nav fixed, transparent and white until you scroll past the masthead, where JS adds
+  `.scrolled` and it returns to the paper style. Other pages keep the light nav.
 - **Social share card**: `assets/img/og-cover.jpg` (1200×630), referenced by the
   `og:image` tags on every page. Regenerate by rendering the card at 1200×630 and
   saving over it.
