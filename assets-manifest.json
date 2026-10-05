@@ -1,0 +1,344 @@
+{
+  "generated": "2026-10-05T10:52:24",
+  "source_root": "/Volumes/personal_folder/Selected Works",
+  "projects": {
+    "chip-city": {
+      "photos": [
+        {
+          "full": "assets/img/chip-city/01.jpg",
+          "thumb": "assets/img/chip-city/thumbs/01.jpg",
+          "alt": "Chip City BBC crookie"
+        },
+        {
+          "full": "assets/img/chip-city/02.jpg",
+          "thumb": "assets/img/chip-city/thumbs/02.jpg",
+          "alt": "Chip City x Eggo crookie popping out of a toaster"
+        },
+        {
+          "full": "assets/img/chip-city/03.jpg",
+          "thumb": "assets/img/chip-city/thumbs/03.jpg",
+          "alt": "Chip City churro cookie"
+        },
+        {
+          "full": "assets/img/chip-city/04.jpg",
+          "thumb": "assets/img/chip-city/thumbs/04.jpg",
+          "alt": "Berry New Weekend cookie"
+        },
+        {
+          "full": "assets/img/chip-city/05.jpg",
+          "thumb": "assets/img/chip-city/thumbs/05.jpg",
+          "alt": "Crookie tiramisu"
+        },
+        {
+          "full": "assets/img/chip-city/06.jpg",
+          "thumb": "assets/img/chip-city/thumbs/06.jpg",
+          "alt": "Red velvet cheesecake cookie"
+        },
+        {
+          "full": "assets/img/chip-city/07.jpg",
+          "thumb": "assets/img/chip-city/thumbs/07.jpg",
+          "alt": "Rainbow tricolor crookie"
+        },
+        {
+          "full": "assets/img/chip-city/08.jpg",
+          "thumb": "assets/img/chip-city/thumbs/08.jpg",
+          "alt": "Raspberry ripple cookie"
+        },
+        {
+          "full": "assets/img/chip-city/09.jpg",
+          "thumb": "assets/img/chip-city/thumbs/09.jpg",
+          "alt": "PBHF crookie"
+        },
+        {
+          "full": "assets/img/chip-city/10.jpg",
+          "thumb": "assets/img/chip-city/thumbs/10.jpg",
+          "alt": "Lemon berry stack cookie"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Product lineup",
+          "mp4": "assets/video/chip-city-v01.mp4",
+          "poster": "assets/video/posters/chip-city-v01.jpg",
+          "livid": ""
+        },
+        {
+          "title": "Croissant & coffee",
+          "mp4": "assets/video/chip-city-v02.mp4",
+          "poster": "assets/video/posters/chip-city-v02.jpg",
+          "livid": ""
+        },
+        {
+          "title": "Baklava cookie",
+          "mp4": "assets/video/chip-city-v03.mp4",
+          "poster": "assets/video/posters/chip-city-v03.jpg",
+          "livid": ""
+        },
+        {
+          "title": "Strawberry drop",
+          "mp4": "assets/video/chip-city-v04.mp4",
+          "poster": "assets/video/posters/chip-city-v04.jpg",
+          "livid": ""
+        }
+      ]
+    },
+    "massis": {
+      "photos": [
+        {
+          "full": "assets/img/massis/01.jpg",
+          "thumb": "assets/img/massis/thumbs/01.jpg",
+          "alt": "Massis homemade sandwich"
+        },
+        {
+          "full": "assets/img/massis/02.jpg",
+          "thumb": "assets/img/massis/thumbs/02.jpg",
+          "alt": "Cubano sandwich, open"
+        },
+        {
+          "full": "assets/img/massis/03.jpg",
+          "thumb": "assets/img/massis/thumbs/03.jpg",
+          "alt": "Cubano sandwich close-up"
+        },
+        {
+          "full": "assets/img/massis/04.jpg",
+          "thumb": "assets/img/massis/thumbs/04.jpg",
+          "alt": "Philly cheesesteak combo"
+        },
+        {
+          "full": "assets/img/massis/05.jpg",
+          "thumb": "assets/img/massis/thumbs/05.jpg",
+          "alt": "Philly cheesesteak, open"
+        },
+        {
+          "full": "assets/img/massis/06.jpg",
+          "thumb": "assets/img/massis/thumbs/06.jpg",
+          "alt": "Italian combo sandwich"
+        },
+        {
+          "full": "assets/img/massis/07.jpg",
+          "thumb": "assets/img/massis/thumbs/07.jpg",
+          "alt": "Eggplant parm sandwich, open"
+        },
+        {
+          "full": "assets/img/massis/08.jpg",
+          "thumb": "assets/img/massis/thumbs/08.jpg",
+          "alt": "Vodka chicken parm sandwich, open"
+        },
+        {
+          "full": "assets/img/massis/09.jpg",
+          "thumb": "assets/img/massis/thumbs/09.jpg",
+          "alt": "Dirty fries with vodka chicken parm"
+        },
+        {
+          "full": "assets/img/massis/10.jpg",
+          "thumb": "assets/img/massis/thumbs/10.jpg",
+          "alt": "Grilled chicken and broccoli rabe close-up"
+        },
+        {
+          "full": "assets/img/massis/11.jpg",
+          "thumb": "assets/img/massis/thumbs/11.jpg",
+          "alt": "Massis homemade sandwich"
+        },
+        {
+          "full": "assets/img/massis/12.jpg",
+          "thumb": "assets/img/massis/thumbs/12.jpg",
+          "alt": "Massis homemade sandwich"
+        }
+      ],
+      "videos": []
+    },
+    "brasa-astoria": {
+      "photos": [
+        {
+          "full": "assets/img/brasa-astoria/01.jpg",
+          "thumb": "assets/img/brasa-astoria/thumbs/01.jpg",
+          "alt": "Brasa Astoria dish"
+        },
+        {
+          "full": "assets/img/brasa-astoria/02.jpg",
+          "thumb": "assets/img/brasa-astoria/thumbs/02.jpg",
+          "alt": "Brasa Astoria dish"
+        },
+        {
+          "full": "assets/img/brasa-astoria/03.jpg",
+          "thumb": "assets/img/brasa-astoria/thumbs/03.jpg",
+          "alt": "Brasa Astoria dish"
+        },
+        {
+          "full": "assets/img/brasa-astoria/04.jpg",
+          "thumb": "assets/img/brasa-astoria/thumbs/04.jpg",
+          "alt": "Brasa Astoria dish"
+        },
+        {
+          "full": "assets/img/brasa-astoria/05.jpg",
+          "thumb": "assets/img/brasa-astoria/thumbs/05.jpg",
+          "alt": "Brasa Astoria dish"
+        },
+        {
+          "full": "assets/img/brasa-astoria/06.jpg",
+          "thumb": "assets/img/brasa-astoria/thumbs/06.jpg",
+          "alt": "Brasa Astoria dish"
+        },
+        {
+          "full": "assets/img/brasa-astoria/07.jpg",
+          "thumb": "assets/img/brasa-astoria/thumbs/07.jpg",
+          "alt": "Brasa Astoria dish"
+        }
+      ],
+      "videos": []
+    },
+    "sobao-cidrines": {
+      "photos": [
+        {
+          "full": "assets/img/sobao-cidrines/01.jpg",
+          "thumb": "assets/img/sobao-cidrines/thumbs/01.jpg",
+          "alt": "Sobao Cidrines baked good"
+        },
+        {
+          "full": "assets/img/sobao-cidrines/02.jpg",
+          "thumb": "assets/img/sobao-cidrines/thumbs/02.jpg",
+          "alt": "Sobao Cidrines baked good"
+        },
+        {
+          "full": "assets/img/sobao-cidrines/03.jpg",
+          "thumb": "assets/img/sobao-cidrines/thumbs/03.jpg",
+          "alt": "Sobao Cidrines baked good"
+        },
+        {
+          "full": "assets/img/sobao-cidrines/04.jpg",
+          "thumb": "assets/img/sobao-cidrines/thumbs/04.jpg",
+          "alt": "Sobao Cidrines baked good"
+        },
+        {
+          "full": "assets/img/sobao-cidrines/05.jpg",
+          "thumb": "assets/img/sobao-cidrines/thumbs/05.jpg",
+          "alt": "Sobao Cidrines baked good"
+        },
+        {
+          "full": "assets/img/sobao-cidrines/06.jpg",
+          "thumb": "assets/img/sobao-cidrines/thumbs/06.jpg",
+          "alt": "Sobao Cidrines baked good"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Sobao Cidrines social",
+          "mp4": "assets/video/sobao-cidrines-v01.mp4",
+          "poster": "assets/video/posters/sobao-cidrines-v01.jpg",
+          "livid": ""
+        }
+      ]
+    },
+    "bodeguita-manolo": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Bodeguita Manolo pizza",
+          "mp4": "assets/video/bodeguita-manolo-v01.mp4",
+          "poster": "assets/video/posters/bodeguita-manolo-v01.jpg",
+          "livid": ""
+        }
+      ]
+    },
+    "acai-express": {
+      "photos": [
+        {
+          "full": "assets/img/acai-express/01.jpg",
+          "thumb": "assets/img/acai-express/thumbs/01.jpg",
+          "alt": "A\u00e7a\u00ed Express bowl"
+        },
+        {
+          "full": "assets/img/acai-express/02.jpg",
+          "thumb": "assets/img/acai-express/thumbs/02.jpg",
+          "alt": "A\u00e7a\u00ed Express bowl"
+        },
+        {
+          "full": "assets/img/acai-express/03.jpg",
+          "thumb": "assets/img/acai-express/thumbs/03.jpg",
+          "alt": "A\u00e7a\u00ed Express bowl"
+        },
+        {
+          "full": "assets/img/acai-express/04.jpg",
+          "thumb": "assets/img/acai-express/thumbs/04.jpg",
+          "alt": "A\u00e7a\u00ed Express bowl"
+        },
+        {
+          "full": "assets/img/acai-express/05.jpg",
+          "thumb": "assets/img/acai-express/thumbs/05.jpg",
+          "alt": "A\u00e7a\u00ed Express bowl"
+        }
+      ],
+      "videos": []
+    },
+    "nyc-food-stills": {
+      "photos": [
+        {
+          "full": "assets/img/nyc-food-stills/01.jpg",
+          "thumb": "assets/img/nyc-food-stills/thumbs/01.jpg",
+          "alt": "L'Industrie pizza"
+        },
+        {
+          "full": "assets/img/nyc-food-stills/02.jpg",
+          "thumb": "assets/img/nyc-food-stills/thumbs/02.jpg",
+          "alt": "Bowl & Basket dish"
+        },
+        {
+          "full": "assets/img/nyc-food-stills/03.jpg",
+          "thumb": "assets/img/nyc-food-stills/thumbs/03.jpg",
+          "alt": "Bowl & Basket dish"
+        },
+        {
+          "full": "assets/img/nyc-food-stills/04.jpg",
+          "thumb": "assets/img/nyc-food-stills/thumbs/04.jpg",
+          "alt": "Bowl & Basket dish"
+        },
+        {
+          "full": "assets/img/nyc-food-stills/05.jpg",
+          "thumb": "assets/img/nyc-food-stills/thumbs/05.jpg",
+          "alt": "Chef Mia Castro dish"
+        },
+        {
+          "full": "assets/img/nyc-food-stills/06.jpg",
+          "thumb": "assets/img/nyc-food-stills/thumbs/06.jpg",
+          "alt": "Chef Mia Castro dish"
+        }
+      ],
+      "videos": []
+    },
+    "brand-activations": {
+      "photos": [
+        {
+          "full": "assets/img/brand-activations/01.jpg",
+          "thumb": "assets/img/brand-activations/thumbs/01.jpg",
+          "alt": "McDonald's activation, Puerto Rico"
+        },
+        {
+          "full": "assets/img/brand-activations/02.jpg",
+          "thumb": "assets/img/brand-activations/thumbs/02.jpg",
+          "alt": "McDonald's activation, Puerto Rico"
+        },
+        {
+          "full": "assets/img/brand-activations/03.jpg",
+          "thumb": "assets/img/brand-activations/thumbs/03.jpg",
+          "alt": "McDonald's activation, Puerto Rico"
+        },
+        {
+          "full": "assets/img/brand-activations/04.jpg",
+          "thumb": "assets/img/brand-activations/thumbs/04.jpg",
+          "alt": "Pepsi event, Puerto Rico"
+        },
+        {
+          "full": "assets/img/brand-activations/05.jpg",
+          "thumb": "assets/img/brand-activations/thumbs/05.jpg",
+          "alt": "Pepsi event, Puerto Rico"
+        },
+        {
+          "full": "assets/img/brand-activations/06.jpg",
+          "thumb": "assets/img/brand-activations/thumbs/06.jpg",
+          "alt": "Pepsi event, Puerto Rico"
+        }
+      ],
+      "videos": []
+    }
+  }
+}
