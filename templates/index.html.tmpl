@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; frame-src https://livid.com; connect-src https://formspree.io; form-action 'self' https://formspree.io; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noai, noimageai">
+<title>${NAME} — ${TITLE}</title>
+<meta name="description" content="${META_DESCRIPTION}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="${OG_URL}">
+<meta property="og:title" content="${NAME} — ${TITLE}">
+<meta property="og:description" content="${META_DESCRIPTION}">
+<meta property="og:image" content="${OG_IMAGE}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="${OG_IMAGE}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f7f5f0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23E2401C'/><text x='50' y='54' font-family='Georgia,serif' font-size='62' fill='%23fff' text-anchor='middle' dominant-baseline='middle'>A</text></svg>">
+<link rel="preload" as="font" type="font/woff2" href="${ROOT_PREFIX}assets/fonts/fraunces-latin.woff2" crossorigin>
+<link rel="stylesheet" href="${ROOT_PREFIX}assets/css/fonts.css">
+<link rel="stylesheet" href="${ROOT_PREFIX}assets/css/styles.css">
+</head>
+<body class="has-masthead">
+${NAV}
+<main>
+<section class="masthead">
+  <picture>
+    <source media="(max-width: 720px)" srcset="${ROOT_PREFIX}${HERO_IMAGE_PHONE}">
+    <img class="layer back" src="${ROOT_PREFIX}${HERO_IMAGE}" alt="${HERO_CAPTION}" fetchpriority="high" decoding="async" draggable="false">
+  </picture>
+  <div class="layer scrim"></div>
+
+  <div class="stack">
+    <div class="labels top">
+      <span>${LABEL_TL}</span>
+      <span>${LABEL_TR}</span>
+    </div>
+
+    <h1 class="name">${NAME_MASTHEAD}</h1>
+${LABELS_BOTTOM}
+  </div>
+
+  <picture>
+    <source media="(max-width: 720px)" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+    <img class="layer front" src="${ROOT_PREFIX}${HERO_CUTOUT}" alt="" aria-hidden="true" decoding="async" draggable="false">
+  </picture>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="kicker">Selected work</span>
+        <h2>Recent projects</h2>
+      </div>
+    </div>
+${FEATURE}
+    <div class="grid grid-2">
+${FEATURED_CARDS}
+    </div>
+    <p style="margin-top:44px"><a class="link-arrow" href="${ROOT_PREFIX}gallery.html">See the full portfolio</a></p>
+  </div>
+</section>
+
+<section class="about" id="about">
+  <div class="wrap about-grid">
+    <div>
+      <span class="kicker">About</span>
+      <h2>Food first. Always.</h2>
+    </div>
+    <div class="body">
+${BIO_PARAGRAPHS}
+      <p class="cta">${CTA}</p>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>What I do</h2>
+      </div>
+    </div>
+    <div class="services">
+      <div class="service"><span class="num">01</span><h3>Food &amp; beverage photography</h3><p>Styled, shot, and retouched for delivery apps, web, and print.</p></div>
+      <div class="service"><span class="num">02</span><h3>Social content</h3><p>Reels, reveals, and launches, cut for the phone screen.</p></div>
+      <div class="service"><span class="num">03</span><h3>Menu &amp; product coverage</h3><p>Every dish in consistent light and framing. Sorted folders by product category, every file named for its dish, in web-ready and print-ready versions.</p></div>
+      <div class="service"><span class="num">04</span><h3>Brand campaigns</h3><p>Activations and collaborations, photo and video in one pass.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="kicker">Contact</span>
+        <h2>Let's work together</h2>
+      </div>
+      <p class="lede">Bookings, freelance projects, full-time conversations, or just to say hello.</p>
+    </div>
+${CONTACT_FORM}
+  </div>
+</section>
+</main>
+${FOOTER}

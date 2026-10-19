@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; frame-src https://livid.com; connect-src https://formspree.io; form-action 'self' https://formspree.io; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noai, noimageai">
+<title>Contact — ${NAME}</title>
+<meta name="description" content="Contact ${NAME}, food & beverage photographer and videographer in New York City.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="${OG_URL}">
+<meta property="og:title" content="Contact — ${NAME}">
+<meta property="og:description" content="Bookings, freelance projects, full-time conversations, or just to say hello.">
+<meta property="og:image" content="${OG_IMAGE}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="${OG_IMAGE}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#f7f5f0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23E2401C'/><text x='50' y='54' font-family='Georgia,serif' font-size='62' fill='%23fff' text-anchor='middle' dominant-baseline='middle'>A</text></svg>">
+<link rel="preload" as="font" type="font/woff2" href="${ROOT_PREFIX}assets/fonts/fraunces-latin.woff2" crossorigin>
+<link rel="stylesheet" href="${ROOT_PREFIX}assets/css/fonts.css">
+<link rel="stylesheet" href="${ROOT_PREFIX}assets/css/styles.css">
+</head>
+<body>
+${NAV}
+<main>
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="kicker">Contact</span>
+        <h2>Let's work together</h2>
+      </div>
+      <p class="lede">Bookings, freelance projects, full-time conversations, or just to say hello. Prefer email? Write to <a href="mailto:${EMAIL}">${EMAIL}</a>.</p>
+    </div>
+${CONTACT_FORM}
+  </div>
+</section>
+</main>
+${FOOTER}
