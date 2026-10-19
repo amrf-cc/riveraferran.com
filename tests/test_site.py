@@ -449,5 +449,246 @@ class TestParallax(unittest.TestCase):
             self.assertIn(marker, text)
 
 
+def ph_or_text(v):
+    """The escaped text a value renders as (placeholders lose their brackets)."""
+    return html.escape(v[1:-1].strip() if is_ph(v) else v)
+
+
+class TestReels(BuiltSite):
+    def setUp(self):
+        super().setUp()
+        self.text = read(ROOT / "reels.html")
+        self.media = load("media.json")
+
+    def test_format_filters_first_seen_order(self):
+        import build
+        seen = []
+        for r in self.media["reels"]:
+            key = build.slugify(r.get("format", ""))
+            if key not in seen:
+                seen.append(key)
+        filters = re.findall(r'<a class="filter[^"]*" href="#([^"]+)" data-filter="([^"]+)"', self.text)
+        self.assertEqual([f[1] for f in filters], ["all"] + seen)
+        self.assertIn('data-filter-scope=".reel-groups"', self.text)
+        groups = re.findall(r'<div class="reel-group" data-tags="([^"]+)">', self.text)
+        self.assertEqual(groups, seen)
+
+    def test_every_reel_and_motion_item_rendered(self):
+        for group in ("reels", "motion"):
+            for r in self.media.get(group, []):
+                if r.get("livid"):
+                    self.assertRegex(self.text, r'style="aspect-ratio:%s"><iframe src="%s"[^>]*loading="lazy"'
+                                     % (re.escape(r["ratio"]), re.escape(html.escape(r["livid"]))), r["slug"])
+                elif r.get("mp4"):
+                    m = re.search(r'style="aspect-ratio:%s"><button type="button" class="reel-play" '
+                                  r'data-src="%s\?v=[0-9a-f]{8}"' % (re.escape(r["ratio"]), re.escape(r["mp4"])),
+                                  self.text)
+                    self.assertTrue(m, r["slug"])
+                    if r.get("poster"):
+                        self.assertIn('data-poster="%s?v=' % r["poster"], self.text, r["slug"])
+                self.assertIn('<span class="rtitle">%s</span>' % ph_or_text(r["title"]), self.text, r["slug"])
+
+    def test_reel_labels_and_confirm_pills(self):
+        draft = is_draft_build()
+        for r in self.media["reels"]:
+            meta = " · ".join(html.escape(b) for b in (r.get("brand"), r.get("format"), r.get("year")) if b)
+            self.assertIn('<span class="rtitle">%s</span><span class="rmeta">%s</span>'
+                          % (html.escape(r["title"]), meta), self.text, r["slug"])
+            if r.get("confirm") and draft:
+                pill = '<span class="confirm-pill">Confirm: %s</span>' % ", ".join(r["confirm"])
+                card = re.search(r'<span class="rtitle">%s</span>.*?</figcaption>' % re.escape(html.escape(r["title"])),
+                                 self.text).group(0)
+                self.assertIn(pill, card, r["slug"])
+
+    def test_motion_section(self):
+        motion = self.text[self.text.index('id="motion"'):]
+        for m in self.media["motion"]:
+            if m.get("role"):
+                self.assertIn('<span class="role-chip">%s</span>' % ph_or_text(m["role"]), motion, m["slug"])
+            if is_ph(m.get("client")) and is_draft_build():
+                self.assertIn('<span class="ph-chip" title="To add">%s</span>' % ph_or_text(m["client"]), motion)
+        ratios = set(re.findall(r'style="aspect-ratio:([^"]+)"', motion))
+        self.assertEqual(ratios, {m["ratio"] for m in self.media["motion"]})
+
+    def test_anatomy_after_grid(self):
+        note = self.media.get("reel_formats_note")
+        if not note:
+            self.skipTest("no reel_formats_note")
+        i = self.text.index("Anatomy of a reel</p>")
+        self.assertGreater(i, self.text.rindex('class="reel-group"'))
+        self.assertLess(i, self.text.index('id="motion"'))
+        self.assertIn(ph_or_text(note), self.text)
+
+    def test_reel_js_reused(self):
+        js = read(ROOT / "assets/js/main.js")
+        self.assertIn("data-filter-scope", js)
+        self.assertEqual(js.count("button.reel-play"), 1, "reel playback JS duplicated")
+        self.assertIn("pauseOthers", js)
+
+
+class TestAI(BuiltSite):
+    def setUp(self):
+        super().setUp()
+        import build
+        self.build = build
+        self.text = read(ROOT / "ai.html")
+        self.projects = {p["slug"]: p for p in visible_projects()}
+        self.media = load("media.json")
+
+    def test_feature_block(self):
+        p = self.projects.get(self.build.AI_FEATURE)
+        if not p:
+            self.skipTest("feature project not visible")
+        feature = re.search(r'<section class="ai-feature">(.*?)</section>', self.text, re.S).group(1)
+        self.assertIn('href="work/%s.html"' % p["slug"], feature)
+        self.assertIn(ph_or_text(p["title"]), feature)
+        for d in p.get("did", []):
+            self.assertIn("<li>%s</li>" % ph_or_text(d), feature)
+        if p.get("demo"):
+            self.assertIn(ph_or_text(p["demo"]), feature)
+
+    def test_process_strip(self):
+        steps = re.findall(r'<li><span class="step-num">(\d\d)</span><span class="step-label">([^<]+)</span></li>',
+                           self.text)
+        self.assertEqual([s[0] for s in steps], ["%02d" % (i + 1) for i in range(len(self.media["ai_process"]))])
+        self.assertEqual([s[1] for s in steps], [html.escape(s) for s in self.media["ai_process"]])
+
+    def test_ran_live(self):
+        live = re.search(r'<section class="ai-live" id="ran-live">(.*?)</section>', self.text, re.S).group(1)
+        draft = is_draft_build()
+        for slug in self.build.AI_LIVE:
+            p = self.projects.get(slug)
+            if not p:
+                continue
+            card = re.search(r'<article class="card live-card"[^>]*>\s*<a class="thumb[^"]*" href="work/%s\.html".*?</article>'
+                             % re.escape(slug), live, re.S)
+            self.assertTrue(card, slug)
+            card = card.group(0)
+            if p.get("ai_steps"):
+                self.assertIn(ph_or_text(p["ai_steps"]), card)
+            elif draft:
+                self.assertIn('<div class="ph-box"><span class="ph-label">To add</span><p>%s AI-assisted pieces: '
+                              'real shot → AI step → final</p></div>' % html.escape(p["client"]), card)
+
+    def test_tools_line_and_label(self):
+        config = load("site-config.json")
+        self.assertIn(html.escape(self.media["ai_tools_line"]), self.text)
+        self.assertIn('Every AI-assisted piece on this site is marked <span class="ai-badge">%s</span>.'
+                      % html.escape(config["ai_label"]), self.text)
+
+
+class TestPaidSocial(BuiltSite):
+    def test_sections_and_size_placeholders(self):
+        text = read(ROOT / "paid-social.html")
+        ps = load("media.json").get("paid_social", {})
+        for key, anchor, heading in (("video_ads", "video-ads", "Video ads"), ("static_ads", "static-ads", "Static ads")):
+            sec = re.search(r'<section class="paid-section" id="%s">(.*?)</section>' % anchor, text, re.S)
+            self.assertTrue(sec, anchor)
+            sec = sec.group(1)
+            self.assertIn("<h2>%s</h2>" % heading, sec)
+            if not ps.get(key) and is_draft_build():
+                self.assertIn("9:16, 4:5, 1:1", sec)
+                self.assertIn('class="ph-box"', sec)
+            for item in ps.get(key) or []:
+                src = item.get("mp4") or item.get("image") or item.get("livid")
+                self.assertIn(html.escape(src), sec)
+                self.assertIn('aspect-ratio:%s' % item.get("ratio", ""), sec)
+
+    def test_intro(self):
+        intro = load("site-config.json")["page_intros"].get("paid")
+        if intro:
+            self.assertIn(ph_or_text(intro), read(ROOT / "paid-social.html"))
+
+
+class TestAbout(BuiltSite):
+    def setUp(self):
+        super().setUp()
+        self.text = read(ROOT / "about.html")
+        self.config = load("site-config.json")
+        self.media = load("media.json")
+
+    def test_bio_and_intro(self):
+        for b in self.config["bio"]:
+            self.assertIn(ph_or_text(b), self.text)
+        self.assertIn(ph_or_text(self.config["page_intros"]["about"]), self.text)
+
+    def test_experience(self):
+        items = re.findall(r'<li><span class="x-role">(.*?)</li>', self.text)
+        self.assertEqual(len(items), len(self.config["experience"]))
+        for li, e in zip(items, self.config["experience"]):
+            self.assertTrue(li.startswith(ph_or_text(e["role"])), li)
+            self.assertEqual('class="x-org"' in li, bool(e.get("org")), li)
+            if e.get("org"):
+                self.assertIn("— %s" % ph_or_text(e["org"]), li)
+            for k in ("years", "place"):
+                if e.get(k):
+                    self.assertIn(ph_or_text(e[k]), li)
+
+    def test_credits_table(self):
+        table = re.search(r'<table class="credits">(.*?)</table>(.*?)</div>\s*</div>', self.text, re.S)
+        self.assertTrue(table)
+        rows = re.findall(r"<tr><td>(.*?)</td><td>(.*?)</td><td>(.*?)</td><td>(.*?)</td></tr>", table.group(1))
+        self.assertEqual(len(rows), len(self.media["credits"]))
+        for row, cr in zip(rows, self.media["credits"]):
+            self.assertEqual(row[0], ph_or_text(cr["artist"]))
+            self.assertEqual(row[1], ph_or_text(cr["work"]))
+        pill = "confirm-pill" in table.group(2)
+        self.assertEqual(pill, bool(self.media.get("credits_confirm")) and is_draft_build())
+
+    def test_lists_and_links(self):
+        for t in self.config["tools"]:
+            self.assertIn("<li>%s</li>" % html.escape(t), self.text)
+        self.assertIn(html.escape(self.config["education"]), self.text)
+        for c in self.config["certifications"]:
+            self.assertIn(html.escape(c), self.text)
+        self.assertIn(html.escape(self.config["languages"]), self.text)
+        for sp in self.config["side_projects"]:
+            self.assertIn('<a href="%s" rel="noopener">%s</a>' % (html.escape(sp["href"]), html.escape(sp["label"])),
+                          self.text)
+
+    def test_resume_section(self):
+        sec = re.search(r'id="resume">(.*?)</div>\s*</div>', self.text, re.S).group(1)
+        if self.config.get("resume_pdf"):
+            self.assertIn('href="%s" download' % html.escape(self.config["resume_pdf"]), sec)
+        elif is_draft_build():
+            self.assertIn("Résumé PDF: brand version pending", sec)
+
+
+class TestLegalContact404(BuiltSite):
+    def test_legal_is_domain_agnostic(self):
+        email = load("site-config.json")["email"]
+        for name in ("privacy.html", "terms.html"):
+            body = read(ROOT / name)
+            body = body[body.index('<article class="wrap legal">'):body.index("</article>")]
+            self.assertNotIn("riveraferran.com", body.replace(email, ""), name)
+            self.assertNotIn("GitHub", body, name)
+            self.assertIn('href="mailto:%s"' % email, body, name)
+        privacy = read(ROOT / "privacy.html")
+        for processor in ("Formspree", "Livid", "the hosting provider"):
+            self.assertIn(processor, privacy.lower() if processor.islower() else privacy, processor)
+
+    def test_contact_subject(self):
+        name = load("site-config.json")["name"]
+        text = read(ROOT / "contact.html")
+        self.assertIn('<input type="hidden" name="_subject" value="Portfolio inquiry — %s">' % html.escape(name), text)
+        self.assertNotIn('value="Portfolio inquiry — riveraferran.com"', text)
+
+    def test_case_cta_label(self):
+        for page in (ROOT / "work").glob("*.html"):
+            text = read(page)
+            self.assertNotIn("Start a project", text, page.name)
+            self.assertIn('href="../contact.html">Get in touch</a>', text, page.name)
+
+    def test_404(self):
+        text = read(ROOT / "404.html")
+        self.assertIn('http-equiv="Content-Security-Policy"', text)
+        self.assertIn("frame-src https://livid.com", text)
+        self.assertIn(html.escape(load("site-config.json")["name"]), text)
+        for href in ("/", "/work.html", "/contact.html"):
+            self.assertIn('href="%s"' % href, text)
+        for page in ("work.html", "reels.html", "contact.html"):
+            self.assertTrue((ROOT / page).exists())
+
+
 if __name__ == "__main__":
     unittest.main()

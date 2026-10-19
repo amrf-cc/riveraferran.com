@@ -10,14 +10,18 @@
   }
 })();
 
-// Work filters: pills are plain #tag links, so without JS every card stays
-// visible. With JS the hash (#ai, #product ...) selects the cards to show,
-// which also makes work.html#ai links from other pages land pre-filtered.
+// Filters (Work by capability, Reels by format): pills are plain #tag links,
+// so without JS every item stays visible. With JS the hash (#ai, #product ...)
+// selects the items to show, which also makes work.html#ai links from other
+// pages land pre-filtered. data-filter-scope names the container whose
+// [data-tags] children are filtered (default: the Work grid).
 (function () {
   var bar = document.querySelector('[data-filter-group]');
   if (!bar) return;
+  var scope = document.querySelector(bar.getAttribute('data-filter-scope') || '.work-grid');
+  if (!scope) return;
   var links = Array.prototype.slice.call(bar.querySelectorAll('a[data-filter]'));
-  var items = Array.prototype.slice.call(document.querySelectorAll('.work-grid [data-tags]'));
+  var items = Array.prototype.slice.call(scope.querySelectorAll('[data-tags]'));
   var empty = document.querySelector('.filter-empty');
   var known = links.map(function (a) { return a.getAttribute('data-filter'); });
   function apply() {
@@ -29,6 +33,8 @@
       var on = tag === 'all' || tags.indexOf(tag) !== -1;
       el.hidden = !on;
       if (on) shown++;
+      // A reel filtered out of view stops playing.
+      if (!on) Array.prototype.forEach.call(el.querySelectorAll('video'), function (v) { v.pause(); });
     });
     links.forEach(function (a) {
       var on = a.getAttribute('data-filter') === tag;

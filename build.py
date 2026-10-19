@@ -32,6 +32,13 @@ NAV_ITEMS = (
     ("contact", "Contact", "contact.html"),
 )
 
+# AI & Workflow page: the feature project and the "Ran live" projects, by slug.
+AI_FEATURE = "ai-production-assistant"
+AI_LIVE = ("rodowita-water", "chip-city")
+
+# Ad placement sizes the Paid Social page asks for while a list is empty.
+AD_SIZES = "9:16, 4:5, 1:1"
+
 
 # ---------------------------------------------------------------------------
 # Loading
@@ -55,6 +62,19 @@ def tmpl(name):
 
 def esc(s):
     return html.escape(str(s), quote=True)
+
+
+def slugify(s):
+    """'Product reveal' -> 'product-reveal' (filter keys for the Reels page)."""
+    out, dash = [], False
+    for ch in plain(s).lower():
+        if ch.isalnum():
+            out.append(ch)
+            dash = False
+        elif not dash and out:
+            out.append("-")
+            dash = True
+    return "".join(out).strip("-") or "other"
 
 
 # ---------------------------------------------------------------------------
@@ -293,7 +313,7 @@ class Site(object):
         return ('<a class="%s" href="%s" tabindex="-1" aria-hidden="true">%s%s</a>'
                 % (cls, href, inner, self.ribbon(p)))
 
-    def card_html(self, p, rp, use_full=False):
+    def card_html(self, p, rp, use_full=False, extra="", cls="card"):
         href = "%swork/%s.html" % (rp, p["slug"])
         lines = ['          <p class="kicker">%s</p>' % self.txt(p.get("client")),
                  '          <h3><a href="%s">%s</a></h3>' % (href, self.txt(p.get("title")))]
@@ -307,10 +327,12 @@ class Site(object):
         confirm = self.confirm_pill(p.get("confirm"))
         if confirm:
             lines.append("          " + confirm)
+        if extra:
+            lines.append("          " + extra)
         lines.append('          <p class="more"><a class="link-arrow" href="%s">View project</a></p>' % href)
-        return ('      <article class="card" data-tags="%s">\n        %s\n        <div class="meta">\n'
+        return ('      <article class="%s" data-tags="%s">\n        %s\n        <div class="meta">\n'
                 '%s\n        </div>\n      </article>'
-                % (esc(" ".join(p.get("tags", []))), self.cover_html(p, rp, use_full), "\n".join(lines)))
+                % (cls, esc(" ".join(p.get("tags", []))), self.cover_html(p, rp, use_full), "\n".join(lines)))
 
     def feature_html(self, p, rp):
         href = "%swork/%s.html" % (rp, p["slug"])
@@ -331,7 +353,7 @@ class Site(object):
                 '%s\n      </div>\n    </article>'
                 % (esc(" ".join(p.get("tags", []))), self.cover_html(p, rp, True), "\n".join(lines)))
 
-    def reel_card_html(self, r, rp, meta_bits=None):
+    def reel_card_html(self, r, rp, meta_bits=None, extra=""):
         """Ratio-true player card: a lazy Livid iframe, or the poster with a
         play button that main.js swaps for a <video>."""
         ratio = r.get("ratio") or "9 / 16"
@@ -352,12 +374,13 @@ class Site(object):
         if meta_bits is None:
             meta_bits = [r.get("brand"), r.get("format"), r.get("year")]
         meta = " · ".join(self.txt(b) for b in meta_bits if b)
-        return ('      <figure class="reel-card" data-format="%s">\n'
+        fmt = plain(r.get("format", ""))
+        return ('      <figure class="reel-card"%s>\n'
                 '        <div class="frame" style="aspect-ratio:%s">%s</div>\n'
-                '        <figcaption><span class="rtitle">%s</span>%s%s</figcaption>\n'
+                '        <figcaption><span class="rtitle">%s</span>%s%s%s</figcaption>\n'
                 '      </figure>'
-                % (esc(plain(r.get("format", ""))), esc(ratio), frame, self.txt(r.get("title")),
-                   ('<span class="rmeta">%s</span>' % meta) if meta else "",
+                % ((' data-format="%s"' % esc(fmt)) if fmt else "", esc(ratio), frame, self.txt(r.get("title")),
+                   ('<span class="rmeta">%s</span>' % meta) if meta else "", extra,
                    self.confirm_pill(r.get("confirm"))))
 
     # -- shared chrome ------------------------------------------------------
@@ -423,7 +446,8 @@ class Site(object):
         return tmpl("contact_form.html.tmpl").safe_substitute(
             ROOT_PREFIX=rp,
             FORMSPREE_ENDPOINT=esc(self.config.get("formspree_endpoint", "")),
-            EMAIL=esc(self.config.get("email", "")))
+            EMAIL=esc(self.config.get("email", "")),
+            SUBJECT=esc("Portfolio inquiry — %s" % self.config.get("name", "")))
 
     def page_intro(self, key):
         v = (self.config.get("page_intros") or {}).get(key, "")
@@ -608,28 +632,235 @@ class Site(object):
                   "%s — %s" % (plain(p.get("client", "")), self.config.get("name", "")),
                   desc, "project", og_type="article", after_main=after)
 
-    def build_stub(self, out, page_key, heading, intro_key, extra=""):
-        """Phase-1 stub page: header + intro only."""
-        main = tmpl("stub.main.tmpl").safe_substitute(
-            KICKER=esc(heading), HEADING=esc(heading),
-            INTRO=self.page_intro(intro_key), EXTRA=extra)
-        intro = (self.config.get("page_intros") or {}).get(intro_key, "")
-        self.page(out, main, "%s — %s" % (heading, self.config.get("name", "")),
-                  plain(intro) or heading, page_key)
+    def intro_desc(self, key, fallback):
+        intro = (self.config.get("page_intros") or {}).get(key, "")
+        return plain(intro) or fallback
 
-    def build_stubs(self):
-        self.build_stub("reels.html", "reels", "Reels", "reels")
-        self.build_stub("ai.html", "ai", "AI & Workflow", "ai")
-        self.build_stub("paid-social.html", "paid", "Paid Social", "paid")
-        resume = self.config.get("resume_pdf") or ""
+    def project(self, slug):
+        """A visible project by slug (None when hidden, missing or draft-only
+        in a release)."""
+        for p in self.visible:
+            if p.get("slug") == slug:
+                return p
+        return None
+
+    def build_reels(self):
+        reels = self.media.get("reels", [])
+        order, groups = [], {}
+        for r in reels:
+            key = slugify(r.get("format", ""))
+            if key not in groups:
+                order.append(key)
+                groups[key] = (r.get("format", ""), [])
+            groups[key][1].append(r)
+        filters = ['      <a class="filter active" href="#all" data-filter="all" aria-pressed="true">All</a>']
+        blocks = []
+        for key in order:
+            label, items = groups[key]
+            filters.append('      <a class="filter" href="#%s" data-filter="%s" aria-pressed="false">%s</a>'
+                           % (esc(key), esc(key), self.txt(label)))
+            cards = [c for c in (self.reel_card_html(r, "") for r in items) if c]
+            if not cards:
+                continue
+            blocks.append('      <div class="reel-group" data-tags="%s">\n'
+                          '        <h2 class="reel-group-title">%s <span class="count">%d</span></h2>\n'
+                          '        <div class="reel-grid">\n%s\n        </div>\n      </div>'
+                          % (esc(key), self.txt(label), len(cards), "\n".join(cards)))
+        note = self.media.get("reel_formats_note")
+        if note:
+            anatomy = ('    <div class="reel-anatomy">\n      <p class="kicker">Anatomy of a reel</p>\n'
+                       '      %s\n    </div>' % (self.box(note) if is_ph(note)
+                                                  else '<p class="desc">%s</p>' % esc(note)))
+        else:
+            anatomy = ""
+        motion = []
+        for m in self.media.get("motion", []):
+            role = ('<span class="role-chip">%s</span>' % self.txt(m["role"])) if m.get("role") else ""
+            card = self.reel_card_html(m, "", meta_bits=[m.get("client"), m.get("year")], extra=role)
+            if card:
+                motion.append(card)
+        motion_html = ""
+        if motion:
+            motion_html = ('<section class="motion" id="motion">\n  <div class="wrap">\n'
+                           '    <div class="sec-head">\n      <div>\n        <h2>Motion</h2>\n'
+                           '      </div>\n    </div>\n    <div class="motion-grid">\n%s\n    </div>\n'
+                           '  </div>\n</section>' % "\n".join(motion))
+        main = tmpl("reels.main.tmpl").safe_substitute(
+            INTRO=self.page_intro("reels"), FILTERS="\n".join(filters),
+            GROUPS="\n".join(blocks), ANATOMY=anatomy, MOTION=motion_html)
+        self.page("reels.html", main, "Reels — %s" % self.config.get("name", ""),
+                  self.intro_desc("reels", "Reels"), "reels")
+
+    def ai_feature_html(self):
+        p = self.project(AI_FEATURE)
+        if not p:
+            return ""
+        href = "work/%s.html" % p["slug"]
+        copy = ['        <p class="kicker">%s</p>' % self.txt(p.get("client")),
+                '        <h2><a href="%s">%s</a></h2>%s' % (href, self.txt(p.get("title")), self.ribbon(p))]
+        if p.get("oneliner"):
+            copy.append("        " + self.para(p["oneliner"], "desc"))
+        if p.get("did"):
+            copy.append('        <ul class="did">%s</ul>' % "".join(
+                "<li>%s</li>" % self.txt(d) for d in p["did"]))
+        confirm = self.confirm_pill(p.get("confirm"))
+        if confirm:
+            copy.append("        " + confirm)
+        copy.append('        <p class="more"><a class="link-arrow" href="%s">View project</a></p>' % href)
+        media = [b for b in (video_block_html(v, "") for v in
+                             self.manifest.get(p["slug"], {}).get("videos", [])) if b]
+        if p.get("demo"):
+            media.append("      " + (self.box(p["demo"]) if is_ph(p["demo"])
+                                     else '<p class="desc">%s</p>' % esc(p["demo"])))
+        return ('<section class="ai-feature">\n  <div class="wrap">\n    <article class="ai-feature-card">\n'
+                '      <div class="ai-feature-copy">\n%s\n      </div>\n'
+                '      <div class="ai-feature-media">\n%s\n      </div>\n'
+                '    </article>\n  </div>\n</section>' % ("\n".join(copy), "\n".join(media)))
+
+    def build_ai(self):
+        c = self.config
+        label = c.get("ai_label") or ""
+        badge = ('<span class="ai-badge">%s</span>' % self.txt(label)) if label else ""
+        steps = "\n".join(
+            '      <li><span class="step-num">%02d</span><span class="step-label">%s</span></li>'
+            % (i + 1, self.txt(step)) for i, step in enumerate(self.media.get("ai_process", [])))
+        process = ""
+        if steps:
+            process = ('<section class="ai-process" id="process">\n  <div class="wrap">\n'
+                       '    <div class="sec-head">\n      <div>\n        <h2>Process</h2>\n      </div>\n    </div>\n'
+                       '    <ol class="process">\n%s\n    </ol>\n  </div>\n</section>' % steps)
+        live = []
+        for slug in AI_LIVE:
+            p = self.project(slug)
+            if not p:
+                continue
+            v = p.get("ai_steps")
+            if v:
+                steps_html = self.box(v) if is_ph(v) else '<p class="ai-steps">%s</p>' % esc(v)
+            else:
+                steps_html = self.gen_box(
+                    "ai.html#ran-live → %s.ai_steps" % slug,
+                    "[%s AI-assisted pieces: real shot → AI step → final]" % plain(p.get("client", slug)))
+            live.append(self.card_html(p, "", use_full=True, extra=badge + steps_html,
+                                       cls="card live-card"))
+        live_html = ""
+        if live:
+            live_html = ('<section class="ai-live" id="ran-live">\n  <div class="wrap">\n'
+                         '    <div class="sec-head">\n      <div>\n        <h2>Ran live</h2>\n      </div>\n    </div>\n'
+                         '    <div class="live-grid">\n%s\n    </div>\n  </div>\n</section>' % "\n".join(live))
+        tools = []
+        if self.media.get("ai_tools_line"):
+            tools.append("    " + self.para(self.media["ai_tools_line"], "lede"))
+        if label:
+            tools.append('    <p class="ai-mark">Every AI-assisted piece on this site is marked %s.</p>' % badge)
+        tools_html = ('<section class="ai-tools">\n  <div class="wrap">\n%s\n  </div>\n</section>'
+                      % "\n".join(tools)) if tools else ""
+        main = tmpl("ai.main.tmpl").safe_substitute(
+            INTRO=self.page_intro("ai"), FEATURE=self.ai_feature_html(), PROCESS=process,
+            LIVE=live_html, TOOLS=tools_html)
+        self.page("ai.html", main, "AI & Workflow — %s" % c.get("name", ""),
+                  self.intro_desc("ai", "AI & Workflow"), "ai")
+
+    def ad_card_html(self, ad):
+        """A paid-social item in its placement ratio: video (Livid or local
+        mp4, via the reel card) or a static image shown whole (contain)."""
+        meta = [ad.get("campaign")]
+        if ad.get("livid") or ad.get("mp4"):
+            return self.reel_card_html(ad, "", meta_bits=meta)
+        if not ad.get("image"):
+            return ""
+        ratio = ad.get("ratio") or "1 / 1"
+        title = plain(ad.get("title", ""))
+        img = ('<img src="%s" alt="%s" loading="lazy" draggable="false">'
+               % (esc(asset_url(ad["image"])), esc(title)))
+        m = " · ".join(self.txt(b) for b in meta if b)
+        return ('      <figure class="reel-card ad-static">\n'
+                '        <div class="frame" style="aspect-ratio:%s">%s</div>\n'
+                '        <figcaption><span class="rtitle">%s</span>%s%s</figcaption>\n      </figure>'
+                % (esc(ratio), img, self.txt(ad.get("title")),
+                   ('<span class="rmeta">%s</span>' % m) if m else "",
+                   self.confirm_pill(ad.get("confirm"))))
+
+    def build_paid(self):
+        ps = self.media.get("paid_social") or {}
+        sections = []
+        for key, heading, anchor in (("video_ads", "Video ads", "video-ads"),
+                                     ("static_ads", "Static ads", "static-ads")):
+            cards = [c for c in (self.ad_card_html(a) for a in ps.get(key) or []) if c]
+            if cards:
+                body = '    <div class="ad-grid">\n%s\n    </div>' % "\n".join(cards)
+            else:
+                body = "    " + self.gen_box("paid-social.html#%s" % anchor,
+                                             "[%s to add, in the sizes they ran: %s]" % (heading, AD_SIZES))
+            sections.append('<section class="paid-section" id="%s">\n  <div class="wrap">\n'
+                            '    <div class="sec-head">\n      <div>\n        <h2>%s</h2>\n      </div>\n    </div>\n'
+                            '%s\n  </div>\n</section>' % (anchor, esc(heading), body))
+        intro = (self.config.get("page_intros") or {}).get("paid") or ps.get("intro") or ""
+        main = tmpl("paid.main.tmpl").safe_substitute(
+            INTRO=self.para(intro, "lede") if intro else "", SECTIONS="\n".join(sections))
+        self.page("paid-social.html", main, "Paid Social — %s" % self.config.get("name", ""),
+                  plain(intro) or "Paid Social", "paid")
+
+    def build_about(self):
+        c = self.config
+        blocks = []
+
+        def block(heading, inner, anchor=""):
+            blocks.append('    <div class="case-block about-block"%s>\n      <h2 class="kicker">%s</h2>\n'
+                          '      <div class="case-copy">%s</div>\n    </div>'
+                          % ((' id="%s"' % anchor) if anchor else "", heading, inner))
+
+        exp = []
+        for e in c.get("experience", []):
+            org = (' <span class="x-org">— %s</span>' % self.txt(e["org"])) if e.get("org") else ""
+            when = " · ".join(self.txt(e.get(k)) for k in ("years", "place") if e.get(k))
+            exp.append('<li><span class="x-role">%s</span>%s%s</li>'
+                       % (self.txt(e.get("role", "")), org,
+                          ('<span class="x-meta">%s</span>' % when) if when else ""))
+        if exp:
+            block("Experience", '<ul class="xp">%s</ul>' % "".join(exp))
+        credits = self.media.get("credits", [])
+        if credits:
+            rows = "".join("<tr>%s</tr>" % "".join("<td>%s</td>" % self.txt(cr.get(k, ""))
+                                                    for k in ("artist", "work", "role", "year"))
+                           for cr in credits)
+            pill = self.confirm_pill(["credits"]) if self.media.get("credits_confirm") else ""
+            table = ('<div class="credits-wrap"><table class="credits"><thead><tr>'
+                     '<th scope="col">Artist</th><th scope="col">Work</th><th scope="col">Role</th>'
+                     '<th scope="col">Year</th></tr></thead><tbody>%s</tbody></table></div>%s' % (rows, pill))
+            block(self.txt(self.media.get("credits_note") or "Production credits"), table)
+        if c.get("tools"):
+            block("Tools", '<ul class="inline-list">%s</ul>' % "".join(
+                "<li>%s</li>" % self.txt(t) for t in c["tools"]))
+        if c.get("education"):
+            block("Education", self.para(c["education"]))
+        if c.get("certifications"):
+            block("Certifications", "<ul>%s</ul>" % "".join(
+                "<li>%s</li>" % self.txt(x) for x in c["certifications"]))
+        if c.get("languages"):
+            block("Languages", self.para(c["languages"]))
+        sides = []
+        for sp in c.get("side_projects", []):
+            label = self.txt(sp.get("label", ""))
+            href = sp.get("href") or ""
+            if href and not is_ph(href):
+                label = '<a href="%s" rel="noopener">%s</a>' % (esc(href), label)
+            line = (' <span class="sp-line">%s</span>' % self.txt(sp["line"])) if sp.get("line") else ""
+            sides.append('<li><span class="sp-label">%s</span>%s</li>' % (label, line))
+        if sides:
+            block("Side projects", '<ul class="side-projects">%s</ul>' % "".join(sides))
+        resume = c.get("resume_pdf") or ""
         if resume:
-            resume_html = ('<p><a class="btn" href="%s" download>Download résumé (PDF)</a></p>'
-                           % esc(resume))
+            resume_html = ('<p><a class="btn" href="%s" download>Download résumé (PDF)</a></p>' % esc(resume))
         else:
             resume_html = self.gen_box("about.html#resume", "[Résumé PDF: brand version pending]")
-        extra = ('\n  <section id="resume" class="resume">\n    <p class="kicker">Résumé</p>\n'
-                 '    %s\n  </section>' % resume_html)
-        self.build_stub("about.html", "about", "About", "about", extra)
+        block("Résumé", resume_html, anchor="resume")
+        bio = "\n".join("      " + self.para(b) for b in c.get("bio", []))
+        main = tmpl("about.main.tmpl").safe_substitute(
+            NAME=esc(c.get("name", "")), INTRO=self.page_intro("about"), BIO=bio,
+            BLOCKS="\n".join(blocks))
+        self.page("about.html", main, "About — %s" % c.get("name", ""),
+                  self.intro_desc("about", "About %s" % c.get("name", "")), "about")
 
     def build_contact(self):
         c = self.config
@@ -647,7 +878,8 @@ class Site(object):
         for slug, title, desc in legal:
             body = Template((ROOT / "templates" / "legal" / (slug + ".body.html"))
                             .read_text(encoding="utf-8")).safe_substitute(
-                NAME=esc(self.config.get("name", "")))
+                NAME=esc(self.config.get("name", "")), EMAIL=esc(self.config.get("email", "")),
+                BASED=esc(plain(self.config.get("based", ""))))
             main = tmpl("legal.main.tmpl").safe_substitute(LEGAL_TITLE=esc(title), LEGAL_BODY=body)
             self.page(slug + ".html", main, "%s — %s" % (title, self.config.get("name", "")),
                       desc, "legal")
@@ -661,7 +893,10 @@ class Site(object):
         self.build_work()
         for i, p in enumerate(self.visible):
             self.build_case(i, p)
-        self.build_stubs()
+        self.build_reels()
+        self.build_ai()
+        self.build_paid()
+        self.build_about()
         self.build_contact()
         self.build_legal()
         self.build_404()

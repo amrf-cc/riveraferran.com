@@ -10,8 +10,10 @@
 >   confirm list, `draft_only` item, empty showreel, empty `resume_pdf` or empty `domain`
 >   is listed as `file → path → value` and the build exits 1 without writing a page.
 >   Clean data builds without the draft layer and prints `BUILD_OK (release)`.
-> - Pages: `index.html`, `work.html`, `work/<slug>.html`, stubs for `reels.html`,
->   `ai.html`, `paid-social.html`, `about.html` (Phase 2), `contact.html`, legal, 404.
+> - Pages: `index.html`, `work.html`, `work/<slug>.html`, `reels.html` (format filter +
+>   Motion), `ai.html`, `paid-social.html`, `about.html`, `contact.html`, legal, 404.
+>   Template-made placeholders (Ran-live cards without `ai_steps`, empty ad lists, missing
+>   résumé) block a release like data placeholders and are listed as `(generated)`.
 >   No `gallery*` output. `CNAME` is written only when `domain` is set; with no domain,
 >   `og:url` is omitted and `og:image` is relative.
 

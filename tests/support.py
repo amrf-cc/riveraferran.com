@@ -151,7 +151,17 @@ def strip_drafts(node):
     return node
 
 
+# Release-ready stand-ins for the gaps the TEMPLATES fill with generated
+# placeholders (no data string behind them), so the clean release can pass.
+RELEASE_AI_STEPS = "Real shot, AI step, final ad (release test)."
+RELEASE_VIDEO_AD = {"title": "Release test video ad", "campaign": "Test campaign", "ratio": "9 / 16",
+                    "mp4": "assets/video/reels/baklava.mp4", "poster": "assets/img/posters/reels/baklava.jpg"}
+RELEASE_STATIC_AD = {"title": "Release test static ad", "campaign": "Test campaign", "ratio": "4 / 5",
+                     "image": "assets/img/posters/reels/birthday.jpg"}
+
+
 def make_release_ready(root):
+    import build  # the repo's build.py (support puts ROOT on sys.path)
     for name in DATA_FILES:
         data = strip_drafts(load(name, root))
         if name == "site-config.json":
@@ -159,6 +169,18 @@ def make_release_ready(root):
             data["resume_pdf"] = "assets/resume.pdf"
             for slot in ("vertical", "horizontal"):
                 data["showreel"][slot]["livid"] = "https://livid.com/embed/test-" + slot
+        elif name == "projects.json":
+            # ai.html "Ran live": a project without ai_steps gets a generated placeholder.
+            for p in data["projects"]:
+                if p.get("slug") in build.AI_LIVE and not p.get("ai_steps"):
+                    p["ai_steps"] = RELEASE_AI_STEPS
+        elif name == "media.json":
+            # paid-social.html: an empty ad list gets a generated placeholder.
+            ps = data.setdefault("paid_social", {})
+            if not ps.get("video_ads"):
+                ps["video_ads"] = [dict(RELEASE_VIDEO_AD)]
+            if not ps.get("static_ads"):
+                ps["static_ads"] = [dict(RELEASE_STATIC_AD)]
         (root / name).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     (root / "assets" / "resume.pdf").write_bytes(b"%PDF-1.4 test\n")
 
