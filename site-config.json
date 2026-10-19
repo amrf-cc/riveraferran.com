@@ -1,11 +1,32 @@
 {
-  "name": "Adrian Rivera Ferran",
-  "title": "Food & Beverage Photographer + Videographer",
+  "name": "Adrián Rivera Ferrán",
+  "title": "Photo & Video Content Creator",
+  "headline": "Product, process, and people. Shot, cut, and built for social.",
+  "subline": "Photographer, videographer, and content lead. Nine years with consumer brands in New York and Puerto Rico.",
   "based": "New York City",
   "email": "adrian@riveraferran.com",
-  "domain": "riveraferran.com",
+  "domain": "",
   "formspree_endpoint": "https://formspree.io/f/mgaoebdr",
   "instagram": "",
+  "linkedin": "",
+  "resume_pdf": "",
+  "showreel": {
+    "vertical": {
+      "livid": "",
+      "mp4": "",
+      "poster": "",
+      "ratio": "9 / 16",
+      "title": "Showreel (vertical)"
+    },
+    "horizontal": {
+      "livid": "",
+      "mp4": "",
+      "poster": "",
+      "ratio": "16 / 9",
+      "title": "Showreel (horizontal)"
+    },
+    "placeholder": "[Showreel: cut a 45–60s vertical and a 60–90s horizontal from your best hooks]"
+  },
   "hero_image": "assets/img/masthead/tbs-desktop-back.jpg",
   "hero_image_phone": "assets/img/masthead/tbs-phone-back.jpg",
   "hero_caption": "Six cookies stacked and cut open to show their fillings, shot for Chip City in New York City",
@@ -16,8 +37,116 @@
     ""
   ],
   "bio": [
-    "I'm Adrian Rivera Ferran, a photographer and videographer based in New York City, from San Juan, Puerto Rico. I shoot menus, product launches, and social content for restaurants and food brands.",
-    "I've been a professional photographer for eight years and in food & beverage since 2019. I've shot for Chip City Cookies, Massi's Homemade Sandwiches, Brasa, Açaí Express, and Sobao by Los Cidrines, plus brand activations for McDonald's and Pepsi. I shoot photo and video end to end: concept, capture, edit, delivery."
+    "I'm Adrián Rivera Ferrán, a photo and video creator in New York. For three years I ran the content engine at Chip City Cookies: product, reels, paid video and static ads every month, collabs with Eggo, Pop-Tarts and JetBlue, and the company's training series.",
+    "Before that I directed a TV spot for Puerto Rico's largest açaí brand and made content for Nestlé and Magnum at AdWorks. I edit in Premiere and After Effects, and I build AI-assisted workflows and ad creative that keep the product true to life."
   ],
-  "cta": "Available for freelance food & beverage projects, and open to full-time roles. Let's talk."
+  "cta": "Open to full-time and freelance roles in brand content, social video, and AI-assisted creative. Let's talk.",
+  "capabilities": [
+    {
+      "tag": "product",
+      "label": "Studio product",
+      "line": "Product, process, and team, shot in studio and on location."
+    },
+    {
+      "tag": "social",
+      "label": "Short-form social",
+      "line": "Reels built for the first two seconds and the last frame."
+    },
+    {
+      "tag": "paid",
+      "label": "Paid social",
+      "line": "Video and static ads in every placement size, every month."
+    },
+    {
+      "tag": "ai",
+      "label": "AI-assisted creative",
+      "line": "Generated and extended from real product photography, checked against the real thing."
+    },
+    {
+      "tag": "founder",
+      "label": "Founder & behind the scenes",
+      "line": "Real moments with the people who make the product."
+    },
+    {
+      "tag": "campaigns",
+      "label": "Campaigns & production",
+      "line": "TV spots, activations, and music video sets."
+    },
+    {
+      "tag": "motion",
+      "label": "Motion",
+      "line": "Brand-accurate animation in After Effects."
+    }
+  ],
+  "collaborations": {
+    "label": "Collaborations shot for Chip City",
+    "names": [
+      "Eggo",
+      "Pop-Tarts",
+      "Pringles",
+      "Peeps",
+      "Philadelphia Cream Cheese",
+      "JetBlue"
+    ]
+  },
+  "tools": [
+    "Premiere Pro",
+    "After Effects",
+    "DaVinci Resolve",
+    "Final Cut Pro",
+    "Lightroom",
+    "Photoshop",
+    "Adobe Firefly",
+    "Runway",
+    "Veo",
+    "Nano Banana",
+    "ComfyUI"
+  ],
+  "education": "BA, General Communication · Universidad del Sagrado Corazón, San Juan · 2017–2021",
+  "certifications": [
+    "Cinematography Certificate · American Society of Cinematographers Online Master Class · 2022",
+    "Steadicam Operator Certification · Steadicam Operators Association"
+  ],
+  "languages": "Fully bilingual, English and Spanish",
+  "side_projects": [
+    {
+      "label": "La Lucha Continua",
+      "line": "My documentary photobook and exhibition on Puerto Rico's 2017–2019 protests, from a residency at Loisaida Inc.",
+      "href": "https://luchacontinua.com"
+    }
+  ],
+  "page_intros": {
+    "work": "Grouped by what the job needs. Filter by skill, or open any project for the brief, the work, and the result.",
+    "reels": "Short-form video for Instagram and paid social, grouped by format. Motion work in After Effects below.",
+    "ai": "AI is part of how I work, from setup to final ad. Every generated piece starts from real product photography and gets checked against the real thing.",
+    "paid": "[Paid social: the Chip City ads that ran, shown in their real placement sizes]",
+    "about": "Photo and video for consumer brands since 2017, in New York and Puerto Rico."
+  },
+  "experience": [
+    {
+      "role": "Social Media Content Creator",
+      "org": "Chip City Cookies",
+      "years": "2023–2026",
+      "place": "New York"
+    },
+    {
+      "role": "Freelance Audiovisual Creative",
+      "org": "",
+      "years": "2017–present",
+      "place": "New York and Puerto Rico"
+    },
+    {
+      "role": "Content Creator",
+      "org": "AdWorks Corp",
+      "years": "2021–2022",
+      "place": "San Juan"
+    },
+    {
+      "role": "Photojournalist",
+      "org": "Pulso Estudiantil",
+      "years": "2017–2019",
+      "place": "San Juan"
+    }
+  ],
+  "ai_label": "AI-assisted"
 }

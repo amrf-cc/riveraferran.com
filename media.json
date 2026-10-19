@@ -1,0 +1,591 @@
+{
+  "reels": [
+    {
+      "slug": "chip-city-reel",
+      "title": "Chip City Reel",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Brand reel",
+      "livid": "https://livid.com/embed/9noP15mT1z6h",
+      "mp4": "",
+      "poster": "",
+      "ratio": "9 / 16",
+      "year": ""
+    },
+    {
+      "slug": "sabor-y-sazon-preview",
+      "title": "Sabor y Sazón — episode preview",
+      "brand": "Chef Mia Castro",
+      "project": "chef-mia-castro",
+      "format": "Series promo",
+      "livid": "https://livid.com/embed/x9wVwIHDDonT",
+      "mp4": "",
+      "poster": "",
+      "ratio": "9 / 16",
+      "year": ""
+    },
+    {
+      "slug": "sobao-social",
+      "title": "Sobao by Los Cidrines",
+      "brand": "Sobao by Los Cidrines",
+      "project": "sobao-cidrines",
+      "format": "Product reel",
+      "livid": "https://livid.com/embed/gD-po8B9sea9",
+      "mp4": "",
+      "poster": "",
+      "ratio": "9 / 16",
+      "year": "2022"
+    },
+    {
+      "slug": "apple-fritter-bloom-reveal",
+      "title": "Apple fritter bloom reveal",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Product reveal",
+      "livid": "",
+      "mp4": "assets/video/reels/apple-fritter-bloom-reveal.mp4",
+      "poster": "assets/img/posters/reels/apple-fritter-bloom-reveal.jpg",
+      "ratio": "9 / 16",
+      "year": "",
+      "confirm": [
+        "brand",
+        "format",
+        "year"
+      ]
+    },
+    {
+      "slug": "bagels-cream-cheese-reveal",
+      "title": "Bagels and cream cheese reveal",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Collab drop",
+      "livid": "",
+      "mp4": "assets/video/reels/bagels-cream-cheese-reveal.mp4",
+      "poster": "assets/img/posters/reels/bagels-cream-cheese-reveal.jpg",
+      "ratio": "9 / 16",
+      "year": "",
+      "confirm": [
+        "brand",
+        "format",
+        "year"
+      ]
+    },
+    {
+      "slug": "crookie-box",
+      "title": "Crookie box",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Product reveal",
+      "livid": "",
+      "mp4": "assets/video/reels/crookie-box.mp4",
+      "poster": "assets/img/posters/reels/crookie-box.jpg",
+      "ratio": "9 / 16",
+      "year": "",
+      "confirm": [
+        "brand",
+        "format",
+        "year"
+      ]
+    },
+    {
+      "slug": "italian-raspberry-cheesecake-ice-cream",
+      "title": "Italian raspberry cheesecake ice cream",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Close-up",
+      "livid": "",
+      "mp4": "assets/video/reels/italian-raspberry-cheesecake-ice-cream.mp4",
+      "poster": "assets/img/posters/reels/italian-raspberry-cheesecake-ice-cream.jpg",
+      "ratio": "9 / 16",
+      "year": "",
+      "confirm": [
+        "brand",
+        "format",
+        "year"
+      ]
+    },
+    {
+      "slug": "mixed-berry-tart-reveal",
+      "title": "Mixed berry tart reveal",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Product reveal",
+      "livid": "",
+      "mp4": "assets/video/reels/mixed-berry-tart-reveal.mp4",
+      "poster": "assets/img/posters/reels/mixed-berry-tart-reveal.jpg",
+      "ratio": "9 / 16",
+      "year": "",
+      "confirm": [
+        "brand",
+        "format",
+        "year"
+      ]
+    },
+    {
+      "slug": "ssc-crookie-out-of-box",
+      "title": "Crookie out of the box",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Product reveal",
+      "livid": "",
+      "mp4": "assets/video/reels/ssc-crookie-out-of-box.mp4",
+      "poster": "assets/img/posters/reels/ssc-crookie-out-of-box.jpg",
+      "ratio": "9 / 16",
+      "year": "",
+      "confirm": [
+        "brand",
+        "format",
+        "year"
+      ]
+    },
+    {
+      "slug": "smores-thinwich-reveal",
+      "title": "S'mores thinwich reveal",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Collab drop",
+      "livid": "",
+      "mp4": "assets/video/reels/smores-thinwich-reveal.mp4",
+      "poster": "assets/img/posters/reels/smores-thinwich-reveal.jpg",
+      "ratio": "9 / 16",
+      "year": "",
+      "confirm": [
+        "brand",
+        "format",
+        "year"
+      ]
+    },
+    {
+      "slug": "baklava",
+      "title": "Baklava",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Flavor launch",
+      "livid": "",
+      "mp4": "assets/video/reels/baklava.mp4",
+      "poster": "assets/img/posters/reels/baklava.jpg",
+      "ratio": "9 / 16",
+      "year": "2024",
+      "confirm": [
+        "format"
+      ]
+    },
+    {
+      "slug": "birthday",
+      "title": "Birthday",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Flavor launch",
+      "livid": "",
+      "mp4": "assets/video/reels/birthday.mp4",
+      "poster": "assets/img/posters/reels/birthday.jpg",
+      "ratio": "9 / 16",
+      "year": "2025",
+      "confirm": [
+        "format"
+      ]
+    },
+    {
+      "slug": "black-white-cookie",
+      "title": "Black and white cookie",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Flavor launch",
+      "livid": "",
+      "mp4": "assets/video/reels/black-white-cookie.mp4",
+      "poster": "assets/img/posters/reels/black-white-cookie.jpg",
+      "ratio": "9 / 16",
+      "year": "2024",
+      "confirm": [
+        "format"
+      ]
+    },
+    {
+      "slug": "butterscotch",
+      "title": "Butterscotch",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Flavor launch",
+      "livid": "",
+      "mp4": "assets/video/reels/butterscotch.mp4",
+      "poster": "assets/img/posters/reels/butterscotch.jpg",
+      "ratio": "9 / 16",
+      "year": "2023",
+      "confirm": [
+        "format"
+      ]
+    },
+    {
+      "slug": "cinnamon-roll",
+      "title": "Cinnamon roll",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Flavor launch",
+      "livid": "",
+      "mp4": "assets/video/reels/cinnamon-roll.mp4",
+      "poster": "assets/img/posters/reels/cinnamon-roll.jpg",
+      "ratio": "9 / 16",
+      "year": "2024",
+      "confirm": [
+        "format"
+      ]
+    },
+    {
+      "slug": "coconut",
+      "title": "Coconut",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Flavor launch",
+      "livid": "",
+      "mp4": "assets/video/reels/coconut.mp4",
+      "poster": "assets/img/posters/reels/coconut.jpg",
+      "ratio": "9 / 16",
+      "year": "2024",
+      "confirm": [
+        "format"
+      ]
+    },
+    {
+      "slug": "cookies-2025",
+      "title": "Weekly lineup",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Menu",
+      "livid": "",
+      "mp4": "assets/video/reels/cookies-2025.mp4",
+      "poster": "assets/img/posters/reels/cookies-2025.jpg",
+      "ratio": "9 / 16",
+      "year": "2025",
+      "confirm": [
+        "format"
+      ]
+    },
+    {
+      "slug": "thin-chips",
+      "title": "Thin chips",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Product launch",
+      "livid": "",
+      "mp4": "assets/video/reels/thin-chips.mp4",
+      "poster": "assets/img/posters/reels/thin-chips.jpg",
+      "ratio": "9 / 16",
+      "year": "2024",
+      "confirm": [
+        "format"
+      ]
+    },
+    {
+      "slug": "launch-2023",
+      "title": "Weekly drop",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Flavor launch",
+      "livid": "",
+      "mp4": "assets/video/reels/launch-2023.mp4",
+      "poster": "assets/img/posters/reels/launch-2023.jpg",
+      "ratio": "9 / 16",
+      "year": "2023",
+      "confirm": [
+        "format"
+      ]
+    },
+    {
+      "slug": "strawberry",
+      "title": "Strawberry",
+      "brand": "Chip City Cookies",
+      "project": "chip-city",
+      "format": "Flavor launch",
+      "livid": "",
+      "mp4": "assets/video/reels/strawberry.mp4",
+      "poster": "assets/img/posters/reels/strawberry.jpg",
+      "ratio": "9 / 16",
+      "year": "2025",
+      "confirm": [
+        "format"
+      ]
+    }
+  ],
+  "reel_formats_note": "[Anatomy of a reel: pick one reel and break down the hook (0–2s), the pacing, and the last frame, in your words]",
+  "motion": [
+    {
+      "slug": "acai-express-logo",
+      "title": "Açaí Express logo animation",
+      "client": "Açaí Express",
+      "year": "",
+      "ratio": "16 / 9",
+      "confirm": [
+        "role"
+      ],
+      "livid": "",
+      "role": "[Animation]",
+      "mp4": "assets/video/motion/acai-express-logo.mp4",
+      "poster": "assets/img/posters/motion/acai-express-logo.jpg"
+    },
+    {
+      "slug": "world-water-day",
+      "title": "World Water Day",
+      "client": "[Client]",
+      "year": "2021",
+      "ratio": "16 / 9",
+      "confirm": [
+        "client",
+        "role"
+      ],
+      "livid": "",
+      "role": "[Animation]",
+      "mp4": "assets/video/motion/world-water-day.mp4",
+      "poster": "assets/img/posters/motion/world-water-day.jpg"
+    },
+    {
+      "slug": "mosaico-doctores",
+      "title": "Mosaico Doctores",
+      "client": "[Client]",
+      "year": "2022",
+      "ratio": "1 / 1",
+      "confirm": [
+        "client",
+        "role"
+      ],
+      "livid": "",
+      "role": "[Animation]",
+      "mp4": "assets/video/motion/mosaico-doctores.mp4",
+      "poster": "assets/img/posters/motion/mosaico-doctores.jpg"
+    },
+    {
+      "slug": "pride",
+      "title": "Pride",
+      "client": "[Client]",
+      "year": "2022",
+      "ratio": "1 / 1",
+      "confirm": [
+        "client",
+        "role"
+      ],
+      "livid": "",
+      "role": "[Animation]",
+      "mp4": "assets/video/motion/pride.mp4",
+      "poster": "assets/img/posters/motion/pride.jpg"
+    },
+    {
+      "slug": "gallera",
+      "title": "Gallera",
+      "client": "[Client]",
+      "year": "",
+      "ratio": "1 / 1",
+      "confirm": [
+        "client",
+        "role",
+        "year"
+      ],
+      "livid": "",
+      "role": "[Animation]",
+      "mp4": "assets/video/motion/gallera.mp4",
+      "poster": "assets/img/posters/motion/gallera.jpg"
+    },
+    {
+      "slug": "promo-animation-2020",
+      "title": "Promotional animation",
+      "client": "[Client]",
+      "year": "2020",
+      "ratio": "16 / 9",
+      "confirm": [
+        "client",
+        "role"
+      ],
+      "livid": "",
+      "role": "[Animation]",
+      "mp4": "assets/video/motion/promo-animation-2020.mp4",
+      "poster": "assets/img/posters/motion/promo-animation-2020.jpg"
+    },
+    {
+      "slug": "acai-truck",
+      "title": "Açaí Express truck animation",
+      "client": "Açaí Express",
+      "year": "",
+      "ratio": "9 / 16",
+      "livid": "https://livid.com/embed/myDK79jCqScT",
+      "confirm": [
+        "role"
+      ],
+      "role": "[Animation]",
+      "mp4": "",
+      "poster": ""
+    }
+  ],
+  "paid_social": {
+    "intro": "[Paid social: the Chip City ads that ran, shown in their real placement sizes]",
+    "video_ads": [],
+    "static_ads": []
+  },
+  "ai_process": [
+    "Brief",
+    "Reference shoot",
+    "Prompt from product references",
+    "Generate",
+    "Check against the real product",
+    "Retouch",
+    "Deliver"
+  ],
+  "ai_tools_line": "I generate mostly in Adobe Firefly, which Adobe trains on licensed content, and refine every prompt in Wondr Forge first.",
+  "credits_note": "Production credits",
+  "credits": [
+    {
+      "artist": "Bad Bunny",
+      "work": "Tenemos Que Hablar (visualizer)",
+      "role": "Cinematographer",
+      "year": "2018"
+    },
+    {
+      "artist": "Bad Bunny",
+      "work": "Caro (visualizer)",
+      "role": "Producer",
+      "year": "2018"
+    },
+    {
+      "artist": "Bad Bunny",
+      "work": "Cuando Perriabas (visualizer)",
+      "role": "Producer",
+      "year": "2018"
+    },
+    {
+      "artist": "Bad Bunny",
+      "work": "Como Antes (visualizer)",
+      "role": "Talent producer",
+      "year": "2018"
+    },
+    {
+      "artist": "Bad Bunny & Diplo",
+      "work": "200 MPH (visualizer)",
+      "role": "Colorist",
+      "year": ""
+    },
+    {
+      "artist": "Bad Bunny & Diplo",
+      "work": "200 MPH (music video)",
+      "role": "Key production assistant",
+      "year": ""
+    },
+    {
+      "artist": "Rauw Alejandro & Chencho Corleone",
+      "work": "El Efecto",
+      "role": "Producer",
+      "year": "2019"
+    },
+    {
+      "artist": "Wisin & Yandel, Bad Bunny",
+      "work": "Dame Algo",
+      "role": "Production assistant",
+      "year": "2019"
+    },
+    {
+      "artist": "Jhay Cortez",
+      "work": "Apple Music interview",
+      "role": "Videographer",
+      "year": "2020"
+    },
+    {
+      "artist": "Jhay Cortez",
+      "work": "Apple Music",
+      "role": "Videographer",
+      "year": "2022"
+    },
+    {
+      "artist": "Jhay Cortez",
+      "work": "Music video behind the scenes",
+      "role": "Videographer",
+      "year": "2022"
+    },
+    {
+      "artist": "Wisin & Jhay Cortez",
+      "work": "Fiel",
+      "role": "Production assistant",
+      "year": "2022"
+    },
+    {
+      "artist": "Wisin & Myke Towers",
+      "work": "Mi Niña",
+      "role": "Production assistant",
+      "year": "2022"
+    },
+    {
+      "artist": "Wisin, Jowell & Randy",
+      "work": "Baja Sube Sube",
+      "role": "Camera operator",
+      "year": "2023"
+    },
+    {
+      "artist": "Irving Reyes",
+      "work": "KTM",
+      "role": "Director",
+      "year": "2022"
+    },
+    {
+      "artist": "Irving Reyes",
+      "work": "Baby Uuu",
+      "role": "Director",
+      "year": "2023"
+    },
+    {
+      "artist": "Irving Reyes",
+      "work": "Toalla",
+      "role": "Director",
+      "year": "2023"
+    },
+    {
+      "artist": "Jotaerre & Lil JouJou",
+      "work": "Flamenco",
+      "role": "Camera operator",
+      "year": "2022"
+    },
+    {
+      "artist": "Gigolo y La Exce",
+      "work": "Rolia",
+      "role": "Gimbal operator",
+      "year": "2022"
+    },
+    {
+      "artist": "Enyel C",
+      "work": "Music video",
+      "role": "Camera operator",
+      "year": "2022"
+    },
+    {
+      "artist": "Ednita Nazario",
+      "work": "Pedir Perdón",
+      "role": "[Role]",
+      "year": "2021"
+    },
+    {
+      "artist": "Disney+",
+      "work": "Gina Yei",
+      "role": "Camera operator",
+      "year": "2022"
+    },
+    {
+      "artist": "MLB",
+      "work": "Roberto Clemente",
+      "role": "Gimbal operator",
+      "year": "2022"
+    },
+    {
+      "artist": "Coliseo de Puerto Rico",
+      "work": "Chente Ydrach commercial",
+      "role": "Camera operator",
+      "year": "2022"
+    },
+    {
+      "artist": "Supermax",
+      "work": "Online commercial",
+      "role": "Camera operator",
+      "year": "2022"
+    },
+    {
+      "artist": "Taller Salud",
+      "work": "Commercial",
+      "role": "Camera operator",
+      "year": "2021"
+    }
+  ],
+  "credits_confirm": true
+}
