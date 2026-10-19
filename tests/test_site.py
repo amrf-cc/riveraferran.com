@@ -470,8 +470,10 @@ class TestReels(BuiltSite):
         filters = re.findall(r'<a class="filter[^"]*" href="#([^"]+)" data-filter="([^"]+)"', self.text)
         self.assertEqual([f[1] for f in filters], ["all"] + seen)
         self.assertIn('data-filter-scope=".reel-groups"', self.text)
-        groups = re.findall(r'<div class="reel-group" data-tags="([^"]+)">', self.text)
-        self.assertEqual(groups, seen)
+        items = re.findall(r'<div class="reel-item" data-tags="([^"]+)">', self.text)
+        self.assertEqual(len(items), len(self.media["reels"]))
+        self.assertEqual(sorted(set(items)), sorted(seen))
+        self.assertEqual(self.text.count('class="reel-grid"'), 1)
 
     def test_every_reel_and_motion_item_rendered(self):
         for group in ("reels", "motion"):
@@ -515,7 +517,7 @@ class TestReels(BuiltSite):
         if not note:
             self.skipTest("no reel_formats_note")
         i = self.text.index("Anatomy of a reel</p>")
-        self.assertGreater(i, self.text.rindex('class="reel-group"'))
+        self.assertGreater(i, self.text.rindex('class="reel-item"'))
         self.assertLess(i, self.text.index('id="motion"'))
         self.assertIn(ph_or_text(note), self.text)
 

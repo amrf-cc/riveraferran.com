@@ -654,18 +654,18 @@ class Site(object):
                 groups[key] = (r.get("format", ""), [])
             groups[key][1].append(r)
         filters = ['      <a class="filter active" href="#all" data-filter="all" aria-pressed="true">All</a>']
-        blocks = []
         for key in order:
-            label, items = groups[key]
             filters.append('      <a class="filter" href="#%s" data-filter="%s" aria-pressed="false">%s</a>'
-                           % (esc(key), esc(key), self.txt(label)))
-            cards = [c for c in (self.reel_card_html(r, "") for r in items) if c]
-            if not cards:
-                continue
-            blocks.append('      <div class="reel-group" data-tags="%s">\n'
-                          '        <h2 class="reel-group-title">%s <span class="count">%d</span></h2>\n'
-                          '        <div class="reel-grid">\n%s\n        </div>\n      </div>'
-                          % (esc(key), self.txt(label), len(cards), "\n".join(cards)))
+                           % (esc(key), esc(key), self.txt(groups[key][0])))
+        # One grid, filtered by format. Separate per-format rows left long empty
+        # stretches beside formats that hold a single reel.
+        items = []
+        for r in reels:
+            card = self.reel_card_html(r, "")
+            if card:
+                items.append('      <div class="reel-item" data-tags="%s">\n%s\n      </div>'
+                             % (esc(slugify(r.get("format", ""))), card))
+        blocks = ['      <div class="reel-grid">\n%s\n      </div>' % "\n".join(items)] if items else []
         note = self.media.get("reel_formats_note")
         if note:
             anatomy = ('    <div class="reel-anatomy">\n      <p class="kicker">Anatomy of a reel</p>\n'
