@@ -77,10 +77,7 @@
       ],
       "scope": [],
       "result": "AI-assisted creative that ran live for the launch.",
-      "ai_steps": "[Three-step comparison per piece: real studio shot, AI step, final ad]",
-      "confirm": [
-        "publish_permission"
-      ]
+      "ai_steps": "[Three-step comparison per piece: real studio shot, AI step, final ad]"
     },
     {
       "slug": "chef-mia-castro",
