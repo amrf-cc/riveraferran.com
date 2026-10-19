@@ -1,5 +1,20 @@
 # riveraferran.com
 
+> **Fork in progress: personal brand portfolio.** The sections below still describe the
+> food site this was forked from. Current generator behaviour (Phase 1):
+>
+> - `python3 build.py` — DRAFT build: renders every page in place with a "Draft preview"
+>   banner, dashed "To add" boxes/chips for placeholder strings (`"[...]"`), "Confirm: …"
+>   pills for `confirm` lists, and `draft_only` projects with a Draft ribbon. Ends `BUILD_OK`.
+> - `python3 build.py --release` — scans all four data files first; any placeholder,
+>   confirm list, `draft_only` item, empty showreel, empty `resume_pdf` or empty `domain`
+>   is listed as `file → path → value` and the build exits 1 without writing a page.
+>   Clean data builds without the draft layer and prints `BUILD_OK (release)`.
+> - Pages: `index.html`, `work.html`, `work/<slug>.html`, stubs for `reels.html`,
+>   `ai.html`, `paid-social.html`, `about.html` (Phase 2), `contact.html`, legal, 404.
+>   No `gallery*` output. `CNAME` is written only when `domain` is set; with no domain,
+>   `og:url` is omitted and `og:image` is relative.
+
 Food & beverage portfolio of Adrian Rivera Ferran. Static site, generated in place.
 
 - `python3 prepare_assets.py --check` — verify source media on the Selected Works volume

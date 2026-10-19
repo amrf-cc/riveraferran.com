@@ -31,10 +31,7 @@
         "E-commerce photos for every new product"
       ],
       "result": "[One result you can back up: a campaign, a number you kept, a launch that sold out]",
-      "bts": "[Behind-the-scenes photo of you on set]",
-      "confirm": [
-        "years"
-      ]
+      "bts": "[Behind-the-scenes photo of you on set]"
     },
     {
       "slug": "ai-production-assistant",
@@ -43,7 +40,7 @@
       "title": "An AI agent inside my editing tools",
       "oneliner": "It does the slow setup so I keep the creative calls.",
       "role": "Set up, extended, and run by me",
-      "years": "[2026]",
+      "years": "2026",
       "location": "",
       "tags": [
         "ai",
@@ -57,11 +54,7 @@
       ],
       "scope": [],
       "result": "[Time saved, only if timed: e.g. 4-cam sync, X min to Y min]",
-      "demo": "[60–90s screen recording: the agent syncing a multicam shoot or building an After Effects animation. Hide file paths and logins.]",
-      "confirm": [
-        "years",
-        "did"
-      ]
+      "demo": "[60–90s screen recording: the agent syncing a multicam shoot or building an After Effects animation. Hide file paths and logins.]"
     },
     {
       "slug": "rodowita-water",
@@ -96,17 +89,14 @@
       "title": "Cookbook photography and a cooking series",
       "oneliner": "A Puerto Rican chef's bestselling cookbook, a watch-party booklet, and the companion series.",
       "role": "Photographer · cinematographer for Sabor y Sazón",
-      "years": "[2026]",
+      "years": "2026",
       "location": "",
       "tags": [
         "founder",
         "social",
         "product"
       ],
-      "description": "Chef Mia Castro is a Puerto Rican chef and cookbook author — Beat Bobby Flay champion, Hell's Kitchen standout, host of Ramsay in 10 — whose debut cookbook, Cocina Puerto Rico, became a bestseller. When Bad Bunny's Super Bowl halftime show put Puerto Rico in the spotlight, she moved fast: a picadera booklet, Puerto Rican snack recipes built for watch parties, exclusive to pre-orders. I shot every image in it. Now I'm behind the camera as cinematographer for Sabor y Sazón, the companion series that turns hand-picked recipes from the book into something you can watch, releasing now.",
-      "confirm": [
-        "years"
-      ]
+      "description": "Chef Mia Castro is a Puerto Rican chef and cookbook author — Beat Bobby Flay champion, Hell's Kitchen standout, host of Ramsay in 10 — whose debut cookbook, Cocina Puerto Rico, became a bestseller. When Bad Bunny's Super Bowl halftime show put Puerto Rico in the spotlight, she moved fast: a picadera booklet, Puerto Rican snack recipes built for watch parties, exclusive to pre-orders. I shot every image in it. Now I'm behind the camera as cinematographer for Sabor y Sazón, the companion series that turns hand-picked recipes from the book into something you can watch, releasing now."
     },
     {
       "slug": "acai-express",
@@ -154,18 +144,14 @@
       "slug": "joe-and-joe",
       "client": "Joe & Joe × Atezar",
       "title": "A commercial for two one-person food businesses",
-      "role": "[Director]",
-      "years": "[2020]",
+      "role": "Director and camera operator",
+      "years": "2020",
       "location": "Puerto Rico",
       "tags": [
         "founder",
         "campaigns"
       ],
-      "description": "When Joe & Joe and Atezar Cocina & Ahumado planned a collab, both were one-person operations running out of home kitchens. Atezar turned its smoked meat into sausages, Joe & Joe made the buns, and I shot the commercial in the mountains of Puerto Rico. Both businesses have grown into their own physical locations since, built on high-quality, unique products.",
-      "confirm": [
-        "role",
-        "years"
-      ]
+      "description": "When Joe & Joe and Atezar Cocina & Ahumado planned a collab, both were one-person operations running out of home kitchens. Atezar turned its smoked meat into sausages, Joe & Joe made the buns, and I shot the commercial in the mountains of Puerto Rico. Both businesses have grown into their own physical locations since, built on high-quality, unique products."
     },
     {
       "slug": "sobao-cidrines",

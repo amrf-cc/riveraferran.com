@@ -1,17 +1,13 @@
-<!doctype html>
-<html lang="en">
-<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; frame-src https://livid.com; connect-src https://formspree.io; form-action 'self' https://formspree.io; base-uri 'self'; object-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="noai, noimageai">
-<title>${LEGAL_TITLE} — ${NAME}</title>
-<meta name="description" content="${LEGAL_DESC}">
-<meta property="og:type" content="website">
-<meta property="og:url" content="${OG_URL}">
-<meta property="og:title" content="${LEGAL_TITLE} — ${NAME}">
-<meta property="og:description" content="${LEGAL_DESC}">
+<title>${PAGE_TITLE}</title>
+<meta name="description" content="${META_DESCRIPTION}">
+<meta property="og:type" content="${OG_TYPE}">
+${OG_URL_META}<meta property="og:title" content="${PAGE_TITLE}">
+<meta property="og:description" content="${META_DESCRIPTION}">
 <meta property="og:image" content="${OG_IMAGE}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -22,13 +18,3 @@
 <link rel="preload" as="font" type="font/woff2" href="${ROOT_PREFIX}assets/fonts/fraunces-latin.woff2" crossorigin>
 <link rel="stylesheet" href="${ROOT_PREFIX}assets/css/fonts.css">
 <link rel="stylesheet" href="${ROOT_PREFIX}assets/css/styles.css">
-</head>
-<body>
-${NAV}
-<main>
-<article class="wrap legal">
-  <h1>${LEGAL_TITLE}</h1>
-${LEGAL_BODY}
-</article>
-</main>
-${FOOTER}

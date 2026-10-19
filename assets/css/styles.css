@@ -213,10 +213,19 @@ section + section { border-top: 1px solid var(--line-soft); }
   line-height: 0.86;
   text-transform: uppercase;
   color: #fff;
-  /* "ADRIAN RIVERA" measures 7.263 x font-size, so this fills the measure */
-  font-size: min(calc((min(1240px, 100vw) - 2 * var(--gut)) / 7.263), 240px);
+  /* Lockup is "Adrián" / "Rivera Ferrán". The widest line, "RIVERA FERRÁN",
+     measures 7.384 x font-size (738.375px at 100px: hidden span in headless
+     Chrome, Fraunces 800, opsz 144, uppercase, letter-spacing -0.035em; the
+     same probe gives 726.3px = the old 7.263 for "ADRIAN RIVERA"), so this
+     fills the measure. Re-measure if the name, face or tracking changes. */
+  font-size: min(calc((min(1240px, 100vw) - 2 * var(--gut)) / 7.384), 240px);
+  /* Uppercase acute accents (the Á in ADRIÁN) rise ~0.115em above the line
+     box at this line-height; the padding keeps them inside the h1 so they
+     never collide with the label row above. */
+  padding-top: 0.12em;
 }
 .masthead .name .last { display: block; }
+.masthead .labels.top { justify-content: space-between; }
 .masthead .labels {
   position: relative;
   z-index: 4;
@@ -531,30 +540,17 @@ footer.site a:hover { text-decoration: underline; }
 @media (max-width: 720px) {
   body { font-size: 16.5px; }
   :root { --gut: 20px; }
-  button.nav-toggle { display: block; }
-  nav.main {
-    display: none;
-    position: absolute;
-    top: 74px;
-    left: 0;
-    right: 0;
-    background: var(--paper);
-    border-bottom: 1px solid var(--line);
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    padding: 10px var(--gut) 22px;
-  }
-  nav.main.open { display: flex; }
-  nav.main a { padding: 14px 0; font-size: 16px; }
-  nav.main a.btn { margin-top: 10px; justify-content: center; }
   .photos { columns: 2; column-gap: 14px; }
   .photos button.shot { margin-bottom: 14px; }
   .service { grid-template-columns: 34px 1fr; }
   section { padding: 64px 0; }
+  /* One word per line, sized to the widest word: "FERRÁN" measures 3.753 x
+     font-size (same as unaccented FERRAN); / 4.5 stays deliberately looser so
+     the words clear the subject. line-height 0.96 (not 0.88) because FERRÁN's
+     accent sits right under RIVERA's last letters: at 0.88 it touched them. */
   .masthead .name {
     font-size: min(calc((min(1240px, 100vw) - 2 * var(--gut)) / 4.5), 86px);
-    line-height: 0.88;
+    line-height: 0.96;
   }
   .masthead .name .w, .masthead .name .last { display: block; }
   .masthead .front { display: none; }
@@ -620,4 +616,338 @@ img, video {
   .lb-prev, .lb-next { top: auto; bottom: 18px; transform: none; }
   .lb-prev { left: 18px; }
   .lb-next { right: 18px; }
+}
+
+/* ==========================================================================
+   Brand portfolio components (cards, pills, placeholders, draft layer)
+   ========================================================================== */
+
+/* ---- Nav: six links + Résumé collapse into the toggle below 960px ------- */
+@media (max-width: 1080px) {
+  nav.main { gap: 20px; }
+  nav.main a { font-size: 14.5px; }
+}
+@media (max-width: 960px) {
+  button.nav-toggle { display: block; }
+  nav.main {
+    display: none;
+    position: absolute;
+    top: 74px;
+    left: 0;
+    right: 0;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 10px var(--gut) 22px;
+  }
+  nav.main.open { display: flex; }
+  nav.main a { padding: 14px 0; font-size: 16px; }
+  nav.main a.btn { margin-top: 10px; justify-content: center; }
+}
+
+/* ---- Draft layer (draft builds only; release builds never emit it) ------ */
+.draft-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+body.is-draft { padding-top: 24px; }
+body.is-draft header.site { top: 24px; }
+
+/* Placeholder box: content still to add */
+.ph-box {
+  border: 1.5px dashed var(--accent);
+  background: var(--accent-wash);
+  border-radius: var(--radius);
+  padding: 18px 22px 20px;
+  margin: 18px 0;
+  color: var(--body);
+  max-width: 72ch;
+}
+.ph-box .ph-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.ph-box p { margin: 0; font-size: 16px; line-height: 1.5; }
+/* Inline placeholder chip (a role, a year, a name) */
+.ph-chip {
+  display: inline-block;
+  border: 1px dashed var(--accent);
+  background: var(--accent-wash);
+  color: var(--accent-press);
+  border-radius: 6px;
+  padding: 0 6px;
+  font-family: var(--font-body);
+  font-size: 0.86em;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.5;
+  vertical-align: baseline;
+}
+.ph-chip-btn {
+  margin-left: 8px;
+  font-size: 11px;
+  border-color: rgba(255,255,255,.7);
+  background: rgba(255,255,255,.18);
+  color: #fff;
+}
+/* Confirm pill: muted, never loud */
+.confirm-pill {
+  display: inline-block;
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+}
+.draft-ribbon {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.project-head .draft-ribbon { position: static; display: inline-block; margin-left: 14px; vertical-align: 2px; }
+
+/* ---- Pills -------------------------------------------------------------- */
+.pills { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.pill {
+  display: inline-block;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  line-height: 1.6;
+  transition: border-color .16s ease, color .16s ease;
+}
+a.pill:hover { border-color: var(--accent); color: var(--accent); }
+.head-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; }
+.head-tags .pills, .head-tags .confirm-pill { margin-top: 10px; }
+
+/* ---- Project cards ------------------------------------------------------ */
+.card[hidden] { display: none; }
+.card .thumb, .feature .thumb { position: relative; display: block; }
+.card .kicker { display: block; margin-top: 2px; }
+.card h3 { font-size: 23px; letter-spacing: -0.02em; line-height: 1.2; margin-top: 8px; }
+.card h3 a { transition: color .16s ease; }
+.card:hover h3 a, .feature:hover h3 a { color: var(--accent); }
+.card .oneliner { color: var(--body); font-size: 15.5px; line-height: 1.55; margin-top: 8px; }
+.card .facts, .feature .facts { color: var(--muted); font-size: 14px; margin-top: 8px; }
+.card .more { margin-top: 14px; }
+.feature .feature-body h3 a { transition: color .16s ease; }
+.feature .feature-body .kicker { display: block; }
+.feature .ph-box { margin: 0 0 18px; }
+.feature .more { margin-top: 22px; }
+/* Neutral cover tile when a project has no photo, video or reel poster yet */
+.thumb.tile {
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--line-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.thumb.tile .tile-name {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.4vw, 32px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--muted);
+  text-align: center;
+}
+.feature .thumb.tile { aspect-ratio: 4 / 3; }
+.see-all { margin-top: 44px; }
+
+/* ---- Home: intro, showreel, capabilities, collaborations ---------------- */
+.intro-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 60px; align-items: end; }
+.intro .headline { font-size: clamp(34px, 5vw, 64px); }
+.intro .lede { font-size: 18px; color: var(--body); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 26px; }
+.btn-ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.btn-ghost:hover { background: var(--ink); color: var(--paper); }
+/* Vertical + horizontal at equal height: 9/16 : 16/9 = 0.316 : 1 */
+.showreel { display: grid; grid-template-columns: 0.316fr 1fr; gap: 26px; align-items: start; }
+.showreel .video-block p.vtitle { margin-top: 11px; }
+.caps { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 0 40px; }
+.cap {
+  display: block;
+  padding: 24px 0 26px;
+  border-top: 1px solid var(--line);
+  transition: border-color .16s ease;
+}
+.cap:hover { border-top-color: var(--accent); }
+.cap-label { display: block; font-family: var(--font-display); font-size: 21px; font-weight: 500; letter-spacing: -0.015em; }
+.cap:hover .cap-label { color: var(--accent); }
+.cap-line { display: block; color: var(--muted); font-size: 15px; margin-top: 6px; }
+.collabs { padding: 64px 0; }
+.collab-names {
+  margin-top: 14px;
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.4vw, 28px);
+  letter-spacing: -0.015em;
+  color: var(--body);
+  line-height: 1.4;
+}
+.collab-names .sep { color: var(--accent); }
+
+/* ---- Page header (Work and the other top-level pages) ------------------- */
+.page-head { padding: 80px 0 40px; }
+.page-head h1 { margin-top: 14px; }
+.page-head .lede { margin-top: 22px; }
+.page-head .ph-box { margin-top: 24px; }
+.page-head + section { border-top: 0; padding-top: 24px; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 34px; }
+.filter {
+  display: inline-block;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--body);
+  transition: border-color .16s ease, background .16s ease, color .16s ease;
+}
+.filter:hover { border-color: var(--ink); }
+.filter.active { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.filter-empty { color: var(--muted); }
+.resume { padding: 48px 0 0; border-top: 0; }
+
+/* ---- Case study --------------------------------------------------------- */
+.project-head .desc { margin-top: 18px; }
+.project-head + section { border-top: 0; padding-top: 32px; }
+.case-media .ph-box { margin-top: 26px; }
+.case-block {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 40px;
+  padding: 30px 0;
+  border-top: 1px solid var(--line);
+}
+.case-block:first-child { border-top: 0; padding-top: 0; }
+.case-block h2.kicker { font-family: var(--font-body); font-size: 12px; line-height: 1.65; padding-top: 4px; }
+.case-copy { color: var(--body); max-width: 64ch; }
+.case-copy ul { padding-left: 1.2em; }
+.case-copy li { margin: 0.4em 0; }
+.case-copy .ph-box { margin: 0; }
+.case-desc .desc { max-width: 64ch; font-size: 18px; color: var(--body); }
+.case-desc .ph-box { margin: 0; }
+.case-bts .ph-box { margin-top: 18px; }
+.case-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+.case-nav a {
+  display: block;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transition: border-color .16s ease;
+}
+.case-nav a:hover { border-color: var(--accent); }
+.case-nav .next { text-align: right; }
+.case-nav .kicker { display: block; }
+.cn-title { display: block; font-family: var(--font-display); font-size: 22px; margin-top: 6px; letter-spacing: -0.015em; }
+
+/* ---- Reel cards (case-study row now, Reels page later) ------------------ */
+.reel-row {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding: 6px 2px 18px;
+  margin-top: 24px;
+}
+.reel-row .reel-card { flex: 0 0 220px; scroll-snap-align: start; }
+.reel-card { margin: 0; }
+.reel-card .frame {
+  position: relative;
+  background: var(--line-soft);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.reel-card iframe, .reel-card video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; }
+.reel-play {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.reel-play img { width: 100%; height: 100%; object-fit: cover; }
+.play-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+  border-radius: 50%;
+  background: rgba(19, 18, 16, .55);
+  border: 1px solid rgba(255, 255, 255, .55);
+  transition: background .16s ease;
+}
+.play-icon::after {
+  content: "";
+  position: absolute;
+  left: 23px;
+  top: 18px;
+  border-style: solid;
+  border-width: 11px 0 11px 17px;
+  border-color: transparent transparent transparent #fff;
+}
+.reel-play:hover .play-icon, .reel-play:focus-visible .play-icon { background: var(--accent); border-color: var(--accent); }
+.reel-card figcaption { margin-top: 10px; font-size: 14px; line-height: 1.45; }
+.reel-card .rtitle { display: block; font-weight: 600; color: var(--ink); }
+.reel-card .rmeta { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; }
+.reel-card .confirm-pill { margin-top: 6px; }
+
+@media (max-width: 900px) {
+  .intro-grid { grid-template-columns: 1fr; gap: 28px; }
+  .case-block { grid-template-columns: 1fr; gap: 10px; }
+  .page-head { padding: 60px 0 30px; }
+}
+@media (max-width: 720px) {
+  .showreel { grid-template-columns: 1fr; }
+  .showreel .reel-vertical { max-width: 360px; }
+  .case-nav { grid-template-columns: 1fr; }
+  .case-nav .next { text-align: left; }
+  .reel-row .reel-card { flex-basis: 64vw; }
 }

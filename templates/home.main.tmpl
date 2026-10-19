@@ -1,0 +1,89 @@
+<section class="masthead">
+  <picture>
+    <source media="(max-width: 720px)" srcset="${ROOT_PREFIX}${HERO_IMAGE_PHONE}">
+    <img class="layer back" src="${ROOT_PREFIX}${HERO_IMAGE}" alt="${HERO_CAPTION}" fetchpriority="high" decoding="async" draggable="false">
+  </picture>
+  <div class="layer scrim"></div>
+
+  <div class="stack">
+    <div class="labels top">
+      <span>${LABEL_TL}</span>
+      <span>${LABEL_TR}</span>
+    </div>
+
+    <h1 class="name">${NAME_MASTHEAD}</h1>
+${LABELS_BOTTOM}
+  </div>
+
+  <picture>
+    <source media="(max-width: 720px)" srcset="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+    <img class="layer front" src="${ROOT_PREFIX}${HERO_CUTOUT}" alt="" aria-hidden="true" decoding="async" draggable="false">
+  </picture>
+</section>
+
+<section class="intro" id="intro">
+  <div class="wrap intro-grid">
+    <h2 class="headline">${HEADLINE}</h2>
+    <div class="intro-copy">
+      <p class="lede">${SUBLINE}</p>
+      <p class="actions"><a class="btn" href="#reel">Watch reel</a><a class="btn btn-ghost" href="${ROOT_PREFIX}work.html">See work</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="reel" id="reel">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="kicker">Showreel</span>
+      </div>
+    </div>
+${SHOWREEL}
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="kicker">Selected work</span>
+        <h2>Featured projects</h2>
+      </div>
+    </div>
+${FEATURE}
+    <div class="grid featured-grid">
+${FEATURED_CARDS}
+    </div>
+    <p class="see-all"><a class="link-arrow" href="${ROOT_PREFIX}work.html">See all work</a></p>
+  </div>
+</section>
+
+<section class="capabilities" id="capabilities">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <span class="kicker">Capabilities</span>
+        <h2>What I do</h2>
+      </div>
+    </div>
+    <div class="caps">
+${CAPABILITIES}
+    </div>
+  </div>
+</section>
+
+${COLLABS}
+
+<section class="about" id="about">
+  <div class="wrap about-grid">
+    <div>
+      <span class="kicker">About</span>
+      <h2>${NAME}</h2>
+    </div>
+    <div class="body">
+${BIO_PARAGRAPHS}
+      <p class="cta">${CTA}</p>
+      <p class="actions"><a class="btn" href="${ROOT_PREFIX}contact.html">Get in touch</a><a class="link-arrow" href="${ROOT_PREFIX}about.html">More about me</a></p>
+    </div>
+  </div>
+</section>

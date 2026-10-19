@@ -48,8 +48,6 @@
       "ratio": "9 / 16",
       "year": "",
       "confirm": [
-        "brand",
-        "format",
         "year"
       ]
     },
@@ -58,15 +56,13 @@
       "title": "Bagels and cream cheese reveal",
       "brand": "Chip City Cookies",
       "project": "chip-city",
-      "format": "Collab drop",
+      "format": "Product reveal",
       "livid": "",
       "mp4": "assets/video/reels/bagels-cream-cheese-reveal.mp4",
       "poster": "assets/img/posters/reels/bagels-cream-cheese-reveal.jpg",
       "ratio": "9 / 16",
       "year": "",
       "confirm": [
-        "brand",
-        "format",
         "year"
       ]
     },
@@ -82,8 +78,6 @@
       "ratio": "9 / 16",
       "year": "",
       "confirm": [
-        "brand",
-        "format",
         "year"
       ]
     },
@@ -99,8 +93,6 @@
       "ratio": "9 / 16",
       "year": "",
       "confirm": [
-        "brand",
-        "format",
         "year"
       ]
     },
@@ -116,8 +108,6 @@
       "ratio": "9 / 16",
       "year": "",
       "confirm": [
-        "brand",
-        "format",
         "year"
       ]
     },
@@ -133,8 +123,6 @@
       "ratio": "9 / 16",
       "year": "",
       "confirm": [
-        "brand",
-        "format",
         "year"
       ]
     },
@@ -150,7 +138,6 @@
       "ratio": "9 / 16",
       "year": "",
       "confirm": [
-        "brand",
         "format",
         "year"
       ]
@@ -165,10 +152,7 @@
       "mp4": "assets/video/reels/baklava.mp4",
       "poster": "assets/img/posters/reels/baklava.jpg",
       "ratio": "9 / 16",
-      "year": "2024",
-      "confirm": [
-        "format"
-      ]
+      "year": "2024"
     },
     {
       "slug": "birthday",
@@ -180,10 +164,7 @@
       "mp4": "assets/video/reels/birthday.mp4",
       "poster": "assets/img/posters/reels/birthday.jpg",
       "ratio": "9 / 16",
-      "year": "2025",
-      "confirm": [
-        "format"
-      ]
+      "year": "2025"
     },
     {
       "slug": "black-white-cookie",
@@ -195,10 +176,7 @@
       "mp4": "assets/video/reels/black-white-cookie.mp4",
       "poster": "assets/img/posters/reels/black-white-cookie.jpg",
       "ratio": "9 / 16",
-      "year": "2024",
-      "confirm": [
-        "format"
-      ]
+      "year": "2024"
     },
     {
       "slug": "butterscotch",
@@ -210,10 +188,7 @@
       "mp4": "assets/video/reels/butterscotch.mp4",
       "poster": "assets/img/posters/reels/butterscotch.jpg",
       "ratio": "9 / 16",
-      "year": "2023",
-      "confirm": [
-        "format"
-      ]
+      "year": "2023"
     },
     {
       "slug": "cinnamon-roll",
@@ -225,10 +200,7 @@
       "mp4": "assets/video/reels/cinnamon-roll.mp4",
       "poster": "assets/img/posters/reels/cinnamon-roll.jpg",
       "ratio": "9 / 16",
-      "year": "2024",
-      "confirm": [
-        "format"
-      ]
+      "year": "2024"
     },
     {
       "slug": "coconut",
@@ -240,10 +212,7 @@
       "mp4": "assets/video/reels/coconut.mp4",
       "poster": "assets/img/posters/reels/coconut.jpg",
       "ratio": "9 / 16",
-      "year": "2024",
-      "confirm": [
-        "format"
-      ]
+      "year": "2024"
     },
     {
       "slug": "cookies-2025",
@@ -255,10 +224,7 @@
       "mp4": "assets/video/reels/cookies-2025.mp4",
       "poster": "assets/img/posters/reels/cookies-2025.jpg",
       "ratio": "9 / 16",
-      "year": "2025",
-      "confirm": [
-        "format"
-      ]
+      "year": "2025"
     },
     {
       "slug": "thin-chips",
@@ -270,10 +236,7 @@
       "mp4": "assets/video/reels/thin-chips.mp4",
       "poster": "assets/img/posters/reels/thin-chips.jpg",
       "ratio": "9 / 16",
-      "year": "2024",
-      "confirm": [
-        "format"
-      ]
+      "year": "2024"
     },
     {
       "slug": "launch-2023",
@@ -285,10 +248,7 @@
       "mp4": "assets/video/reels/launch-2023.mp4",
       "poster": "assets/img/posters/reels/launch-2023.jpg",
       "ratio": "9 / 16",
-      "year": "2023",
-      "confirm": [
-        "format"
-      ]
+      "year": "2023"
     },
     {
       "slug": "strawberry",
@@ -300,10 +260,7 @@
       "mp4": "assets/video/reels/strawberry.mp4",
       "poster": "assets/img/posters/reels/strawberry.jpg",
       "ratio": "9 / 16",
-      "year": "2025",
-      "confirm": [
-        "format"
-      ]
+      "year": "2025"
     }
   ],
   "reel_formats_note": "[Anatomy of a reel: pick one reel and break down the hook (0–2s), the pacing, and the last frame, in your words]",
@@ -314,56 +271,41 @@
       "client": "Açaí Express",
       "year": "",
       "ratio": "16 / 9",
-      "confirm": [
-        "role"
-      ],
       "livid": "",
-      "role": "[Animation]",
+      "role": "Animator",
       "mp4": "assets/video/motion/acai-express-logo.mp4",
       "poster": "assets/img/posters/motion/acai-express-logo.jpg"
     },
     {
       "slug": "world-water-day",
       "title": "World Water Day",
-      "client": "[Client]",
+      "client": "AdWorks Corp",
       "year": "2021",
       "ratio": "16 / 9",
-      "confirm": [
-        "client",
-        "role"
-      ],
       "livid": "",
-      "role": "[Animation]",
+      "role": "Animator",
       "mp4": "assets/video/motion/world-water-day.mp4",
       "poster": "assets/img/posters/motion/world-water-day.jpg"
     },
     {
       "slug": "mosaico-doctores",
       "title": "Mosaico Doctores",
-      "client": "[Client]",
+      "client": "AdWorks Corp",
       "year": "2022",
       "ratio": "1 / 1",
-      "confirm": [
-        "client",
-        "role"
-      ],
       "livid": "",
-      "role": "[Animation]",
+      "role": "Animator",
       "mp4": "assets/video/motion/mosaico-doctores.mp4",
       "poster": "assets/img/posters/motion/mosaico-doctores.jpg"
     },
     {
       "slug": "pride",
       "title": "Pride",
-      "client": "[Client]",
+      "client": "AdWorks Corp",
       "year": "2022",
       "ratio": "1 / 1",
-      "confirm": [
-        "client",
-        "role"
-      ],
       "livid": "",
-      "role": "[Animation]",
+      "role": "Animator",
       "mp4": "assets/video/motion/pride.mp4",
       "poster": "assets/img/posters/motion/pride.jpg"
     },
@@ -375,11 +317,10 @@
       "ratio": "1 / 1",
       "confirm": [
         "client",
-        "role",
         "year"
       ],
       "livid": "",
-      "role": "[Animation]",
+      "role": "Animator",
       "mp4": "assets/video/motion/gallera.mp4",
       "poster": "assets/img/posters/motion/gallera.jpg"
     },
@@ -390,11 +331,10 @@
       "year": "2020",
       "ratio": "16 / 9",
       "confirm": [
-        "client",
-        "role"
+        "client"
       ],
       "livid": "",
-      "role": "[Animation]",
+      "role": "Animator",
       "mp4": "assets/video/motion/promo-animation-2020.mp4",
       "poster": "assets/img/posters/motion/promo-animation-2020.jpg"
     },
@@ -405,10 +345,7 @@
       "year": "",
       "ratio": "9 / 16",
       "livid": "https://livid.com/embed/myDK79jCqScT",
-      "confirm": [
-        "role"
-      ],
-      "role": "[Animation]",
+      "role": "Animator",
       "mp4": "",
       "poster": ""
     }
@@ -553,7 +490,7 @@
     {
       "artist": "Ednita Nazario",
       "work": "Pedir Perdón",
-      "role": "[Role]",
+      "role": "Camera operator",
       "year": "2021"
     },
     {
@@ -587,5 +524,5 @@
       "year": "2021"
     }
   ],
-  "credits_confirm": true
+  "credits_confirm": false
 }

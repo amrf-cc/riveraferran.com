@@ -3,8 +3,71 @@
   var btn = document.querySelector('.nav-toggle');
   var nav = document.querySelector('nav.main');
   if (btn && nav) {
-    btn.addEventListener('click', function () { nav.classList.toggle('open'); });
+    btn.addEventListener('click', function () {
+      var open = nav.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
   }
+})();
+
+// Work filters: pills are plain #tag links, so without JS every card stays
+// visible. With JS the hash (#ai, #product ...) selects the cards to show,
+// which also makes work.html#ai links from other pages land pre-filtered.
+(function () {
+  var bar = document.querySelector('[data-filter-group]');
+  if (!bar) return;
+  var links = Array.prototype.slice.call(bar.querySelectorAll('a[data-filter]'));
+  var items = Array.prototype.slice.call(document.querySelectorAll('.work-grid [data-tags]'));
+  var empty = document.querySelector('.filter-empty');
+  var known = links.map(function (a) { return a.getAttribute('data-filter'); });
+  function apply() {
+    var tag = decodeURIComponent((window.location.hash || '').replace(/^#/, ''));
+    if (known.indexOf(tag) === -1) tag = 'all';
+    var shown = 0;
+    items.forEach(function (el) {
+      var tags = (el.getAttribute('data-tags') || '').split(/\s+/);
+      var on = tag === 'all' || tags.indexOf(tag) !== -1;
+      el.hidden = !on;
+      if (on) shown++;
+    });
+    links.forEach(function (a) {
+      var on = a.getAttribute('data-filter') === tag;
+      a.classList.toggle('active', on);
+      a.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    if (empty) empty.hidden = shown !== 0;
+  }
+  window.addEventListener('hashchange', apply);
+  apply();
+})();
+
+// Reel cards: a poster + play button until clicked, then a real <video>.
+// Only one reel plays at a time.
+(function () {
+  function pauseOthers(current) {
+    Array.prototype.forEach.call(document.querySelectorAll('video'), function (v) {
+      if (v !== current && !v.paused) v.pause();
+    });
+  }
+  document.addEventListener('play', function (e) {
+    if (e.target && e.target.tagName === 'VIDEO') pauseOthers(e.target);
+  }, true);
+  document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('button.reel-play') : null;
+    if (!b) return;
+    var v = document.createElement('video');
+    v.setAttribute('controls', '');
+    v.setAttribute('autoplay', '');
+    v.setAttribute('playsinline', '');
+    v.setAttribute('controlslist', 'nodownload');
+    v.setAttribute('draggable', 'false');
+    if (b.getAttribute('data-poster')) v.setAttribute('poster', b.getAttribute('data-poster'));
+    v.src = b.getAttribute('data-src');
+    b.parentNode.replaceChild(v, b);
+    pauseOthers(v);
+    var p = v.play();
+    if (p && p.catch) p.catch(function () {});
+  });
 })();
 
 // Lightbox: open a photo, then browse the whole project with the arrow buttons,
