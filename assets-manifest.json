@@ -1521,80 +1521,6 @@
         }
       ]
     },
-    "music-video-sets": {
-      "photos": [
-        {
-          "full": "assets/img/music-video-sets/01.jpg",
-          "thumb": "assets/img/music-video-sets/thumbs/01.jpg",
-          "alt": "Puerto Rican concert, New York City, 2024"
-        }
-      ],
-      "videos": [
-        {
-          "title": "Ednita Nazario — Pedir Perdón, 2021",
-          "livid": "https://livid.com/embed/5Ovze-6Vj10p",
-          "mp4": "",
-          "poster": "assets/img/music-video-sets/ednita-nazario-pedir-perdon-2021.jpg",
-          "ratio": "16 / 9"
-        },
-        {
-          "title": "Enyel C, 2022",
-          "livid": "https://livid.com/embed/5LM_17UBGDSH",
-          "mp4": "",
-          "poster": "assets/img/music-video-sets/enyel-c-2022.jpg",
-          "ratio": "16 / 9"
-        },
-        {
-          "title": "Gigolo y La Exce — Rolia, 2022",
-          "livid": "https://livid.com/embed/-756Dn06BhdQ",
-          "mp4": "",
-          "poster": "assets/img/music-video-sets/gigolo-y-la-exce-rolia-2022.jpg",
-          "ratio": "16 / 9"
-        },
-        {
-          "title": "Jotaerre & Lil JouJou — Flamenco, 2022",
-          "livid": "https://livid.com/embed/pSGWhgli5CBi",
-          "mp4": "",
-          "poster": "assets/img/music-video-sets/jotaerre-lil-joujou-flamenco-2022.jpg",
-          "ratio": "16 / 9"
-        },
-        {
-          "title": "Rauw Alejandro & Chencho Corleone — El Efecto, 2019",
-          "livid": "https://livid.com/embed/hp_vsZ99xdTt",
-          "mp4": "",
-          "poster": "assets/img/music-video-sets/rauw-alejandro-chencho-corleone-el-efecto-2019.jpg",
-          "ratio": "16 / 9"
-        },
-        {
-          "title": "Wisin & Jhay Cortez — Fiel, 2022",
-          "livid": "https://livid.com/embed/5Uiob4L5WNVW",
-          "mp4": "",
-          "poster": "assets/img/music-video-sets/wisin-jhay-cortez-fiel-2022.jpg",
-          "ratio": "16 / 9"
-        },
-        {
-          "title": "Wisin, Jowell & Randy — Baja Sube Sube, 2023",
-          "livid": "https://livid.com/embed/TIYfzMxqiT-y",
-          "mp4": "",
-          "poster": "assets/img/music-video-sets/wisin-jowell-randy-baja-sube-sube-2023.jpg",
-          "ratio": "16 / 9"
-        },
-        {
-          "title": "Wisin & Myke Towers — Mi Niña, 2022",
-          "livid": "https://livid.com/embed/uwsJ6maMEOGg",
-          "mp4": "",
-          "poster": "assets/img/music-video-sets/wisin-myke-towers-mi-nina-2022.jpg",
-          "ratio": "16 / 9"
-        },
-        {
-          "title": "Wisin, Yandel & Bad Bunny — Dame Algo, 2019",
-          "livid": "https://livid.com/embed/BOq-QP7NayHn",
-          "mp4": "",
-          "poster": "assets/img/music-video-sets/wisin-yandel-bad-bunny-dame-algo-2019.jpg",
-          "ratio": "16 / 9"
-        }
-      ]
-    },
     "concerts-photography": {
       "photos": [
         {
@@ -2066,6 +1992,109 @@
           "full": "assets/img/the-french-workshop/08.jpg",
           "thumb": "assets/img/the-french-workshop/thumbs/08.jpg",
           "alt": "Close-up of a Black Forest cake with cherry"
+        }
+      ],
+      "videos": []
+    },
+    "wisin": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Wisin & Jhay Cortez — Fiel, 2022",
+          "livid": "https://livid.com/embed/5Uiob4L5WNVW",
+          "mp4": "",
+          "poster": "assets/img/wisin/wisin-jhay-cortez-fiel-2022.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Wisin, Jowell & Randy — Baja Sube Sube, 2023",
+          "livid": "https://livid.com/embed/TIYfzMxqiT-y",
+          "mp4": "",
+          "poster": "assets/img/wisin/wisin-jowell-randy-baja-sube-sube-2023.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Wisin & Myke Towers — Mi Niña, 2022",
+          "livid": "https://livid.com/embed/uwsJ6maMEOGg",
+          "mp4": "",
+          "poster": "assets/img/wisin/wisin-myke-towers-mi-nina-2022.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Wisin, Yandel & Bad Bunny — Dame Algo, 2019",
+          "livid": "https://livid.com/embed/BOq-QP7NayHn",
+          "mp4": "",
+          "poster": "assets/img/wisin/wisin-yandel-bad-bunny-dame-algo-2019.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "rauw-alejandro": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Rauw Alejandro & Chencho Corleone — El Efecto, 2019",
+          "livid": "https://livid.com/embed/hp_vsZ99xdTt",
+          "mp4": "",
+          "poster": "assets/img/rauw-alejandro/rauw-alejandro-chencho-corleone-el-efecto-2019.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "ednita-nazario": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Ednita Nazario — Pedir Perdón, 2021",
+          "livid": "https://livid.com/embed/5Ovze-6Vj10p",
+          "mp4": "",
+          "poster": "assets/img/ednita-nazario/ednita-nazario-pedir-perdon-2021.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "jotaerre": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Jotaerre & Lil JouJou — Flamenco, 2022",
+          "livid": "https://livid.com/embed/pSGWhgli5CBi",
+          "mp4": "",
+          "poster": "assets/img/jotaerre/jotaerre-lil-joujou-flamenco-2022.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "gigolo-la-exce": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Gigolo y La Exce — Rolia, 2022",
+          "livid": "https://livid.com/embed/-756Dn06BhdQ",
+          "mp4": "",
+          "poster": "assets/img/gigolo-la-exce/gigolo-y-la-exce-rolia-2022.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "enyel-c": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Enyel C, 2022",
+          "livid": "https://livid.com/embed/5LM_17UBGDSH",
+          "mp4": "",
+          "poster": "assets/img/enyel-c/enyel-c-2022.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "cosculluela": {
+      "photos": [
+        {
+          "full": "assets/img/cosculluela/01.jpg",
+          "thumb": "assets/img/cosculluela/thumbs/01.jpg",
+          "alt": "Puerto Rican concert, New York City, 2024"
         }
       ],
       "videos": []

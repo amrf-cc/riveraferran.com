@@ -239,8 +239,7 @@
       "years": "2021, 2023–2024",
       "location": "New York City · Puerto Rico",
       "tags": [
-        "social",
-        "motion"
+        "social"
       ],
       "description": "Vertical fitness videos for Ninja Bear in New York City across 2023 and 2024, and a fitness video for Norberto NMZ in Puerto Rico in 2021.",
       "category": "commercial-corporate"
@@ -323,11 +322,10 @@
       "years": "2022",
       "location": "Puerto Rico",
       "tags": [
-        "campaigns",
-        "motion"
+        "campaigns"
       ],
       "description": "Camera operator on a commercial for Chente Ydrach at the Coliseo de Puerto Rico, 2022, in a 30-second cut and a 2:11 cut.",
-      "category": "concerts-events"
+      "category": "film-tv"
     },
     {
       "slug": "lunay-recap",
@@ -383,7 +381,7 @@
       "tags": [
         "motion"
       ],
-      "description": "Producer on the Caro and Cuando Perriabas visualizers, talent producer on Como Antes, cinematographer on Tenemos Que Hablar, key production assistant on the 200 MPH music video with Diplo, and colorist on its visualizer.",
+      "description": "Producer on the Caro and Cuando Perriabas visualizers, on-camera talent on Como Antes, cinematographer on Tenemos Que Hablar, key production assistant on the 200 MPH music video with Diplo, and colorist on its visualizer.",
       "category": "music-videos"
     },
     {
@@ -395,24 +393,108 @@
       "years": "2020–2022",
       "location": "Puerto Rico",
       "tags": [
-        "motion",
-        "social"
+        "social",
+        "motion"
       ],
       "description": "Videographer on an Apple Music interview with Jhay Cortez (2020), an Apple Music video (2022), and a music video behind-the-scenes piece (2022).",
-      "category": "music-videos"
+      "category": "film-tv"
     },
     {
-      "slug": "music-video-sets",
-      "client": "Wisin · Rauw Alejandro · Ednita Nazario · more",
-      "title": "Music video sets",
-      "oneliner": "Camera, gimbal, and production work across nine music videos.",
-      "role": "Camera operator · gimbal operator · producer · production assistant",
+      "slug": "wisin",
+      "client": "Wisin",
+      "title": "Wisin music videos",
+      "oneliner": "Production assistant on Dame Algo, Fiel and Mi Niña; camera operator on Baja Sube Sube.",
+      "role": "Production assistant · camera operator",
       "years": "2019–2023",
       "location": "Puerto Rico",
       "tags": [
         "motion"
       ],
-      "description": "Work on music videos for Wisin, Rauw Alejandro & Chencho Corleone, Ednita Nazario, Jotaerre & Lil JouJou, Gigolo y La Exce, and Enyel C, plus a Cosculluela behind-the-scenes photo.",
+      "description": "Production assistant on Dame Algo, Fiel and Mi Niña; camera operator on Baja Sube Sube.",
+      "category": "music-videos"
+    },
+    {
+      "slug": "rauw-alejandro",
+      "client": "Rauw Alejandro & Chencho Corleone",
+      "title": "El Efecto",
+      "oneliner": "Producer on the El Efecto music video.",
+      "role": "Producer",
+      "years": "2019",
+      "location": "Puerto Rico",
+      "tags": [
+        "motion"
+      ],
+      "description": "Producer on the El Efecto music video.",
+      "category": "music-videos"
+    },
+    {
+      "slug": "ednita-nazario",
+      "client": "Ednita Nazario",
+      "title": "Pedir Perdón",
+      "oneliner": "Camera operator on the Pedir Perdón music video.",
+      "role": "Camera operator",
+      "years": "2021",
+      "location": "Puerto Rico",
+      "tags": [
+        "motion"
+      ],
+      "description": "Camera operator on the Pedir Perdón music video.",
+      "category": "music-videos"
+    },
+    {
+      "slug": "jotaerre",
+      "client": "Jotaerre & Lil JouJou",
+      "title": "Flamenco",
+      "oneliner": "Camera operator on the Flamenco music video.",
+      "role": "Camera operator",
+      "years": "2022",
+      "location": "Puerto Rico",
+      "tags": [
+        "motion"
+      ],
+      "description": "Camera operator on the Flamenco music video.",
+      "category": "music-videos"
+    },
+    {
+      "slug": "gigolo-la-exce",
+      "client": "Gigolo y La Exce",
+      "title": "Rolia",
+      "oneliner": "Gimbal operator on the Rolia music video.",
+      "role": "Gimbal operator",
+      "years": "2022",
+      "location": "Puerto Rico",
+      "tags": [
+        "motion"
+      ],
+      "description": "Gimbal operator on the Rolia music video.",
+      "category": "music-videos"
+    },
+    {
+      "slug": "enyel-c",
+      "client": "Enyel C",
+      "title": "Music video",
+      "oneliner": "Camera operator on the music video.",
+      "role": "Camera operator",
+      "years": "2022",
+      "location": "Puerto Rico",
+      "tags": [
+        "motion"
+      ],
+      "description": "Camera operator on the music video.",
+      "category": "music-videos"
+    },
+    {
+      "slug": "cosculluela",
+      "client": "Cosculluela",
+      "title": "Behind the scenes",
+      "oneliner": "Behind the scenes on a Cosculluela music video.",
+      "role": "",
+      "years": "2020",
+      "location": "Puerto Rico",
+      "tags": [
+        "motion"
+      ],
+      "description": "Behind the scenes on a Cosculluela music video.",
       "category": "music-videos"
     },
     {
