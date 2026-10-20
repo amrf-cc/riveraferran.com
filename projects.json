@@ -31,7 +31,8 @@
         "E-commerce photos for every new product"
       ],
       "result": "[One result you can back up: a campaign, a number you kept, a launch that sold out]",
-      "bts": "[Behind-the-scenes photo of you on set]"
+      "bts": "[Behind-the-scenes photo of you on set]",
+      "category": "food-beverage"
     },
     {
       "slug": "ai-production-assistant",
@@ -54,7 +55,8 @@
       ],
       "scope": [],
       "result": "[Time saved, only if timed: e.g. 4-cam sync, X min to Y min]",
-      "demo": "[60–90s screen recording: the agent syncing a multicam shoot or building an After Effects animation. Hide file paths and logins.]"
+      "demo": "[60–90s screen recording: the agent syncing a multicam shoot or building an After Effects animation. Hide file paths and logins.]",
+      "category": ""
     },
     {
       "slug": "rodowita-water",
@@ -77,7 +79,8 @@
       ],
       "scope": [],
       "result": "AI-assisted creative that ran live for the launch.",
-      "ai_steps": "[Three-step comparison per piece: real studio shot, AI step, final ad]"
+      "ai_steps": "[Three-step comparison per piece: real studio shot, AI step, final ad]",
+      "category": "food-beverage"
     },
     {
       "slug": "chef-mia-castro",
@@ -93,7 +96,8 @@
         "social",
         "product"
       ],
-      "description": "Chef Mia Castro is a Puerto Rican chef and cookbook author — Beat Bobby Flay champion, Hell's Kitchen standout, host of Ramsay in 10 — whose debut cookbook, Cocina Puerto Rico, became a bestseller. When Bad Bunny's Super Bowl halftime show put Puerto Rico in the spotlight, she moved fast: a picadera booklet, Puerto Rican snack recipes built for watch parties, exclusive to pre-orders. I shot every image in it. Now I'm behind the camera as cinematographer for Sabor y Sazón, the companion series that turns hand-picked recipes from the book into something you can watch, releasing now."
+      "description": "Chef Mia Castro is a Puerto Rican chef and cookbook author — Beat Bobby Flay champion, Hell's Kitchen standout, host of Ramsay in 10 — whose debut cookbook, Cocina Puerto Rico, became a bestseller. When Bad Bunny's Super Bowl halftime show put Puerto Rico in the spotlight, she moved fast: a picadera booklet, Puerto Rican snack recipes built for watch parties, exclusive to pre-orders. I shot every image in it. Now I'm behind the camera as cinematographer for Sabor y Sazón, the companion series that turns hand-picked recipes from the book into something you can watch, releasing now.",
+      "category": "food-beverage"
     },
     {
       "slug": "acai-express",
@@ -109,7 +113,8 @@
         "social",
         "motion"
       ],
-      "description": "Açaí Express went from one surfside food truck in San Juan to Puerto Rico's largest açaí brand. I shot product photography for them, and directed my first TV commercial — it aired during the Super Bowl broadcast in Puerto Rico."
+      "description": "Açaí Express went from one surfside food truck in San Juan to Puerto Rico's largest açaí brand. I shot product photography for them, and directed my first TV commercial — it aired during the Super Bowl broadcast in Puerto Rico.",
+      "category": "food-beverage"
     },
     {
       "slug": "massis",
@@ -122,7 +127,8 @@
         "product",
         "founder"
       ],
-      "description": "Massi's Homemade Sandwiches runs on a simple premise: real food, made from scratch. Semolina sourdough baked in-house, fresh meats sourced with care, everything prepared by hand. When they called me to shoot their soft opening, I was in. A sandwich shop this proud of doing it right — and fully seed oil-free — is rare. After the opening, I shot their entire menu for the delivery apps."
+      "description": "Massi's Homemade Sandwiches runs on a simple premise: real food, made from scratch. Semolina sourdough baked in-house, fresh meats sourced with care, everything prepared by hand. When they called me to shoot their soft opening, I was in. A sandwich shop this proud of doing it right — and fully seed oil-free — is rare. After the opening, I shot their entire menu for the delivery apps.",
+      "category": "food-beverage"
     },
     {
       "slug": "gyro-king",
@@ -135,7 +141,8 @@
         "product",
         "founder"
       ],
-      "description": "Gyro King has held the same corner at 50 E. Fordham Road for over 50 years — same owner, same recipes. I shot part of the menu for DoorDash, then stayed for store and operations photos that show how the place works. The brief I gave myself: capture the raw essence of a Bronx institution."
+      "description": "Gyro King has held the same corner at 50 E. Fordham Road for over 50 years — same owner, same recipes. I shot part of the menu for DoorDash, then stayed for store and operations photos that show how the place works. The brief I gave myself: capture the raw essence of a Bronx institution.",
+      "category": "food-beverage"
     },
     {
       "slug": "joe-and-joe",
@@ -148,7 +155,8 @@
         "founder",
         "campaigns"
       ],
-      "description": "When Joe & Joe and Atezar Cocina & Ahumado planned a collab, both were one-person operations running out of home kitchens. Atezar turned its smoked meat into sausages, Joe & Joe made the buns, and I shot the commercial in the mountains of Puerto Rico. Both businesses have grown into their own physical locations since, built on high-quality, unique products."
+      "description": "When Joe & Joe and Atezar Cocina & Ahumado planned a collab, both were one-person operations running out of home kitchens. Atezar turned its smoked meat into sausages, Joe & Joe made the buns, and I shot the commercial in the mountains of Puerto Rico. Both businesses have grown into their own physical locations since, built on high-quality, unique products.",
+      "category": "food-beverage"
     },
     {
       "slug": "sobao-cidrines",
@@ -161,7 +169,8 @@
         "product",
         "social"
       ],
-      "description": "Sobao by Los Cidrines and La Bodeguita de Manolo share one address in San Juan. Sobao is the bakery and restaurant from Los Cidrines, an iconic Puerto Rico bakery name. The Bodeguita is the speakeasy hidden inside: a camouflaged door, moody ambiance, natural wood, exposed bulbs. I shot product photography and social video for both as one project."
+      "description": "Sobao by Los Cidrines and La Bodeguita de Manolo share one address in San Juan. Sobao is the bakery and restaurant from Los Cidrines, an iconic Puerto Rico bakery name. The Bodeguita is the speakeasy hidden inside: a camouflaged door, moody ambiance, natural wood, exposed bulbs. I shot product photography and social video for both as one project.",
+      "category": "food-beverage"
     },
     {
       "slug": "blue-moon",
@@ -173,7 +182,8 @@
       "tags": [
         "campaigns"
       ],
-      "description": "Mela designed a set of special-edition Blue Moon labels, and the beer landed at a favorite Puerto Rico hangout. I shot the recap video for the activation — Mela, the crowd, the bottles."
+      "description": "Mela designed a set of special-edition Blue Moon labels, and the beer landed at a favorite Puerto Rico hangout. I shot the recap video for the activation — Mela, the crowd, the bottles.",
+      "category": "food-beverage"
     },
     {
       "slug": "brand-activations",
@@ -186,7 +196,8 @@
         "campaigns"
       ],
       "description": "Brand activation and event coverage in Puerto Rico for McDonald's and Pepsi.",
-      "hidden": true
+      "hidden": true,
+      "category": "food-beverage"
     },
     {
       "slug": "spec-jewelry",
@@ -201,7 +212,8 @@
         "ai"
       ],
       "description": "[Planned spec shoot: bench work and materials, focus-stacked macro product, pieces worn, founder behind the scenes, three reels, one AI-assisted ad checked against the real piece.]",
-      "draft_only": true
+      "draft_only": true,
+      "category": "commercial-corporate"
     }
   ]
 }

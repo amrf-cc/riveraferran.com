@@ -148,5 +148,47 @@
       "place": "San Juan"
     }
   ],
-  "ai_label": "AI-assisted"
+  "ai_label": "AI-assisted",
+  "categories": [
+    {
+      "key": "food-beverage",
+      "label": "Food & Beverage",
+      "personal": false
+    },
+    {
+      "key": "commercial-corporate",
+      "label": "Commercial & Corporate",
+      "personal": false
+    },
+    {
+      "key": "film-tv",
+      "label": "Film & TV",
+      "personal": false
+    },
+    {
+      "key": "music-videos",
+      "label": "Music Videos",
+      "personal": false
+    },
+    {
+      "key": "concerts-events",
+      "label": "Concerts & Events",
+      "personal": false
+    },
+    {
+      "key": "photojournalism",
+      "label": "Photojournalism",
+      "personal": false
+    },
+    {
+      "key": "portraits",
+      "label": "Portraits",
+      "personal": false
+    },
+    {
+      "key": "street-travel",
+      "label": "Street & Travel",
+      "personal": true
+    }
+  ]
 }
