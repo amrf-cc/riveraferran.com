@@ -203,7 +203,7 @@ class TestReleaseGate(unittest.TestCase):
         ai = (self.tmp / "ai.html").read_text(encoding="utf-8")
         self.assertIn(RELEASE_AI_STEPS, ai)
         paid = (self.tmp / "paid-social.html").read_text(encoding="utf-8")
-        self.assertIn(RELEASE_VIDEO_AD["mp4"] + "?v=", paid)
+        self.assertIn(RELEASE_VIDEO_AD["livid"], paid)
         self.assertIn(RELEASE_STATIC_AD["image"] + "?v=", paid)
         reels = (self.tmp / "reels.html").read_text(encoding="utf-8")
         self.assertIn('id="motion"', reels)
