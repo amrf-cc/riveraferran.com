@@ -68,7 +68,8 @@ class TestPlaceholderHelpers(unittest.TestCase):
         site.build_all()
         where = {w for w, _ in site.generated}
         live_missing = [s for s in build.AI_LIVE
-                        if site.project(s) and not site.project(s).get("ai_steps")]
+                        if site.project(s) and not site.project(s).get("ai_steps")
+                        and not (site.manifest.get(s) or {}).get("sets")]
         for slug in live_missing:
             self.assertIn("ai.html#ran-live → %s.ai_steps" % slug, where)
         ps = data["media.json"].get("paid_social", {})

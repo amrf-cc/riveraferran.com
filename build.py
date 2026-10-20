@@ -994,8 +994,11 @@ class Site(object):
             if not p:
                 continue
             v = p.get("ai_steps")
+            has_sets = bool((self.manifest.get(slug) or {}).get("sets"))
             if v:
                 steps_html = self.box(v) if is_ph(v) else '<p class="ai-steps">%s</p>' % esc(v)
+            elif has_sets:
+                steps_html = ""   # the comparison sets below the cards carry this
             else:
                 steps_html = self.gen_box(
                     "ai.html#ran-live → %s.ai_steps" % slug,

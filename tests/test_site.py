@@ -786,8 +786,11 @@ class TestAI(BuiltSite):
                              % re.escape(slug), live, re.S)
             self.assertTrue(card, slug)
             card = card.group(0)
+            has_sets = bool((load("assets-manifest.json")["projects"].get(slug) or {}).get("sets"))
             if p.get("ai_steps"):
                 self.assertIn(ph_or_text(p["ai_steps"]), card)
+            elif has_sets:
+                self.assertNotIn("AI-assisted pieces: real shot", card)   # the sets below carry it
             elif draft:
                 self.assertIn('<div class="ph-box"><span class="ph-label">To add</span><p>%s AI-assisted pieces: '
                               'real shot → AI step → final</p></div>' % html.escape(p["client"]), card)
