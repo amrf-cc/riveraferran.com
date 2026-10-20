@@ -24,11 +24,9 @@
         "In my final months, built an AI chatbot that lets store staff look up baking procedures in plain language."
       ],
       "scope": [
-        "4–5 social videos a week",
-        "20–30 social photos a week",
-        "3–5 video ads and 10–15 static ads a month",
-        "Weekly menu videos and website updates",
-        "E-commerce photos for every new product"
+        "103 photos",
+        "5 videos",
+        "[Placeholder: where it ran]"
       ],
       "result": "[One result you can back up: a campaign, a number you kept, a launch that sold out]",
       "bts": "[Behind-the-scenes photo of you on set]",
@@ -53,7 +51,10 @@
         "It syncs four-camera shoots to audio, animates brand-accurate designs in After Effects, and builds ComfyUI workflows.",
         "It works with DaVinci Resolve, After Effects, Photoshop, Lightroom, and ComfyUI, so its output lands in my project files, ready to edit."
       ],
-      "scope": [],
+      "scope": [
+        "[Placeholder: what you delivered and where it ran]",
+        "[Placeholder: what you delivered and where it ran]"
+      ],
       "result": "[Time saved, only if timed: e.g. 4-cam sync, X min to Y min]",
       "demo": "[60–90s screen recording: the agent syncing a multicam shoot or building an After Effects animation. Hide file paths and logins.]",
       "category": "",
@@ -78,7 +79,11 @@
         "Extended and animated scenes with AI (Nano Banana, Photoshop Generative Extend, Runway, Veo), checking label, color, and shape against the real bottle at every step.",
         "Refined every prompt in Wondr Forge, my prompt tool, before generating."
       ],
-      "scope": [],
+      "scope": [
+        "23 photos",
+        "4 videos",
+        "[Placeholder: where it ran]"
+      ],
       "result": "AI-assisted creative that ran live for the launch.",
       "category": "food-beverage"
     },
@@ -96,8 +101,18 @@
         "social",
         "product"
       ],
-      "description": "Chef Mia Castro is a Puerto Rican chef and cookbook author — Beat Bobby Flay champion, Hell's Kitchen standout, host of Ramsay in 10 — whose debut cookbook, Cocina Puerto Rico, became a bestseller. When Bad Bunny's Super Bowl halftime show put Puerto Rico in the spotlight, she moved fast: a picadera booklet, Puerto Rican snack recipes built for watch parties, exclusive to pre-orders. I shot every image in it. Now I'm behind the camera as cinematographer for Sabor y Sazón, the companion series that turns hand-picked recipes from the book into something you can watch, releasing now.",
-      "category": "food-beverage"
+      "category": "food-beverage",
+      "scope": [
+        "14 photos",
+        "3 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Chef Mia Castro is a Puerto Rican chef and cookbook author — Beat Bobby Flay champion, Hell's Kitchen standout, host of Ramsay in 10 — whose debut cookbook, Cocina Puerto Rico, became a bestseller. When Bad Bunny's Super Bowl halftime show put Puerto Rico in the spotlight, she moved fast: a picadera booklet, Puerto Rican snack recipes built for watch parties, exclusive to pre-orders. I shot every image in it. Now I'm behind the camera as cinematographer for Sabor y Sazón, the companion series that turns hand-picked recipes from the book into something you can watch, releasing now.",
+      "did": [
+        "Worked as Photographer and cinematographer for Sabor y Sazón.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "acai-express",
@@ -113,8 +128,18 @@
         "social",
         "motion"
       ],
-      "description": "Açaí Express went from one surfside food truck in San Juan to Puerto Rico's largest açaí brand. I shot product photography for them, and directed my first TV commercial — it aired during the Super Bowl broadcast in Puerto Rico.",
-      "category": "food-beverage"
+      "category": "food-beverage",
+      "scope": [
+        "11 photos",
+        "4 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Açaí Express went from one surfside food truck in San Juan to Puerto Rico's largest açaí brand. I shot product photography for them, and directed my first TV commercial — it aired during the Super Bowl broadcast in Puerto Rico.",
+      "did": [
+        "Worked as Photographer and director.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "massis",
@@ -127,8 +152,18 @@
         "product",
         "founder"
       ],
-      "description": "Massi's Homemade Sandwiches runs on a simple premise: real food, made from scratch. Semolina sourdough baked in-house, fresh meats sourced with care, everything prepared by hand. When they called me to shoot their soft opening, I was in. A sandwich shop this proud of doing it right — and fully seed oil-free — is rare. After the opening, I shot their entire menu for the delivery apps.",
-      "category": "food-beverage"
+      "category": "food-beverage",
+      "oneliner": "Massi's Homemade Sandwiches, Photographer & Videographer, 2025.",
+      "scope": [
+        "19 photos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Massi's Homemade Sandwiches runs on a simple premise: real food, made from scratch. Semolina sourdough baked in-house, fresh meats sourced with care, everything prepared by hand. When they called me to shoot their soft opening, I was in. A sandwich shop this proud of doing it right — and fully seed oil-free — is rare. After the opening, I shot their entire menu for the delivery apps.",
+      "did": [
+        "Worked as Photographer & Videographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "gyro-king",
@@ -141,8 +176,18 @@
         "product",
         "founder"
       ],
-      "description": "Gyro King has held the same corner at 50 E. Fordham Road for over 50 years — same owner, same recipes. I shot part of the menu for DoorDash, then stayed for store and operations photos that show how the place works. The brief I gave myself: capture the raw essence of a Bronx institution.",
-      "category": "food-beverage"
+      "category": "food-beverage",
+      "oneliner": "Gyro King, Photographer.",
+      "scope": [
+        "15 photos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Gyro King has held the same corner at 50 E. Fordham Road for over 50 years — same owner, same recipes. I shot part of the menu for DoorDash, then stayed for store and operations photos that show how the place works. The brief I gave myself: capture the raw essence of a Bronx institution.",
+      "did": [
+        "Worked as Photographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "joe-and-joe",
@@ -155,8 +200,18 @@
         "founder",
         "campaigns"
       ],
-      "description": "When Joe & Joe and Atezar Cocina & Ahumado planned a collab, both were one-person operations running out of home kitchens. Atezar turned its smoked meat into sausages, Joe & Joe made the buns, and I shot the commercial in the mountains of Puerto Rico. Both businesses have grown into their own physical locations since, built on high-quality, unique products.",
-      "category": "food-beverage"
+      "category": "food-beverage",
+      "oneliner": "Joe & Joe × Atezar, Director and camera operator, 2020.",
+      "scope": [
+        "1 video",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "When Joe & Joe and Atezar Cocina & Ahumado planned a collab, both were one-person operations running out of home kitchens. Atezar turned its smoked meat into sausages, Joe & Joe made the buns, and I shot the commercial in the mountains of Puerto Rico. Both businesses have grown into their own physical locations since, built on high-quality, unique products.",
+      "did": [
+        "Worked as Director and camera operator.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "sobao-cidrines",
@@ -169,8 +224,19 @@
         "product",
         "social"
       ],
-      "description": "Sobao by Los Cidrines and La Bodeguita de Manolo share one address in San Juan. Sobao is the bakery and restaurant from Los Cidrines, an iconic Puerto Rico bakery name. The Bodeguita is the speakeasy hidden inside: a camouflaged door, moody ambiance, natural wood, exposed bulbs. I shot product photography and social video for both as one project.",
-      "category": "food-beverage"
+      "category": "food-beverage",
+      "oneliner": "Sobao by Los Cidrines & La Bodeguita de Manolo, Photographer & Videographer, 2021–2022.",
+      "scope": [
+        "16 photos",
+        "3 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Sobao by Los Cidrines and La Bodeguita de Manolo share one address in San Juan. Sobao is the bakery and restaurant from Los Cidrines, an iconic Puerto Rico bakery name. The Bodeguita is the speakeasy hidden inside: a camouflaged door, moody ambiance, natural wood, exposed bulbs. I shot product photography and social video for both as one project.",
+      "did": [
+        "Worked as Photographer & Videographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "blue-moon",
@@ -182,8 +248,18 @@
       "tags": [
         "campaigns"
       ],
-      "description": "Mela designed a set of special-edition Blue Moon labels, and the beer landed at a favorite Puerto Rico hangout. I shot the recap video for the activation — Mela, the crowd, the bottles.",
-      "category": "food-beverage"
+      "category": "food-beverage",
+      "oneliner": "Blue Moon × Check-In Mela, Videographer.",
+      "scope": [
+        "1 video",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Mela designed a set of special-edition Blue Moon labels, and the beer landed at a favorite Puerto Rico hangout. I shot the recap video for the activation — Mela, the crowd, the bottles.",
+      "did": [
+        "Worked as Videographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "brand-activations",
@@ -195,9 +271,19 @@
       "tags": [
         "campaigns"
       ],
-      "description": "Brand activation and event coverage in Puerto Rico for McDonald's and Pepsi.",
       "hidden": true,
-      "category": "food-beverage"
+      "category": "food-beverage",
+      "oneliner": "McDonald's · Pepsi, Photographer, 2019.",
+      "scope": [
+        "6 photos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Brand activation and event coverage in Puerto Rico for McDonald's and Pepsi.",
+      "did": [
+        "Worked as Photographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "spec-jewelry",
@@ -211,9 +297,19 @@
         "founder",
         "ai"
       ],
-      "description": "[Planned spec shoot: bench work and materials, focus-stacked macro product, pieces worn, founder behind the scenes, three reels, one AI-assisted ad checked against the real piece.]",
       "draft_only": true,
-      "category": "commercial-corporate"
+      "category": "commercial-corporate",
+      "oneliner": "[Independent jeweler], Spec project.",
+      "scope": [
+        "[Placeholder: what you delivered and where it ran]",
+        "[Placeholder: what you delivered and where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "[Planned spec shoot: bench work and materials, focus-stacked macro product, pieces worn, founder behind the scenes, three reels, one AI-assisted ad checked against the real piece.]",
+      "did": [
+        "Worked as Spec project.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "supermax",
@@ -227,8 +323,17 @@
         "product",
         "campaigns"
       ],
-      "description": "Camera operator on an online commercial for Supermax in Puerto Rico, 2022.",
-      "category": "food-beverage"
+      "category": "food-beverage",
+      "scope": [
+        "1 video",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Camera operator on an online commercial for Supermax in Puerto Rico, 2022.",
+      "did": [
+        "Worked as Camera operator.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "ninja-bear",
@@ -241,8 +346,17 @@
       "tags": [
         "social"
       ],
-      "description": "Vertical fitness videos for Ninja Bear in New York City across 2023 and 2024, and a fitness video for Norberto NMZ in Puerto Rico in 2021.",
-      "category": "commercial-corporate"
+      "category": "commercial-corporate",
+      "scope": [
+        "9 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Vertical fitness videos for Ninja Bear in New York City across 2023 and 2024, and a fitness video for Norberto NMZ in Puerto Rico in 2021.",
+      "did": [
+        "Worked as Videographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "bldm",
@@ -255,8 +369,17 @@
       "tags": [
         "campaigns"
       ],
-      "description": "Corporate video for BLDM, a construction company in Puerto Rico, 2023.",
-      "category": "commercial-corporate"
+      "category": "commercial-corporate",
+      "scope": [
+        "5 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Corporate video for BLDM, a construction company in Puerto Rico, 2023.",
+      "did": [
+        "Worked as Videographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "cooperativa-hidroelectrica",
@@ -269,8 +392,17 @@
       "tags": [
         "campaigns"
       ],
-      "description": "Video for the Cooperativa Hidroeléctrica de la Montaña, a renewable energy cooperative in Puerto Rico, 2023.",
-      "category": "commercial-corporate"
+      "category": "commercial-corporate",
+      "scope": [
+        "2 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Video for the Cooperativa Hidroeléctrica de la Montaña, a renewable energy cooperative in Puerto Rico, 2023.",
+      "did": [
+        "Worked as Videographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "vrm-companies",
@@ -281,8 +413,17 @@
       "years": "2022",
       "location": "Puerto Rico",
       "tags": [],
-      "description": "Corporate photography for VRM Companies in Puerto Rico, 2022.",
-      "category": "commercial-corporate"
+      "category": "commercial-corporate",
+      "scope": [
+        "7 photos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Corporate photography for VRM Companies in Puerto Rico, 2022.",
+      "did": [
+        "Worked as Photographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "taller-salud",
@@ -295,8 +436,17 @@
       "tags": [
         "campaigns"
       ],
-      "description": "Camera operator on a commercial for Taller Salud in Puerto Rico, 2021.",
-      "category": "commercial-corporate"
+      "category": "commercial-corporate",
+      "scope": [
+        "1 video",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Camera operator on a commercial for Taller Salud in Puerto Rico, 2021.",
+      "did": [
+        "Worked as Camera operator.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "san-pa",
@@ -310,8 +460,17 @@
         "campaigns",
         "motion"
       ],
-      "description": "A 24-second commercial that ran on San Patricio Plaza's social channels and at the mall itself, promoting the mall as a spot to watch the FIFA World Cup in Puerto Rico. I edited and color graded it.",
-      "category": "commercial-corporate"
+      "category": "commercial-corporate",
+      "scope": [
+        "1 video",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "A 24-second commercial that ran on San Patricio Plaza's social channels and at the mall itself, promoting the mall as a spot to watch the FIFA World Cup in Puerto Rico. I edited and color graded it.",
+      "did": [
+        "Worked as Editor and colorist.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "chente-ydrach-coliseo",
@@ -324,8 +483,17 @@
       "tags": [
         "campaigns"
       ],
-      "description": "Camera operator on a commercial for Chente Ydrach at the Coliseo de Puerto Rico, 2022, in a 30-second cut and a 2:11 cut.",
-      "category": "film-tv"
+      "category": "film-tv",
+      "scope": [
+        "2 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Camera operator on a commercial for Chente Ydrach at the Coliseo de Puerto Rico, 2022, in a 30-second cut and a 2:11 cut.",
+      "did": [
+        "Worked as Camera operator.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "lunay-recap",
@@ -339,8 +507,17 @@
         "social",
         "motion"
       ],
-      "description": "Recap video for Lunay in Puerto Rico, 2019.",
-      "category": "concerts-events"
+      "category": "concerts-events",
+      "scope": [
+        "1 video",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Recap video for Lunay in Puerto Rico, 2019.",
+      "did": [
+        "Worked as Videographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "tv-film-sets",
@@ -353,8 +530,17 @@
       "tags": [
         "motion"
       ],
-      "description": "Camera operator on Gina Yei (Disney+, 2022), gimbal operator on an MLB Roberto Clemente piece (2022), and videographer on Exatlón (2019).",
-      "category": "film-tv"
+      "category": "film-tv",
+      "scope": [
+        "3 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Camera operator on Gina Yei (Disney+, 2022), gimbal operator on an MLB Roberto Clemente piece (2022), and videographer on Exatlón (2019).",
+      "did": [
+        "Worked as Camera operator and gimbal operator.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "irving-reyes",
@@ -367,8 +553,17 @@
       "tags": [
         "motion"
       ],
-      "description": "Director on Baby Uuu (2023), KTM (2022), and Toalla (2023) for Irving Reyes.",
-      "category": "music-videos"
+      "category": "music-videos",
+      "scope": [
+        "3 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Director on Baby Uuu (2023), KTM (2022), and Toalla (2023) for Irving Reyes.",
+      "did": [
+        "Worked as Director.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "bad-bunny",
@@ -381,8 +576,17 @@
       "tags": [
         "motion"
       ],
-      "description": "Producer on the Caro and Cuando Perriabas visualizers, on-camera talent on Como Antes, cinematographer on Tenemos Que Hablar, key production assistant on the 200 MPH music video with Diplo, and colorist on its visualizer.",
-      "category": "music-videos"
+      "category": "music-videos",
+      "scope": [
+        "6 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Producer on the Caro and Cuando Perriabas visualizers, on-camera talent on Como Antes, cinematographer on Tenemos Que Hablar, key production assistant on the 200 MPH music video with Diplo, and colorist on its visualizer.",
+      "did": [
+        "Worked as Producer, talent producer, cinematographer, colorist and key production assistant.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "jhay-cortez",
@@ -396,8 +600,17 @@
         "social",
         "motion"
       ],
-      "description": "Videographer on an Apple Music interview with Jhay Cortez (2020), an Apple Music video (2022), and a music video behind-the-scenes piece (2022).",
-      "category": "film-tv"
+      "category": "film-tv",
+      "scope": [
+        "2 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Videographer on an Apple Music interview with Jhay Cortez (2020), an Apple Music video (2022), and a music video behind-the-scenes piece (2022).",
+      "did": [
+        "Worked as Videographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "wisin",
@@ -410,8 +623,17 @@
       "tags": [
         "motion"
       ],
-      "description": "Production assistant on Dame Algo, Fiel and Mi Niña; camera operator on Baja Sube Sube.",
-      "category": "music-videos"
+      "category": "music-videos",
+      "scope": [
+        "4 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Production assistant on Dame Algo, Fiel and Mi Niña; camera operator on Baja Sube Sube.",
+      "did": [
+        "Worked as Production assistant and camera operator.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "rauw-alejandro",
@@ -424,8 +646,17 @@
       "tags": [
         "motion"
       ],
-      "description": "Producer on the El Efecto music video.",
-      "category": "music-videos"
+      "category": "music-videos",
+      "scope": [
+        "1 video",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Producer on the El Efecto music video.",
+      "did": [
+        "Worked as Producer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "ednita-nazario",
@@ -438,8 +669,17 @@
       "tags": [
         "motion"
       ],
-      "description": "Camera operator on the Pedir Perdón music video.",
-      "category": "music-videos"
+      "category": "music-videos",
+      "scope": [
+        "1 video",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Camera operator on the Pedir Perdón music video.",
+      "did": [
+        "Worked as Camera operator.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "jotaerre",
@@ -452,8 +692,17 @@
       "tags": [
         "motion"
       ],
-      "description": "Camera operator on the Flamenco music video.",
-      "category": "music-videos"
+      "category": "music-videos",
+      "scope": [
+        "1 video",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Camera operator on the Flamenco music video.",
+      "did": [
+        "Worked as Camera operator.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "gigolo-la-exce",
@@ -466,8 +715,17 @@
       "tags": [
         "motion"
       ],
-      "description": "Gimbal operator on the Rolia music video.",
-      "category": "music-videos"
+      "category": "music-videos",
+      "scope": [
+        "1 video",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Gimbal operator on the Rolia music video.",
+      "did": [
+        "Worked as Gimbal operator.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "enyel-c",
@@ -480,8 +738,17 @@
       "tags": [
         "motion"
       ],
-      "description": "Camera operator on the music video.",
-      "category": "music-videos"
+      "category": "music-videos",
+      "scope": [
+        "1 video",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Camera operator on the music video.",
+      "did": [
+        "Worked as Camera operator.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "cosculluela",
@@ -494,8 +761,17 @@
       "tags": [
         "motion"
       ],
-      "description": "Behind the scenes on a Cosculluela music video.",
-      "category": "music-videos"
+      "category": "music-videos",
+      "scope": [
+        "1 photo",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Behind the scenes on a Cosculluela music video.",
+      "did": [
+        "[Placeholder: what you did on this project]",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "concerts-photography",
@@ -506,8 +782,17 @@
       "years": "2017–2024",
       "location": "Puerto Rico · New York City",
       "tags": [],
-      "description": "Concert photography for Cultura Profética, Los Walters, and Teatro Breve at the Coliseo de Puerto Rico; concert and documentary photography for Dúo Deleite; and concert photography from New York City, 2017–2024.",
-      "category": "concerts-events"
+      "category": "concerts-events",
+      "scope": [
+        "18 photos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Concert photography for Cultura Profética, Los Walters, and Teatro Breve at the Coliseo de Puerto Rico; concert and documentary photography for Dúo Deleite; and concert photography from New York City, 2017–2024.",
+      "did": [
+        "Worked as Photographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "portraits",
@@ -518,8 +803,17 @@
       "years": "2023–2025",
       "location": "New York City · Puerto Rico",
       "tags": [],
-      "description": "Portraits of Bendi La Bendición (New York City, 2025), DLA Piper (Puerto Rico, 2023), and Enyel C (New York City, 2024).",
-      "category": "portraits"
+      "category": "portraits",
+      "scope": [
+        "8 photos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Portraits of Bendi La Bendición (New York City, 2025), DLA Piper (Puerto Rico, 2023), and Enyel C (New York City, 2024).",
+      "did": [
+        "Worked as Photographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "street-travel",
@@ -530,8 +824,17 @@
       "years": "2017–2025",
       "location": "New York City · Alaska · Barcelona · Puerto Rico",
       "tags": [],
-      "description": "Street photography in New York City (2024, including Kodak 400 film) and travel photography from Alaska (2020), Barcelona (2025), and Puerto Rico.",
-      "category": "street-travel"
+      "category": "street-travel",
+      "scope": [
+        "41 photos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Street photography in New York City (2024, including Kodak 400 film) and travel photography from Alaska (2020), Barcelona (2025), and Puerto Rico.",
+      "did": [
+        "Worked as Photographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "la-lucha-continua",
@@ -542,8 +845,17 @@
       "years": "2017",
       "location": "San Juan, Puerto Rico",
       "tags": [],
-      "description": "Documentary photographs from 2017 protest events in San Juan, Puerto Rico: national assemblies, the May Day national strike, pickets, Family Day #AuditNow, and the 3rd General Student Assembly at UPR Río Piedras.",
-      "category": "photojournalism"
+      "category": "photojournalism",
+      "scope": [
+        "15 photos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "Documentary photographs from 2017 protest events in San Juan, Puerto Rico: national assemblies, the May Day national strike, pickets, Family Day #AuditNow, and the 3rd General Student Assembly at UPR Río Piedras.",
+      "did": [
+        "Worked as Photographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     },
     {
       "slug": "the-french-workshop",
@@ -557,8 +869,18 @@
         "product",
         "social"
       ],
-      "description": "A set of product images and two reels for The French Workshop in 2026, delivered for their social media.",
-      "category": "food-beverage"
+      "category": "food-beverage",
+      "scope": [
+        "8 photos",
+        "2 videos",
+        "[Placeholder: where it ran]"
+      ],
+      "result": "[Placeholder: how it was used, or what it led to]",
+      "brief": "A set of product images and two reels for The French Workshop in 2026, delivered for their social media.",
+      "did": [
+        "Worked as Photographer and videographer.",
+        "[Placeholder: what you were responsible for, in one line]"
+      ]
     }
   ]
 }

@@ -756,7 +756,8 @@ class TestAI(BuiltSite):
             self.assertLess(copy.index(ph_or_text(p["brief"])), did_at, "brief must come before the bullets")
         if p.get("scope"):
             for x in p["scope"]:
-                self.assertIn("<li>%s</li>" % ph_or_text(x), copy)
+                # A placeholder scope item renders as a chip inside the <li>.
+                self.assertIn(ph_or_text(x), copy)
         else:
             self.assertNotIn("ai-scope", copy)
         if p.get("result"):
