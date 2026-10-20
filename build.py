@@ -39,6 +39,25 @@ AI_LIVE = ("rodowita-water", "chip-city")
 # Ad placement sizes the Paid Social page asks for while a list is empty.
 AD_SIZES = "9:16, 4:5, 1:1"
 
+# Capability tag -> the page that shows that skill (root-relative to the site,
+# prefixed per page). The home capability strip and the case-study tag pills
+# both link through this one map. "" (or a tag missing here) renders as plain
+# text with no link.
+CAP_LINKS = {
+    "social": "reels.html",
+    "motion": "reels.html#motion",
+    "paid": "paid-social.html",
+    "ai": "ai.html",
+    "product": "work.html#food-beverage",
+    "campaigns": "work.html#commercial-corporate",
+    "founder": "",
+}
+
+# Work page: heading for projects that belong to no category (All view only),
+# and the note personal categories carry on their heading and cards.
+OTHER_WORK_LABEL = "Other work"
+PERSONAL_LABEL = "Personal work"
+
 
 # ---------------------------------------------------------------------------
 # Loading
@@ -215,6 +234,11 @@ class Site(object):
                         and not (release and p.get("draft_only"))]
         self.cap_labels = {c.get("tag"): c.get("label", c.get("tag"))
                            for c in self.config.get("capabilities", [])}
+        # Work groups, in display order. A project whose category is "" or a
+        # key missing here belongs to no group (Work "All" view only).
+        self.categories = [c for c in self.config.get("categories", [])
+                           if isinstance(c, dict) and c.get("key")]
+        self.cat_by_key = {c["key"]: c for c in self.categories}
         self.hero_paths = {self.config.get("hero_image"),
                            self.config.get("hero_image_phone")} - {None, ""}
         # Placeholders the templates had to invent (no data string behind
@@ -265,18 +289,59 @@ class Site(object):
         return " · ".join(self.txt(p.get(k)) for k in ("role", "years", "location") if p.get(k))
 
     def pills(self, tags, root_prefix=None):
-        """Tag pills. With root_prefix set they link to the Work filter."""
+        """Capability tag pills (case studies). With root_prefix set, a tag
+        with a CAP_LINKS target links to the page that shows that skill."""
         if not tags:
             return ""
         items = []
         for t in tags:
             label = esc(self.cap_labels.get(t, t))
-            if root_prefix is None:
+            target = CAP_LINKS.get(t) or ""
+            if root_prefix is None or not target:
                 items.append('<li class="pill">%s</li>' % label)
             else:
-                items.append('<li><a class="pill" href="%swork.html#%s">%s</a></li>'
-                             % (root_prefix, esc(t), label))
+                items.append('<li><a class="pill" href="%s%s">%s</a></li>'
+                             % (root_prefix, esc(target), label))
         return '<ul class="pills">%s</ul>' % "".join(items)
+
+    # -- work groups (categories) ------------------------------------------
+
+    def category(self, p):
+        """The project's category dict, or None (no group / unknown key)."""
+        return self.cat_by_key.get(p.get("category") or "")
+
+    def cat_key(self, p):
+        c = self.category(p)
+        return c["key"] if c else ""
+
+    def personal_note(self):
+        return '<span class="personal-note">%s</span>' % esc(PERSONAL_LABEL)
+
+    def cat_label_html(self, p, href=None):
+        """Category label for cards and case studies, plus the personal note
+        for personal categories. Empty when the project has no group."""
+        c = self.category(p)
+        if not c:
+            return ""
+        label = self.txt(c.get("label") or c["key"])
+        if href:
+            label = '<a class="cat-link" href="%s">%s</a>' % (esc(href), label)
+        note = (" " + self.personal_note()) if c.get("personal") else ""
+        return label + note
+
+    def work_groups(self):
+        """[(category or None, [projects])] for the Work page: categories in
+        config order (only those with a visible project), projects in data
+        order within each; projects without a group last, under None."""
+        groups = []
+        for c in self.categories:
+            members = [p for p in self.visible if self.cat_key(p) == c["key"]]
+            if members:
+                groups.append((c, members))
+        rest = [p for p in self.visible if not self.cat_key(p)]
+        if rest:
+            groups.append((None, rest))
+        return groups
 
     # -- covers and cards ---------------------------------------------------
 
@@ -322,8 +387,9 @@ class Site(object):
         facts = self.facts(p)
         if facts:
             lines.append('          <p class="facts">%s</p>' % facts)
-        if p.get("tags"):
-            lines.append("          " + self.pills(p["tags"]))
+        cat = self.cat_label_html(p)
+        if cat:
+            lines.append('          <p class="kicker card-cat">%s</p>' % cat)
         confirm = self.confirm_pill(p.get("confirm"))
         if confirm:
             lines.append("          " + confirm)
@@ -332,7 +398,7 @@ class Site(object):
         lines.append('          <p class="more"><a class="link-arrow" href="%s">View project</a></p>' % href)
         return ('      <article class="%s" data-tags="%s">\n        %s\n        <div class="meta">\n'
                 '%s\n        </div>\n      </article>'
-                % (cls, esc(" ".join(p.get("tags", []))), self.cover_html(p, rp, use_full), "\n".join(lines)))
+                % (cls, esc(self.cat_key(p)), self.cover_html(p, rp, use_full), "\n".join(lines)))
 
     def feature_html(self, p, rp):
         href = "%swork/%s.html" % (rp, p["slug"])
@@ -343,15 +409,16 @@ class Site(object):
         facts = self.facts(p)
         if facts:
             lines.append('        <p class="facts">%s</p>' % facts)
-        if p.get("tags"):
-            lines.append("        " + self.pills(p["tags"]))
+        cat = self.cat_label_html(p)
+        if cat:
+            lines.append('        <p class="kicker card-cat">%s</p>' % cat)
         confirm = self.confirm_pill(p.get("confirm"))
         if confirm:
             lines.append("        " + confirm)
         lines.append('        <p class="more"><a class="link-arrow" href="%s">View project</a></p>' % href)
         return ('    <article class="feature" data-tags="%s">\n      %s\n      <div class="feature-body">\n'
                 '%s\n      </div>\n    </article>'
-                % (esc(" ".join(p.get("tags", []))), self.cover_html(p, rp, True), "\n".join(lines)))
+                % (esc(self.cat_key(p)), self.cover_html(p, rp, True), "\n".join(lines)))
 
     def reel_card_html(self, r, rp, meta_bits=None, extra=""):
         """Ratio-true player card: a lazy Livid iframe, or the poster with a
@@ -487,17 +554,23 @@ class Site(object):
                              else self.gen_box("index.html#reel", "[%s]" % text))
         return out
 
+    def cap_html(self, cap):
+        """One capability-strip item: linked to its skill page via CAP_LINKS,
+        plain text when the map has no target for the tag."""
+        inner = ('<span class="cap-label">%s</span><span class="cap-line">%s</span>'
+                 % (self.txt(cap.get("label")), self.txt(cap.get("line"))))
+        target = CAP_LINKS.get(cap.get("tag", "")) or ""
+        if target:
+            return '      <a class="cap" href="%s">%s</a>' % (esc(target), inner)
+        return '      <div class="cap cap-plain">%s</div>' % inner
+
     def build_home(self):
         c = self.config
         featured = sorted([p for p in self.visible if p.get("featured")],
                           key=lambda p: p["featured"])
         lead = self.feature_html(featured[0], "") if featured else ""
         cards = "\n".join(self.card_html(p, "", use_full=True) for p in featured[1:4])
-        caps = "\n".join(
-            '      <a class="cap" href="work.html#%s"><span class="cap-label">%s</span>'
-            '<span class="cap-line">%s</span></a>'
-            % (esc(cap.get("tag", "")), self.txt(cap.get("label")), self.txt(cap.get("line")))
-            for cap in c.get("capabilities", []))
+        caps = "\n".join(self.cap_html(cap) for cap in c.get("capabilities", []))
         collab = c.get("collaborations") or {}
         if collab.get("names"):
             names = '<span class="sep" aria-hidden="true"> · </span>'.join(
@@ -536,14 +609,30 @@ class Site(object):
                   "home", body_class="has-masthead")
 
     def build_work(self):
+        """Filter pills = All + each category with a visible project. The All
+        view lists the groups in config order, each under its heading; the
+        headings carry data-tags too, so the shared filter JS shows only the
+        active group's heading. Projects with no group come last, All only."""
+        groups = self.work_groups()
         filters = ['      <a class="filter active" href="#all" data-filter="all" aria-pressed="true">All</a>']
-        for cap in self.config.get("capabilities", []):
-            filters.append('      <a class="filter" href="#%s" data-filter="%s" aria-pressed="false">%s</a>'
-                           % (esc(cap.get("tag", "")), esc(cap.get("tag", "")), self.txt(cap.get("label"))))
+        blocks = []
+        for c, members in groups:
+            if c is not None:
+                key = esc(c["key"])
+                filters.append('      <a class="filter" href="#%s" data-filter="%s" aria-pressed="false">%s</a>'
+                               % (key, key, self.txt(c.get("label") or c["key"])))
+                note = (" " + self.personal_note()) if c.get("personal") else ""
+                heading = ('      <h2 class="work-group" data-tags="%s" data-filter-heading>%s%s</h2>'
+                           % (key, self.txt(c.get("label") or c["key"]), note))
+            else:
+                heading = ('      <h2 class="work-group work-group-other" data-tags="" data-filter-heading>%s</h2>'
+                           % esc(OTHER_WORK_LABEL))
+            blocks.append(heading)
+            blocks.extend(self.card_html(p, "") for p in members)
         main = tmpl("work.main.tmpl").safe_substitute(
             INTRO=self.page_intro("work"),
             FILTERS="\n".join(filters),
-            CARDS="\n".join(self.card_html(p, "") for p in self.visible))
+            CARDS="\n".join(blocks))
         intro = (self.config.get("page_intros") or {}).get("work", "")
         self.page("work.html", main, "Work — %s" % self.config.get("name", ""),
                   plain(intro) or "Work by %s" % self.config.get("name", ""), "work")
@@ -606,9 +695,11 @@ class Site(object):
             bts = self.box(p["bts"]) if is_ph(p["bts"]) else '<p class="desc">%s</p>' % esc(p["bts"])
             sections.append('<section class="case-bts">\n  <div class="wrap">\n'
                             '    <p class="kicker">Behind the scenes</p>\n    %s\n  </div>\n</section>' % bts)
-        # Previous / next, in visible order, wrapping around.
-        n = len(self.visible)
-        prev_p, next_p = self.visible[(idx - 1) % n], self.visible[(idx + 1) % n]
+        # Previous / next, in the Work page's grouped order, wrapping around.
+        order = [q for _, members in self.work_groups() for q in members]
+        idx = next((i for i, q in enumerate(order) if q.get("slug") == p.get("slug")), idx)
+        n = len(order)
+        prev_p, next_p = order[(idx - 1) % n], order[(idx + 1) % n]
         pager = ('<nav class="case-nav" aria-label="More projects">\n'
                  '      <a class="prev" href="%s.html"><span class="kicker">← Previous</span>'
                  '<span class="cn-title">%s</span></a>\n'
@@ -616,8 +707,12 @@ class Site(object):
                  '<span class="cn-title">%s</span></a>\n'
                  '    </nav>' % (esc(prev_p["slug"]), self.txt(prev_p.get("client")),
                                   esc(next_p["slug"]), self.txt(next_p.get("client"))))
+        cat = self.category(p)
+        cat_html = ('<p class="kicker case-cat">%s</p>'
+                    % self.cat_label_html(p, href="%swork.html#%s" % (rp, cat["key"]))) if cat else ""
         main = tmpl("case.main.tmpl").safe_substitute(
             RIBBON=self.ribbon(p),
+            CATEGORY=cat_html,
             CLIENT=self.txt(p.get("client")),
             PTITLE=self.txt(p.get("title")),
             ONELINER=self.para(p.get("oneliner"), "desc") if p.get("oneliner") else "",

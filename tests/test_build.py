@@ -6,9 +6,12 @@ so the real data files and the real generated pages are never touched.
 import shutil
 import unittest
 
+import json
+import re
+
 from support import (ROOT, NAME_UNACCENTED, EMAIL_OR_DOMAIN, RELEASE_AI_STEPS, RELEASE_STATIC_AD,
-                     RELEASE_VIDEO_AD, html_pages, load, make_release_ready, make_temp_repo,
-                     run_build)
+                     RELEASE_VIDEO_AD, expected_work_groups, html_pages, load, make_release_ready,
+                     make_temp_repo, run_build, work_sequence)
 import build  # noqa: E402  (support puts the repo root on sys.path)
 
 
@@ -159,6 +162,65 @@ class TestReleaseGate(unittest.TestCase):
         self.assertIn(RELEASE_STATIC_AD["image"] + "?v=", paid)
         reels = (self.tmp / "reels.html").read_text(encoding="utf-8")
         self.assertIn('id="motion"', reels)
+        # Work pills: draft-only projects do not count in a release.
+        work = (self.tmp / "work.html").read_text(encoding="utf-8")
+        released = [p for p in load("projects.json", self.tmp)["projects"] if not p.get("hidden")]
+        cats = load("site-config.json", self.tmp)["categories"]
+        want = [k for k, _ in expected_work_groups(released, cats) if k]
+        self.assertEqual(re.findall(r'data-filter="([^"]+)"', work), ["all"] + want)
+
+    def test_work_groups_generic_over_categories(self):
+        """Fixture: move projects into other groups (incl. the personal one and
+        an unknown key) in the temp copy only, then check the draft build."""
+        projects = load("projects.json", self.tmp)
+        cats = load("site-config.json", self.tmp)["categories"]
+        personal = [c for c in cats if c.get("personal")]
+        self.assertTrue(personal, "fixture needs a personal category in site-config")
+        plain_cat = [c for c in cats if not c.get("personal")][-1]
+        movable = [p for p in projects["projects"] if not p.get("hidden") and not p.get("draft_only")
+                   and p.get("category")]
+        self.assertGreaterEqual(len(movable), 3)
+        moved = {movable[0]["slug"]: personal[0]["key"], movable[1]["slug"]: plain_cat["key"],
+                 movable[2]["slug"]: "no-such-group"}
+        for p in projects["projects"]:
+            if p["slug"] in moved:
+                p["category"] = moved[p["slug"]]
+        (self.tmp / "projects.json").write_text(json.dumps(projects, ensure_ascii=False, indent=2),
+                                                encoding="utf-8")
+        r = run_build(self.tmp)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        work = (self.tmp / "work.html").read_text(encoding="utf-8")
+        visible = [p for p in projects["projects"] if not p.get("hidden")]
+        groups = expected_work_groups(visible, cats)
+        pills = re.findall(r'data-filter="([^"]+)"', work)
+        self.assertEqual(pills, ["all"] + [k for k, _ in groups if k])
+        self.assertIn(personal[0]["key"], pills)
+        self.assertIn(plain_cat["key"], pills)
+        self.assertNotIn("no-such-group", work)
+        # Order: config order of groups, the unknown key falls to "Other work".
+        seq = work_sequence(work)
+        got, cur = [], None
+        for item in seq:
+            if item[0] == "heading":
+                cur = (item[1], [])
+                got.append(cur)
+            else:
+                self.assertEqual(item[2], cur[0], item[1])
+                cur[1].append(item[1])
+        self.assertEqual(got, groups)
+        self.assertIn(movable[2]["slug"], dict(got)[""])
+        note = '<span class="personal-note">Personal work</span>'
+        for item in seq:
+            if item[0] == "heading":
+                self.assertEqual(note in item[2], item[1] == personal[0]["key"], item[1])
+            else:
+                self.assertEqual(note in item[3], item[1] == movable[0]["slug"], item[1])
+        case = (self.tmp / "work" / (movable[0]["slug"] + ".html")).read_text(encoding="utf-8")
+        self.assertIn('<a class="cat-link" href="../work.html#%s">' % personal[0]["key"], case)
+        self.assertIn(note, case)
+        other = (self.tmp / "work" / (movable[2]["slug"] + ".html")).read_text(encoding="utf-8")
+        self.assertNotIn("case-cat", other)
+        self.assertNotIn(note, (self.tmp / "work" / (movable[1]["slug"] + ".html")).read_text(encoding="utf-8"))
 
     def test_real_data_untouched_by_tests(self):
         # The temp copy shares no data files with the repo.

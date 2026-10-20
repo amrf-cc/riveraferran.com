@@ -443,7 +443,7 @@ body.has-masthead header.site.scrolled .nav-toggle { color: var(--ink); border-c
 .video-block p.vtitle { color: var(--muted); font-size: 14px; margin-top: 11px; }
 
 /* ---- Project page ------------------------------------------------------- */
-.project-head { padding: 60px 0 34px; }
+.project-head { padding: 60px var(--gut) 34px; }  /* keep the .wrap gutter */
 .project-head h1 { font-size: clamp(38px, 6.4vw, 76px); margin-top: 14px; max-width: 22ch; }
 .project-head .facts { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.02em; color: var(--muted); margin-top: 20px; }
 .project-head .desc { max-width: 62ch; margin-top: 24px; font-size: 18px; color: var(--body); }
@@ -755,6 +755,45 @@ body.is-draft header.site { top: 24px; }
   transition: border-color .16s ease, color .16s ease;
 }
 a.pill:hover { border-color: var(--accent); color: var(--accent); }
+/* Work groups: a full-width heading per category inside the masonry columns. */
+.work-grid .work-group {
+  column-span: all;
+  -webkit-column-span: all;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  font-size: clamp(26px, 3vw, 38px);
+  letter-spacing: -0.025em;
+  margin: 0 0 28px;
+}
+.work-grid .work-group ~ .work-group { border-top: 1px solid var(--line); padding-top: 40px; margin-top: 16px; }
+.work-grid .work-group[hidden] { display: none; }
+/* On Work the group heading already names the category (and carries the "Personal work"
+   note), so the card kicker would only repeat it. Home and AI cards keep theirs. */
+.work-grid .card-cat { display: none; }
+.personal-note {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 10px;
+  line-height: 1.6;
+  vertical-align: 2px;
+}
+.work-group .personal-note { font-size: 11px; letter-spacing: 0.14em; }
+.card .kicker.card-cat, .feature .kicker.card-cat { margin-top: 14px; }
+.card-cat .personal-note { margin-left: 6px; font-size: 10px; padding: 1px 8px; vertical-align: 1px; }
+.project-head .case-cat { margin-top: 24px; }
+.project-head .case-cat + .client-kicker { margin-top: 8px; }
+.project-head .client-kicker { margin-top: 24px; }
+.cat-link { color: var(--accent); transition: color .16s ease; }
+.cat-link:hover { color: var(--accent-press); }
 .head-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; }
 .head-tags .pills, .head-tags .confirm-pill { margin-top: 10px; }
 
@@ -811,9 +850,9 @@ a.pill:hover { border-color: var(--accent); color: var(--accent); }
   border-top: 1px solid var(--line);
   transition: border-color .16s ease;
 }
-.cap:hover { border-top-color: var(--accent); }
+a.cap:hover { border-top-color: var(--accent); }
 .cap-label { display: block; font-family: var(--font-display); font-size: 21px; font-weight: 500; letter-spacing: -0.015em; }
-.cap:hover .cap-label { color: var(--accent); }
+a.cap:hover .cap-label { color: var(--accent); }
 .cap-line { display: block; color: var(--muted); font-size: 15px; margin-top: 6px; }
 .collabs { padding: 64px 0; }
 .collab-names {

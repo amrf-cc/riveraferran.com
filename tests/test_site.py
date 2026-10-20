@@ -5,8 +5,8 @@ import re
 import unittest
 
 from support import (ROOT, TOP_PAGES, EMAIL_OR_DOMAIN, NAME_UNACCENTED, built_pages,
-                     is_draft_build, is_ph, load, local_links, meta_tags, read,
-                     visible_projects)
+                     expected_work_groups, is_draft_build, is_ph, load, local_links, meta_tags,
+                     read, visible_projects, work_sequence)
 
 NAV_LABELS = ("Work", "Reels", "AI &amp; Workflow", "Paid Social", "About", "Contact")
 
@@ -241,9 +241,39 @@ class TestHome(BuiltSite):
             if photos:
                 self.assertEqual(src, photos[0]["full"], slug)
 
-    def test_capabilities_link_to_work_filters(self):
-        for cap in self.config["capabilities"]:
-            self.assertIn('href="work.html#%s"' % cap["tag"], self.text)
+    def test_capability_strip_links_to_skill_pages(self):
+        import build
+        strip = re.search(r'<div class="caps">(.*?)\n    </div>', self.text, re.S).group(1)
+        items = re.findall(r'<(a|div) class="cap[^"]*"(?: href="([^"]*)")?><span class="cap-label">([^<]*)</span>',
+                           strip)
+        caps = self.config["capabilities"]
+        self.assertEqual(len(items), len(caps))
+        work_filters = set(re.findall(r'data-filter="([^"]+)"', read(ROOT / "work.html")))
+        cat_keys = {c["key"] for c in self.config.get("categories", [])}
+        for (tag, href, label), cap in zip(items, caps):
+            self.assertEqual(label, html.escape(cap["label"]))
+            target = build.CAP_LINKS.get(cap["tag"]) or ""
+            if not target:
+                self.assertEqual((tag, href), ("div", ""), "%s should be plain text" % cap["tag"])
+                continue
+            self.assertEqual((tag, href), ("a", target), cap["tag"])
+            page, _, frag = target.partition("#")
+            self.assertTrue((ROOT / page).is_file(), "%s -> %s missing" % (cap["tag"], page))
+            if not frag:
+                continue
+            if page == "work.html":
+                self.assertIn(frag, cat_keys, "%s links an unknown category" % cap["tag"])
+                if is_draft_build():
+                    self.assertIn(frag, work_filters, "%s: no #%s pill on work.html" % (cap["tag"], frag))
+            else:
+                self.assertIn('id="%s"' % frag, read(ROOT / page), "%s: no #%s on %s" % (cap["tag"], frag, page))
+
+    def test_capability_map_is_the_brief(self):
+        import build
+        self.assertEqual(build.CAP_LINKS, {
+            "social": "reels.html", "motion": "reels.html#motion", "paid": "paid-social.html",
+            "ai": "ai.html", "product": "work.html#food-beverage",
+            "campaigns": "work.html#commercial-corporate", "founder": ""})
 
     def test_collaborations_and_bio(self):
         for n in self.config["collaborations"]["names"]:
@@ -255,20 +285,76 @@ class TestHome(BuiltSite):
 
 
 class TestWork(BuiltSite):
-    def test_one_card_per_visible_project(self):
-        text = read(ROOT / "work.html")
-        cards = re.findall(r'<article class="card" data-tags="([^"]*)">\s*<a class="thumb[^"]*" href="work/([^"]+)\.html"', text)
-        vis = visible_projects()
-        self.assertEqual([c[1] for c in cards], [p["slug"] for p in vis])
-        for (tags, slug), p in zip(cards, vis):
-            self.assertEqual(tags.split(), p.get("tags", []), slug)
+    def setUp(self):
+        super().setUp()
+        self.text = read(ROOT / "work.html")
+        self.categories = load("site-config.json").get("categories", [])
+        self.groups = expected_work_groups(visible_projects(), self.categories)
 
-    def test_filter_pills(self):
-        text = read(ROOT / "work.html")
-        filters = re.findall(r'<a class="filter[^"]*" href="#([^"]+)" data-filter="([^"]+)"', text)
-        caps = load("site-config.json")["capabilities"]
-        self.assertEqual([f[1] for f in filters], ["all"] + [c["tag"] for c in caps])
-        self.assertIn("data-filter-group", text)
+    def test_one_card_per_visible_project(self):
+        cards = [i for i in work_sequence(self.text) if i[0] == "card"]
+        self.assertEqual(sorted(c[1] for c in cards), sorted(p["slug"] for p in visible_projects()))
+        keys = {c["key"] for c in self.categories}
+        for p in visible_projects():
+            card = [c for c in cards if c[1] == p["slug"]][0]
+            want = p.get("category") if p.get("category") in keys else ""
+            self.assertEqual(card[2], want, p["slug"])
+
+    def test_filter_pills_match_categories_with_projects(self):
+        filters = re.findall(r'<a class="filter[^"]*" href="#([^"]+)" data-filter="([^"]+)"[^>]*>([^<]*)</a>', self.text)
+        want = [k for k, _ in self.groups if k]
+        self.assertEqual([f[1] for f in filters], ["all"] + want)
+        self.assertEqual([f[0] for f in filters], [f[1] for f in filters])
+        labels = {c["key"]: c["label"] for c in self.categories}
+        self.assertEqual([f[2] for f in filters], ["All"] + [html.escape(labels[k]) for k in want])
+        self.assertIn("data-filter-group", self.text)
+        # Draft-only projects count only in draft builds.
+        for p in load("projects.json")["projects"]:
+            if p.get("draft_only") and not p.get("hidden"):
+                others = [q for q in visible_projects() if q.get("category") == p.get("category")
+                          and not q.get("draft_only")]
+                if not others and p.get("category"):
+                    self.assertEqual('data-filter="%s"' % p["category"] in self.text, is_draft_build())
+
+    def test_cards_sit_under_their_group_heading(self):
+        seq = work_sequence(self.text)
+        got, current = [], None
+        for item in seq:
+            if item[0] == "heading":
+                current = (item[1], [])
+                got.append(current)
+            else:
+                self.assertIsNotNone(current, "card %s before any heading" % item[1])
+                self.assertEqual(item[2], current[0], "%s sits under the wrong heading" % item[1])
+                current[1].append(item[1])
+        self.assertEqual(got, self.groups)
+        labels = {c["key"]: c["label"] for c in self.categories}
+        for kind, key, inner in [i for i in seq if i[0] == "heading"]:
+            label = re.sub(r"<span.*", "", inner).strip()
+            self.assertEqual(label, html.escape(labels[key]) if key else "Other work")
+
+    def test_personal_markers_only_on_personal_groups(self):
+        personal = {c["key"] for c in self.categories if c.get("personal")}
+        note = '<span class="personal-note">Personal work</span>'
+        for item in work_sequence(self.text):
+            if item[0] == "heading":
+                self.assertEqual(note in item[2], item[1] in personal, "heading %s" % item[1])
+            else:
+                self.assertEqual(note in item[3], item[2] in personal, "card %s" % item[1])
+        if not any(k in personal for k, _ in self.groups):
+            self.assertNotIn("Personal work", self.text)
+
+    def test_cards_show_category_not_capability_pills(self):
+        labels = {c["key"]: c["label"] for c in self.categories}
+        for item in [i for i in work_sequence(self.text) if i[0] == "card"]:
+            self.assertNotIn('class="pills"', item[3], item[1])
+            self.assertNotIn('class="pill"', item[3], item[1])
+            cat = re.findall(r'<p class="kicker card-cat">(.*?)</p>', item[3])
+            if item[2]:
+                self.assertEqual(len(cat), 1, item[1])
+                self.assertTrue(cat[0].startswith(html.escape(labels[item[2]])), item[1])
+            else:
+                self.assertEqual(cat, [], item[1])
 
     def test_filter_js(self):
         js = read(ROOT / "assets/js/main.js")
@@ -276,7 +362,48 @@ class TestWork(BuiltSite):
             self.assertIn(marker, js)
 
 
+class TestNoCapabilityPillsOnCards(BuiltSite):
+    def test_home_and_ai_cards(self):
+        for name in ("index.html", "work.html", "ai.html"):
+            text = read(ROOT / name)
+            for card in re.findall(r'<article class="(?:card|feature)[^"]*".*?</article>', text, re.S):
+                self.assertNotIn('class="pills"', card, name)
+
+    def test_home_cards_carry_category(self):
+        text = read(ROOT / "index.html")
+        cats = {c["key"]: c for c in load("site-config.json").get("categories", [])}
+        projects = {p["slug"]: p for p in visible_projects()}
+        found = re.findall(r'<article class="(?:card|feature)[^"]*" data-tags="([^"]*)">\s*'
+                           r'<a class="thumb[^"]*" href="work/([^"]+)\.html"(.*?)</article>', text, re.S)
+        self.assertTrue(found)
+        for tags, slug, body in found:
+            key = projects[slug].get("category") or ""
+            self.assertEqual(tags, key if key in cats else "", slug)
+            self.assertEqual('class="kicker card-cat"' in body, key in cats, slug)
+
+
 class TestCaseStudies(BuiltSite):
+    def test_category_link_and_capability_pills(self):
+        import build
+        cats = {c["key"]: c for c in load("site-config.json").get("categories", [])}
+        labels = {c["tag"]: c["label"] for c in load("site-config.json")["capabilities"]}
+        for p in visible_projects():
+            text = read(ROOT / "work" / (p["slug"] + ".html"))
+            head = text[text.index('<div class="wrap project-head">'):text.index("<h1>")]
+            key = p.get("category") or ""
+            if key in cats:
+                self.assertIn('<p class="kicker case-cat"><a class="cat-link" href="../work.html#%s">%s</a>'
+                              % (key, html.escape(cats[key]["label"])), head, p["slug"])
+                self.assertEqual("Personal work" in head, bool(cats[key].get("personal")), p["slug"])
+            else:
+                self.assertNotIn("case-cat", head, p["slug"])
+            tags_html = re.search(r'<div class="head-tags">(.*?)</div>', text, re.S).group(1)
+            pills = re.findall(r'<li(?: class="pill")?>(?:<a class="pill" href="([^"]+)">)?([^<]+)', tags_html)
+            self.assertEqual([x[1] for x in pills], [html.escape(labels.get(t, t)) for t in p.get("tags", [])])
+            for (href, _), t in zip(pills, p.get("tags", [])):
+                target = build.CAP_LINKS.get(t) or ""
+                self.assertEqual(href, ("../" + target) if target else "", "%s pill %s" % (p["slug"], t))
+
     def test_body_sections(self):
         for p in visible_projects():
             text = read(ROOT / "work" / (p["slug"] + ".html"))
@@ -311,7 +438,12 @@ class TestCaseStudies(BuiltSite):
             self.assertEqual('id="lightbox"' in text, bool(data["photos"]), p["slug"])
 
     def test_prev_next(self):
+        # Pager follows the Work page's grouped order: categories in config
+        # order, then projects without a group.
         vis = visible_projects()
+        by_slug = {p["slug"]: p for p in vis}
+        groups = expected_work_groups(vis, load("site-config.json").get("categories", []))
+        vis = [by_slug[s] for _, slugs in groups for s in slugs]
         n = len(vis)
         for i, p in enumerate(vis):
             text = read(ROOT / "work" / (p["slug"] + ".html"))

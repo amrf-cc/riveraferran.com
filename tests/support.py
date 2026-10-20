@@ -185,6 +185,38 @@ def make_release_ready(root):
     (root / "assets" / "resume.pdf").write_bytes(b"%PDF-1.4 test\n")
 
 
+WORK_ITEM = re.compile(
+    r'<h2 class="work-group[^"]*" data-tags="([^"]*)" data-filter-heading>(.*?)</h2>'
+    r'|<article class="card" data-tags="([^"]*)">\s*<a class="thumb[^"]*" href="work/([^"]+)\.html"(.*?)</article>',
+    re.S)
+
+
+def work_sequence(text):
+    """The Work grid in document order: ("heading", key, inner_html) and
+    ("card", slug, data_tags, card_html) tuples."""
+    out = []
+    for m in WORK_ITEM.finditer(text):
+        if m.group(2) is not None:
+            out.append(("heading", m.group(1), m.group(2)))
+        else:
+            out.append(("card", m.group(4), m.group(3), m.group(0)))
+    return out
+
+
+def expected_work_groups(projects, categories):
+    """[(key or "", [slugs])] the Work page should show, in display order."""
+    keys = [c["key"] for c in categories]
+    out = []
+    for k in keys:
+        members = [p["slug"] for p in projects if p.get("category") == k]
+        if members:
+            out.append((k, members))
+    rest = [p["slug"] for p in projects if p.get("category") not in keys]
+    if rest:
+        out.append(("", rest))
+    return out
+
+
 def html_pages(root):
     return sorted(root.glob("*.html")) + sorted((root / "work").glob("*.html"))
 

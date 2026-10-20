@@ -10,11 +10,13 @@
   }
 })();
 
-// Filters (Work by capability, Reels by format): pills are plain #tag links,
-// so without JS every item stays visible. With JS the hash (#ai, #product ...)
-// selects the items to show, which also makes work.html#ai links from other
-// pages land pre-filtered. data-filter-scope names the container whose
-// [data-tags] children are filtered (default: the Work grid).
+// Filters (Work by group, Reels by format): pills are plain #tag links, so
+// without JS every item stays visible. With JS the hash (#food-beverage ...)
+// selects the items to show, which also makes work.html#food-beverage links
+// from other pages land pre-filtered. data-filter-scope names the container
+// whose [data-tags] children are filtered (default: the Work grid). Group
+// headings carry data-tags plus data-filter-heading: they follow their group
+// but never count as a shown item.
 (function () {
   var bar = document.querySelector('[data-filter-group]');
   if (!bar) return;
@@ -32,7 +34,7 @@
       var tags = (el.getAttribute('data-tags') || '').split(/\s+/);
       var on = tag === 'all' || tags.indexOf(tag) !== -1;
       el.hidden = !on;
-      if (on) shown++;
+      if (on && !el.hasAttribute('data-filter-heading')) shown++;
       // A reel filtered out of view stops playing.
       if (!on) Array.prototype.forEach.call(el.querySelectorAll('video'), function (v) { v.pause(); });
     });
