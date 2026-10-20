@@ -684,8 +684,11 @@ class TestReels(BuiltSite):
         draft = is_draft_build()
         for r in self.media["reels"]:
             meta = " · ".join(html.escape(b) for b in (r.get("brand"), r.get("format"), r.get("year")) if b)
-            self.assertIn('<span class="rtitle">%s</span><span class="rmeta">%s</span>'
-                          % (html.escape(r["title"]), meta), self.text, r["slug"])
+            # An AI/composite badge may sit between the title and the meta line.
+            self.assertRegex(self.text,
+                             r'<span class="rtitle">%s</span>(<span class="ai-badge reel-badge">[^<]*</span>)?'
+                             r'<span class="rmeta">%s</span>' % (re.escape(html.escape(r["title"])), re.escape(meta)),
+                             r["slug"])
             if r.get("confirm") and draft:
                 pill = '<span class="confirm-pill">Confirm: %s</span>' % ", ".join(r["confirm"])
                 card = re.search(r'<span class="rtitle">%s</span>.*?</figcaption>' % re.escape(html.escape(r["title"])),

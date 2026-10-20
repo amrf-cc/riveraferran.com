@@ -368,9 +368,18 @@ class TestFixtureBuild(unittest.TestCase):
         self.assertTrue(r.stdout.strip().endswith("BUILD_OK"), r.stdout)
         cfg = load("site-config.json", self.tmp)
         case = read(self.tmp / "work" / "chip-city.html")
-        # Photos: AI then composite, in order, with the lightbox caption value.
-        self.assertEqual(re.findall(r'<span class="ai-badge shot-badge">([^<]+)</span>', case),
-                         [cfg["ai_label"], "Composite"])
+        # Photos: one badge per flagged photo, in manifest order (the real data may already
+        # carry its own flags, so the expectation is computed, never a fixed list).
+        expected = []
+        for ph in load("assets-manifest.json", self.tmp)["projects"]["chip-city"]["photos"]:
+            if ph.get("ai") and ph.get("composite"):
+                expected.append(cfg["ai_label"] + " · Composite")
+            elif ph.get("ai"):
+                expected.append(cfg["ai_label"])
+            elif ph.get("composite"):
+                expected.append("Composite")
+        self.assertTrue(expected, "fixture should flag at least one photo")
+        self.assertEqual(re.findall(r'<span class="ai-badge shot-badge">([^<]+)</span>', case), expected)
         self.assertIn('data-badge="%s"' % cfg["ai_label"], case)
         # Video title badge.
         self.assertIn('<span class="ai-badge vtitle-badge">%s</span>' % cfg["ai_label"], case)

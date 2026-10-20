@@ -1201,6 +1201,10 @@ a.cap:hover .cap-label { color: var(--accent); }
   overflow: hidden;
 }
 .compare-frame img { display: block; width: 100%; height: auto; }
+/* Steps keep a common height so one tall template or product plate does not stretch
+   the row; the photo is shown whole, letterboxed on its own background. */
+.compare-frame { display: grid; place-items: center; min-height: 260px; max-height: 460px; }
+.compare-frame img { max-height: 460px; width: 100%; object-fit: contain; }
 .compare-frame .ph-box { margin: 0; }
 .compare-label {
   display: flex;

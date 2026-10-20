@@ -255,11 +255,13 @@ class TestReleaseGate(unittest.TestCase):
         self.assertEqual(got, groups)
         self.assertIn(movable[2]["slug"], dict(got)[""])
         note = '<span class="personal-note">Personal work</span>'
+        personal_keys = {c["key"] for c in load("site-config.json", self.tmp)["categories"] if c.get("personal")}
+        personal_slugs = {p["slug"] for p in visible if p.get("category") in personal_keys}
         for item in seq:
             if item[0] == "heading":
-                self.assertEqual(note in item[2], item[1] == personal[0]["key"], item[1])
+                self.assertEqual(note in item[2], item[1] in personal_keys, item[1])
             else:
-                self.assertEqual(note in item[3], item[1] == movable[0]["slug"], item[1])
+                self.assertEqual(note in item[3], item[1] in personal_slugs, item[1])
         case = (self.tmp / "work" / (movable[0]["slug"] + ".html")).read_text(encoding="utf-8")
         self.assertIn('<a class="cat-link" href="../work.html#%s">' % personal[0]["key"], case)
         self.assertIn(note, case)
