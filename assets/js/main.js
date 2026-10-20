@@ -88,6 +88,7 @@
   var img = box.querySelector('.lb-stage img');
   var countEl = box.querySelector('.lb-count');
   var altEl = box.querySelector('.lb-alt');
+  var badgeEl = box.querySelector('.lb-badge');
   var btnClose = box.querySelector('.lb-close');
   var btnPrev = box.querySelector('.lb-prev');
   var btnNext = box.querySelector('.lb-next');
@@ -108,6 +109,12 @@
     img.alt = t.getAttribute('data-alt') || '';
     altEl.textContent = img.alt;
     countEl.textContent = (index + 1) + ' / ' + tiles.length;
+    // AI-backed / composite photos keep their disclosure inside the viewer.
+    var badge = t.getAttribute('data-badge') || '';
+    if (badgeEl) {
+      badgeEl.textContent = badge;
+      badgeEl.hidden = !badge;
+    }
     preload(index + 1);
     preload(index - 1);
   }

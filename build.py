@@ -58,6 +58,13 @@ CAP_LINKS = {
 OTHER_WORK_LABEL = "Other work"
 PERSONAL_LABEL = "Personal work"
 
+# Media disclosure. A manifest photo/video (or a comparison-set step) may carry
+# "ai": true or "composite": true. The AI wording comes from site-config
+# `ai_label`; composites always read "Composite". The comparison-set heading is
+# the one the case study and the AI page share.
+COMPOSITE_LABEL = "Composite"
+COMPARE_HEADING = "Real shot → AI step → final"
+
 
 # ---------------------------------------------------------------------------
 # Loading
@@ -207,28 +214,13 @@ def is_remote(url):
     return url.startswith(("http://", "https://", "//"))
 
 
-def video_block_html(v, root_prefix):
-    if v.get("livid"):
-        frame = ('<iframe src="%s" allow="autoplay; fullscreen; picture-in-picture" '
-                 'allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="%s"></iframe>'
-                 % (esc(v["livid"]), esc(plain(v.get("title", "")))))
-    elif v.get("mp4"):
-        poster = (' poster="%s%s"' % (root_prefix, asset_url(v["poster"]))) if v.get("poster") else ""
-        frame = ('<video controls controlslist="nodownload" draggable="false" preload="none"%s playsinline>'
-                 '<source src="%s%s" type="video/mp4"></video>'
-                 % (poster, root_prefix, asset_url(v["mp4"])))
-    else:
-        return ""
-    ratio = v.get("ratio") or "16 / 9"
-    return ('    <div class="video-block">\n      <div class="frame" style="aspect-ratio:%s">%s</div>\n'
-            '      <p class="vtitle">%s</p>\n    </div>' % (esc(ratio), frame, esc(plain(v.get("title", "")))))
+def media_flags(item):
+    """(ai, composite) for a manifest photo, video, reel or set step. Missing
+    flags read as false, and a missing/None entry is simply unflagged."""
+    if not isinstance(item, dict):
+        return False, False
+    return bool(item.get("ai")), bool(item.get("composite"))
 
-
-def photo_button_html(ph, root_prefix):
-    return ('      <button class="shot" data-full="%s%s" data-alt="%s">'
-            '<img src="%s%s" alt="%s" loading="lazy" draggable="false"></button>'
-            % (root_prefix, asset_url(ph["full"]), esc(ph["alt"]),
-               root_prefix, asset_url(ph["thumb"]), esc(ph["alt"])))
 
 
 # ---------------------------------------------------------------------------
@@ -373,29 +365,92 @@ class Site(object):
     def related_reels(self, slug):
         return [r for r in self.media.get("reels", []) if r.get("project") == slug]
 
+    # -- AI / composite disclosure -----------------------------------------
+
+    def badge_labels(self, item):
+        """Plain-text labels an item earns: the config's AI label when `ai`,
+        "Composite" when `composite`. [] means no badge at all."""
+        ai, composite = media_flags(item)
+        out = []
+        if ai:
+            label = plain(self.config.get("ai_label") or "")
+            if label:
+                out.append(label)
+        if composite:
+            out.append(COMPOSITE_LABEL)
+        return out
+
+    def badge_attr(self, item):
+        """The badge text for data-attributes (the lightbox caption)."""
+        return " · ".join(self.badge_labels(item))
+
+    def badge_html(self, item, cls="ai-badge"):
+        labels = self.badge_labels(item)
+        if not labels:
+            return ""
+        return '<span class="%s">%s</span>' % (cls, esc(" · ".join(labels)))
+
+    # -- video and photo markup --------------------------------------------
+
+    def video_block_html(self, v, root_prefix):
+        if v.get("livid"):
+            frame = ('<iframe src="%s" allow="autoplay; fullscreen; picture-in-picture" '
+                     'allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin" title="%s"></iframe>'
+                     % (esc(v["livid"]), esc(plain(v.get("title", "")))))
+        elif v.get("mp4"):
+            poster = (' poster="%s%s"' % (root_prefix, asset_url(v["poster"]))) if v.get("poster") else ""
+            frame = ('<video controls controlslist="nodownload" draggable="false" preload="none"%s playsinline>'
+                     '<source src="%s%s" type="video/mp4"></video>'
+                     % (poster, root_prefix, asset_url(v["mp4"])))
+        else:
+            return ""
+        ratio = v.get("ratio") or "16 / 9"
+        badge = self.badge_html(v, "ai-badge vtitle-badge")
+        return ('    <div class="video-block">\n      <div class="frame" style="aspect-ratio:%s">%s</div>\n'
+                '      <p class="vtitle">%s%s</p>\n    </div>'
+                % (esc(ratio), frame, esc(plain(v.get("title", ""))),
+                   (" " + badge) if badge else ""))
+
+    def photo_button_html(self, ph, root_prefix):
+        """A masonry tile: the badge rides on the tile and travels to the
+        lightbox caption through data-badge."""
+        alt = ph.get("alt", "")
+        badge = self.badge_html(ph, "ai-badge shot-badge")
+        return ('      <button class="shot" data-full="%s%s" data-alt="%s" data-badge="%s">'
+                '<img src="%s%s" alt="%s" loading="lazy" draggable="false">%s</button>'
+                % (root_prefix, asset_url(ph["full"]), esc(alt), esc(self.badge_attr(ph)),
+                   root_prefix, asset_url(ph["thumb"]), esc(alt), badge))
+
     def cover(self, p, use_full):
         """Card cover: manifest photo 01 (02 if 01 is the homepage hero); else
         the first video poster; else the first related reel poster; else
-        (None, "") and the card shows a neutral tile with the client name."""
+        (None, "", None) and the card shows a neutral tile with the client
+        name. The item comes back so the cover can carry its AI badge."""
         data = self.manifest.get(p["slug"], {})
         photos = data.get("photos", [])
         if photos:
             ph = photos[1] if (len(photos) > 1 and photos[0]["full"] in self.hero_paths) else photos[0]
-            return (ph["full"] if use_full else ph["thumb"]), ph.get("alt", "")
+            return (ph["full"] if use_full else ph["thumb"]), ph.get("alt", ""), ph
         for v in data.get("videos", []):
             if v.get("poster"):
-                return v["poster"], plain(v.get("title", ""))
+                return v["poster"], plain(v.get("title", "")), v
         for r in self.related_reels(p["slug"]):
             if r.get("poster"):
-                return r["poster"], plain(r.get("title", ""))
-        return None, ""
+                return r["poster"], plain(r.get("title", "")), r
+        return None, "", None
+
+    def cover_badge_text(self, p, use_full):
+        """Badge text for the card's cover media ("" when unflagged)."""
+        item = self.cover(p, use_full)[2]
+        return " · ".join(self.badge_labels(item)) if item is not None else ""
 
     def cover_html(self, p, rp, use_full):
         href = self.project_href(p, rp)
-        src, alt = self.cover(p, use_full)
+        src, alt, item = self.cover(p, use_full)
         if src:
             inner = ('<img src="%s%s" alt="%s" loading="lazy" draggable="false">'
                      % (rp, asset_url(src), esc(alt)))
+            inner += self.badge_html(item, "ai-badge thumb-badge")
             cls = "thumb"
         else:
             inner = '<span class="tile-name">%s</span>' % esc(plain(p.get("client", "")))
@@ -415,6 +470,10 @@ class Site(object):
         cat = self.cat_label_html(p)
         if cat:
             lines.append('          <p class="kicker card-cat">%s</p>' % cat)
+        sr = self.cover_badge_text(p, use_full)
+        if sr:
+            # The cover badge rides inside an aria-hidden link; say it in text.
+            lines.append('          <span class="sr-only">%s</span>' % esc(sr))
         confirm = self.confirm_pill(p.get("confirm"))
         if confirm:
             lines.append("          " + confirm)
@@ -424,6 +483,59 @@ class Site(object):
         return ('      <article class="%s" data-tags="%s">\n        %s\n        <div class="meta">\n'
                 '%s\n        </div>\n      </article>'
                 % (cls, esc(self.cat_key(p)), self.cover_html(p, rp, use_full), "\n".join(lines)))
+
+    # -- comparison sets (real shot → AI step → final) ----------------------
+
+    def compare_list_html(self, slug, root_prefix):
+        """A project's manifest `sets` as rows of labelled steps with arrows.
+        Each step is a plain <img> (real shots included); a step that carries
+        `ai`/`composite` gets the badge. A step without an image becomes a
+        generated placeholder, so a half-built set blocks a release. Returns
+        "" when the project has no sets (the normal case today)."""
+        data = self.manifest.get(slug) or {}
+        figures = []
+        for si, s in enumerate(data.get("sets") or []):
+            if not isinstance(s, dict):
+                continue
+            title = s.get("title")
+            steps = []
+            for sj, step in enumerate(s.get("steps") or []):
+                if not isinstance(step, dict):
+                    continue
+                label = self.txt(step.get("label"))
+                image = step.get("image")
+                if image and not is_ph(image):
+                    alt = plain(step.get("label") or title or "")
+                    frame = ('<img src="%s%s" alt="%s" loading="lazy" draggable="false">'
+                             % (root_prefix, asset_url(image), esc(alt)))
+                else:
+                    where = ("assets-manifest.json → projects.%s.sets[%d].steps[%d].image"
+                             % (slug, si, sj))
+                    frame = self.gen_box(where, "[Comparison step image: %s]"
+                                         % (plain(step.get("label")) or "image"))
+                badge = self.badge_html(step, "ai-badge step-badge")
+                steps.append('        <li class="compare-step">\n'
+                             '          <figure class="compare-frame">%s</figure>\n'
+                             '          <p class="compare-label">%s%s</p>\n'
+                             '        </li>'
+                             % (frame, label, badge))
+            if not steps:
+                continue
+            cap = ('\n        <figcaption class="compare-title">%s</figcaption>' % self.txt(title)) if title else ""
+            figures.append('      <figure class="compare-set">%s\n'
+                           '      <ol class="compare-steps">\n%s\n      </ol>\n'
+                           '      </figure>' % (cap, "\n".join(steps)))
+        if not figures:
+            return ""
+        return '    <div class="compare-list">\n%s\n    </div>' % "\n".join(figures)
+
+    def sets_section_html(self, slug, root_prefix, heading=COMPARE_HEADING):
+        inner = self.compare_list_html(slug, root_prefix)
+        if not inner:
+            return ""
+        return ('<section class="compare-sets" id="compare">\n  <div class="wrap">\n'
+                '    <p class="kicker">%s</p>\n%s\n  </div>\n</section>'
+                % (self.txt(heading), inner))
 
     def feature_html(self, p, rp):
         href = self.project_href(p, rp)
@@ -437,6 +549,9 @@ class Site(object):
         cat = self.cat_label_html(p)
         if cat:
             lines.append('        <p class="kicker card-cat">%s</p>' % cat)
+        sr = self.cover_badge_text(p, True)
+        if sr:
+            lines.append('        <span class="sr-only">%s</span>' % esc(sr))
         confirm = self.confirm_pill(p.get("confirm"))
         if confirm:
             lines.append("        " + confirm)
@@ -467,12 +582,13 @@ class Site(object):
             meta_bits = [r.get("brand"), r.get("format"), r.get("year")]
         meta = " · ".join(self.txt(b) for b in meta_bits if b)
         fmt = plain(r.get("format", ""))
+        badge = self.badge_html(r, "ai-badge reel-badge")
         return ('      <figure class="reel-card"%s>\n'
                 '        <div class="frame" style="aspect-ratio:%s">%s</div>\n'
-                '        <figcaption><span class="rtitle">%s</span>%s%s%s</figcaption>\n'
+                '        <figcaption><span class="rtitle">%s</span>%s%s%s%s</figcaption>\n'
                 '      </figure>'
                 % ((' data-format="%s"' % esc(fmt)) if fmt else "", esc(ratio), frame, self.txt(r.get("title")),
-                   ('<span class="rmeta">%s</span>' % meta) if meta else "", extra,
+                   badge, ('<span class="rmeta">%s</span>' % meta) if meta else "", extra,
                    self.confirm_pill(r.get("confirm"))))
 
     # -- shared chrome ------------------------------------------------------
@@ -565,7 +681,7 @@ class Site(object):
         missing = False
         for slot in ("vertical", "horizontal"):
             s = sr.get(slot) or {}
-            b = video_block_html(s, rp) if (s.get("livid") or s.get("mp4")) else ""
+            b = self.video_block_html(s, rp) if (s.get("livid") or s.get("mp4")) else ""
             if b:
                 blocks.append('      <div class="reel-slot reel-%s">\n%s\n      </div>' % (slot, b))
             else:
@@ -668,7 +784,7 @@ class Site(object):
         data = self.manifest.get(slug, {})
         sections = []
         # Lead media: manifest videos first, then demo / ai_steps placeholders.
-        lead = [b for b in (video_block_html(v, rp) for v in data.get("videos", [])) if b]
+        lead = [b for b in (self.video_block_html(v, rp) for v in data.get("videos", [])) if b]
         lead_html = ('    <div class="videos">\n%s\n    </div>' % "\n".join(lead)) if lead else ""
         for key in ("demo", "ai_steps"):
             if p.get(key):
@@ -697,6 +813,10 @@ class Site(object):
             body = ""
         if body:
             sections.append('<section class="case-body">\n  <div class="wrap">\n%s\n  </div>\n</section>' % body)
+        # Comparison sets (real shot → AI step → final), straight after the copy.
+        sets_html = self.sets_section_html(slug, rp)
+        if sets_html:
+            sections.append(sets_html)
         # Related reels, minus any already shown as a lead video.
         shown = set()
         for v in data.get("videos", []):
@@ -711,7 +831,7 @@ class Site(object):
         # Photos (masonry + lightbox)
         has_photos = bool(data.get("photos"))
         if has_photos:
-            shots = "\n".join(photo_button_html(ph, rp) for ph in data["photos"])
+            shots = "\n".join(self.photo_button_html(ph, rp) for ph in data["photos"])
             sections.append('<section class="case-photos">\n  <div class="wrap">\n'
                             '    <p class="kicker">Photos</p>\n    <div class="photos">\n%s\n    </div>\n'
                             '  </div>\n</section>' % shots)
@@ -844,7 +964,7 @@ class Site(object):
             copy.append("        " + confirm)
         if href:
             copy.append('        <p class="more"><a class="link-arrow" href="%s">View project</a></p>' % href)
-        media = [b for b in (video_block_html(v, "") for v in
+        media = [b for b in (self.video_block_html(v, "") for v in
                              self.manifest.get(p["slug"], {}).get("videos", [])) if b]
         if p.get("demo"):
             media.append("      " + (self.box(p["demo"]) if is_ph(p["demo"])
@@ -884,9 +1004,33 @@ class Site(object):
                                        cls="card live-card"))
         live_html = ""
         if live:
+            # Comparison sets for the live projects sit under the cards (inside
+            # this section, as divs, so the section stays one block).
+            live_sets = []
+            for slug in AI_LIVE:
+                p = self.project(slug)
+                if not p:
+                    continue
+                inner = self.compare_list_html(slug, "")
+                if not inner:
+                    continue
+                live_sets.append((p, inner))
+            live_sets_html = ""
+            if live_sets:
+                # With one project the set titles are enough; a client kicker
+                # only earns its line when two projects share the block.
+                named = len(live_sets) > 1
+                parts = []
+                for p, inner in live_sets:
+                    head = ('      <p class="kicker">%s</p>\n' % self.txt(p.get("client")))
+                    parts.append('    <div class="live-set">\n%s%s\n    </div>'
+                                 % (head if named else "", inner))
+                live_sets_html = ('    <div class="live-sets">\n      <p class="kicker">%s</p>\n%s\n    </div>\n'
+                                  % (self.txt(COMPARE_HEADING), "\n".join(parts)))
             live_html = ('<section class="ai-live" id="ran-live">\n  <div class="wrap">\n'
                          '    <div class="sec-head">\n      <div>\n        <h2>Ran live</h2>\n      </div>\n    </div>\n'
-                         '    <div class="live-grid">\n%s\n    </div>\n  </div>\n</section>' % "\n".join(live))
+                         '    <div class="live-grid">\n%s\n    </div>\n%s  </div>\n</section>'
+                         % ("\n".join(live), live_sets_html))
         tools = []
         if self.media.get("ai_tools_line"):
             tools.append("    " + self.para(self.media["ai_tools_line"], "lede"))

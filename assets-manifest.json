@@ -378,6 +378,147 @@
           "full": "assets/img/chip-city/75.jpg",
           "thumb": "assets/img/chip-city/thumbs/75.jpg",
           "alt": "W-01 Chewie Stack Brown Vertical, Chip City"
+        },
+        {
+          "full": "assets/img/chip-city/76.jpg",
+          "thumb": "assets/img/chip-city/thumbs/76.jpg",
+          "alt": "Chip City Cookies photograph"
+        },
+        {
+          "full": "assets/img/chip-city/77.jpg",
+          "thumb": "assets/img/chip-city/thumbs/77.jpg",
+          "alt": "Chip City Cookies photograph"
+        },
+        {
+          "full": "assets/img/chip-city/78.jpg",
+          "thumb": "assets/img/chip-city/thumbs/78.jpg",
+          "alt": "Chip City Cookies photograph"
+        },
+        {
+          "full": "assets/img/chip-city/79.jpg",
+          "thumb": "assets/img/chip-city/thumbs/79.jpg",
+          "alt": "Chip City Cookies photograph"
+        },
+        {
+          "full": "assets/img/chip-city/80.jpg",
+          "thumb": "assets/img/chip-city/thumbs/80.jpg",
+          "alt": "Chip City × Graza olive oil"
+        },
+        {
+          "full": "assets/img/chip-city/81.jpg",
+          "thumb": "assets/img/chip-city/thumbs/81.jpg",
+          "alt": "Recess Peppermint Bark"
+        },
+        {
+          "full": "assets/img/chip-city/82.jpg",
+          "thumb": "assets/img/chip-city/thumbs/82.jpg",
+          "alt": "Blueberry Waffle × Eggo"
+        },
+        {
+          "full": "assets/img/chip-city/83.jpg",
+          "thumb": "assets/img/chip-city/thumbs/83.jpg",
+          "alt": "Baklava"
+        },
+        {
+          "full": "assets/img/chip-city/84.jpg",
+          "thumb": "assets/img/chip-city/thumbs/84.jpg",
+          "alt": "Apple Fritter"
+        },
+        {
+          "full": "assets/img/chip-city/85.jpg",
+          "thumb": "assets/img/chip-city/thumbs/85.jpg",
+          "alt": "Apple Fritter"
+        },
+        {
+          "full": "assets/img/chip-city/86.jpg",
+          "thumb": "assets/img/chip-city/thumbs/86.jpg",
+          "alt": "Cereal Week Photoshoot"
+        },
+        {
+          "full": "assets/img/chip-city/87.jpg",
+          "thumb": "assets/img/chip-city/thumbs/87.jpg",
+          "alt": "Chippy’s Birthday Recap"
+        },
+        {
+          "full": "assets/img/chip-city/88.jpg",
+          "thumb": "assets/img/chip-city/thumbs/88.jpg",
+          "alt": "Espresso Martini"
+        },
+        {
+          "full": "assets/img/chip-city/89.jpg",
+          "thumb": "assets/img/chip-city/thumbs/89.jpg",
+          "alt": "Espresso Martini"
+        },
+        {
+          "full": "assets/img/chip-city/90.jpg",
+          "thumb": "assets/img/chip-city/thumbs/90.jpg",
+          "alt": "Hal's Chocolate Covered Pretzel Cookie"
+        },
+        {
+          "full": "assets/img/chip-city/91.jpg",
+          "thumb": "assets/img/chip-city/thumbs/91.jpg",
+          "alt": "Hal's Chocolate Covered Pretzel Cookie"
+        },
+        {
+          "full": "assets/img/chip-city/92.jpg",
+          "thumb": "assets/img/chip-city/thumbs/92.jpg",
+          "alt": "Hal's Chocolate Covered Pretzel Cookie"
+        },
+        {
+          "full": "assets/img/chip-city/93.jpg",
+          "thumb": "assets/img/chip-city/thumbs/93.jpg",
+          "alt": "Olive Oil Drizzle Drop"
+        },
+        {
+          "full": "assets/img/chip-city/94.jpg",
+          "thumb": "assets/img/chip-city/thumbs/94.jpg",
+          "alt": "Olive Oil Drizzle Drop"
+        },
+        {
+          "full": "assets/img/chip-city/95.jpg",
+          "thumb": "assets/img/chip-city/thumbs/95.jpg",
+          "alt": "Olive Oil Drizzle Drop"
+        },
+        {
+          "full": "assets/img/chip-city/96.jpg",
+          "thumb": "assets/img/chip-city/thumbs/96.jpg",
+          "alt": "PopTarts Frosted Brownie Cookie"
+        },
+        {
+          "full": "assets/img/chip-city/97.jpg",
+          "thumb": "assets/img/chip-city/thumbs/97.jpg",
+          "alt": "PopTarts Frosted Brownie Cookie"
+        },
+        {
+          "full": "assets/img/chip-city/98.jpg",
+          "thumb": "assets/img/chip-city/thumbs/98.jpg",
+          "alt": "Pringles Cookie Content"
+        },
+        {
+          "full": "assets/img/chip-city/99.jpg",
+          "thumb": "assets/img/chip-city/thumbs/99.jpg",
+          "alt": "Pringles Cookie Content"
+        },
+        {
+          "full": "assets/img/chip-city/100.jpg",
+          "thumb": "assets/img/chip-city/thumbs/100.jpg",
+          "alt": "Witches Brew Crookie",
+          "composite": true
+        },
+        {
+          "full": "assets/img/chip-city/101.jpg",
+          "thumb": "assets/img/chip-city/thumbs/101.jpg",
+          "alt": "Philadelphia Cookie"
+        },
+        {
+          "full": "assets/img/chip-city/102.jpg",
+          "thumb": "assets/img/chip-city/thumbs/102.jpg",
+          "alt": "Puppy Bowl"
+        },
+        {
+          "full": "assets/img/chip-city/103.jpg",
+          "thumb": "assets/img/chip-city/thumbs/103.jpg",
+          "alt": "Smize & Dream"
         }
       ],
       "videos": [
@@ -387,6 +528,13 @@
           "poster": "",
           "livid": "https://livid.com/embed/9noP15mT1z6h",
           "ratio": "9 / 16"
+        },
+        {
+          "title": "Cookie Fries — operations",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/chip-city/cookie-fries-operations.jpg",
+          "ratio": "16 / 9"
         }
       ]
     },
@@ -576,7 +724,7 @@
       "videos": [
         {
           "title": "Sobao Cidrines social",
-          "mp4": "assets/video/sobao-cidrines-v01.mp4",
+          "mp4": "",
           "poster": "assets/video/posters/sobao-cidrines-v01.jpg",
           "livid": "https://livid.com/embed/gD-po8B9sea9",
           "ratio": "9 / 16"
@@ -913,11 +1061,993 @@
       "videos": []
     },
     "rodowita-water": {
-      "photos": [],
-      "videos": []
+      "photos": [
+        {
+          "full": "assets/img/rodowita-water/01.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/01.jpg",
+          "alt": "Rodowita bottle, studio photograph"
+        },
+        {
+          "full": "assets/img/rodowita-water/02.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/02.jpg",
+          "alt": "Rodowita bottles on forest floor",
+          "composite": true
+        },
+        {
+          "full": "assets/img/rodowita-water/03.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/03.jpg",
+          "alt": "Rodowita still bottle with water droplets"
+        },
+        {
+          "full": "assets/img/rodowita-water/04.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/04.jpg",
+          "alt": "Forest floor plate"
+        },
+        {
+          "full": "assets/img/rodowita-water/23.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/23.jpg",
+          "alt": "Rodowita 1L still bottle, final"
+        },
+        {
+          "full": "assets/img/rodowita-water/05.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/05.jpg",
+          "alt": "Rodowita 1L bottle, studio reference"
+        },
+        {
+          "full": "assets/img/rodowita-water/06.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/06.jpg",
+          "alt": "Rodowita 1L bottle, studio reference"
+        },
+        {
+          "full": "assets/img/rodowita-water/07.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/07.jpg",
+          "alt": "Rodowita 1L bottle, studio reference"
+        },
+        {
+          "full": "assets/img/rodowita-water/08.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/08.jpg",
+          "alt": "Rodowita 1L bottle, studio reference"
+        },
+        {
+          "full": "assets/img/rodowita-water/09.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/09.jpg",
+          "alt": "Rodowita 1L bottle, studio reference"
+        },
+        {
+          "full": "assets/img/rodowita-water/10.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/10.jpg",
+          "alt": "AI-generated: 1L bottle on the forest floor",
+          "ai": true
+        },
+        {
+          "full": "assets/img/rodowita-water/11.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/11.jpg",
+          "alt": "AI-generated: Rodowita bottle",
+          "ai": true
+        },
+        {
+          "full": "assets/img/rodowita-water/12.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/12.jpg",
+          "alt": "AI-generated: 1L bottle on damp moss",
+          "ai": true
+        },
+        {
+          "full": "assets/img/rodowita-water/13.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/13.jpg",
+          "alt": "AI-generated: 1L bottle on the forest floor",
+          "ai": true
+        },
+        {
+          "full": "assets/img/rodowita-water/14.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/14.jpg",
+          "alt": "AI-generated: 1L bottle on a fallen tree trunk",
+          "ai": true
+        },
+        {
+          "full": "assets/img/rodowita-water/15.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/15.jpg",
+          "alt": "AI-generated: hand holding a Rodowita bottle",
+          "ai": true
+        },
+        {
+          "full": "assets/img/rodowita-water/16.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/16.jpg",
+          "alt": "AI-generated: top-down of two Rodowita bottles",
+          "ai": true
+        },
+        {
+          "full": "assets/img/rodowita-water/17.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/17.jpg",
+          "alt": "Rodowita AKC Premier Cup, 2026"
+        },
+        {
+          "full": "assets/img/rodowita-water/18.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/18.jpg",
+          "alt": "Rodowita AKC Premier Cup, 2026"
+        },
+        {
+          "full": "assets/img/rodowita-water/19.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/19.jpg",
+          "alt": "Rodowita AKC Premier Cup, 2026"
+        },
+        {
+          "full": "assets/img/rodowita-water/20.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/20.jpg",
+          "alt": "Rodowita AKC Premier Cup, 2026"
+        },
+        {
+          "full": "assets/img/rodowita-water/21.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/21.jpg",
+          "alt": "Rodowita AKC Premier Cup, 2026"
+        },
+        {
+          "full": "assets/img/rodowita-water/22.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/22.jpg",
+          "alt": "Rodowita AKC Premier Cup, 2026"
+        }
+      ],
+      "videos": [],
+      "sets": [
+        {
+          "title": "Studio shot → forest floor plate → final",
+          "steps": [
+            {
+              "label": "Studio shot",
+              "image": "assets/img/rodowita-water/01.jpg"
+            },
+            {
+              "label": "Forest floor plate",
+              "image": "assets/img/rodowita-water/04.jpg"
+            },
+            {
+              "label": "Final",
+              "image": "assets/img/rodowita-water/23.jpg"
+            }
+          ]
+        },
+        {
+          "title": "Studio shot → AI final",
+          "steps": [
+            {
+              "label": "Studio shot",
+              "image": "assets/img/rodowita-water/09.jpg"
+            },
+            {
+              "label": "AI final",
+              "image": "assets/img/rodowita-water/16.jpg",
+              "ai": true
+            }
+          ]
+        }
+      ]
     },
     "spec-jewelry": {
       "photos": [],
+      "videos": []
+    },
+    "supermax": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Supermax, 2022 — online commercial",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/supermax/supermax-2022-online-commercial.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "ninja-bear": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Norberto NMZ, 2021",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/ninja-bear/norberto-nmz-2021.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "bldm": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "BLDM, 2023 — 1",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/bldm/bldm-2023-1.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "BLDM, 2023 — 2",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/bldm/bldm-2023-2.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "BLDM, 2023 — 3",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/bldm/bldm-2023-3.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "BLDM, 2023 — 4",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/bldm/bldm-2023-4.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "BLDM, 2023 — 5",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/bldm/bldm-2023-5.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "cooperativa-hidroelectrica": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Cooperativa Hidroeléctrica de la Montaña, 2023 — 1",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/cooperativa-hidroelectrica/cooperativa-hidroelectrica-de-la-montana-2023-1.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Cooperativa Hidroeléctrica de la Montaña, 2023 — 2",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/cooperativa-hidroelectrica/cooperativa-hidroelectrica-de-la-montana-2023-2.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "vrm-companies": {
+      "photos": [
+        {
+          "full": "assets/img/vrm-companies/01.jpg",
+          "thumb": "assets/img/vrm-companies/thumbs/01.jpg",
+          "alt": "VRM Companies, corporate photography, Puerto Rico, 2022"
+        },
+        {
+          "full": "assets/img/vrm-companies/02.jpg",
+          "thumb": "assets/img/vrm-companies/thumbs/02.jpg",
+          "alt": "VRM Companies, corporate photography, Puerto Rico, 2022"
+        },
+        {
+          "full": "assets/img/vrm-companies/03.jpg",
+          "thumb": "assets/img/vrm-companies/thumbs/03.jpg",
+          "alt": "VRM Companies, corporate photography, Puerto Rico, 2022"
+        },
+        {
+          "full": "assets/img/vrm-companies/04.jpg",
+          "thumb": "assets/img/vrm-companies/thumbs/04.jpg",
+          "alt": "VRM Companies, corporate photography, Puerto Rico, 2022"
+        },
+        {
+          "full": "assets/img/vrm-companies/05.jpg",
+          "thumb": "assets/img/vrm-companies/thumbs/05.jpg",
+          "alt": "VRM Companies, corporate photography, Puerto Rico, 2022"
+        },
+        {
+          "full": "assets/img/vrm-companies/06.jpg",
+          "thumb": "assets/img/vrm-companies/thumbs/06.jpg",
+          "alt": "VRM Companies, corporate photography, Puerto Rico, 2022"
+        },
+        {
+          "full": "assets/img/vrm-companies/07.jpg",
+          "thumb": "assets/img/vrm-companies/thumbs/07.jpg",
+          "alt": "VRM Companies, corporate photography, Puerto Rico, 2022"
+        }
+      ],
+      "videos": []
+    },
+    "taller-salud": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Taller Salud, 2021",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/taller-salud/taller-salud-2021.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "san-pa": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "San Patricio Plaza × FIFA World Cup 2026",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/san-pa/san-patricio-plaza-fifa-world-cup-2026.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "chente-ydrach-coliseo": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Chente Ydrach × Coliseo, 2022 — 30s cut",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/chente-ydrach-coliseo/chente-ydrach-coliseo-2022-30s-cut.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Chente Ydrach × Coliseo, 2022 — extended cut",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/chente-ydrach-coliseo/chente-ydrach-coliseo-2022-extended-cut.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "lunay-recap": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Lunay, 2019 — recap",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/lunay-recap/lunay-2019-recap.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "tv-film-sets": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Exatlón, 2019",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/tv-film-sets/exatlon-2019.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Gina Yei (Disney+), 2022",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/tv-film-sets/gina-yei-disney-2022.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "MLB · Roberto Clemente, 2022",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/tv-film-sets/mlb-roberto-clemente-2022.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "irving-reyes": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Irving Reyes — Baby Uuu, 2023",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/irving-reyes/irving-reyes-baby-uuu-2023.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Irving Reyes — KTM, 2022",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/irving-reyes/irving-reyes-ktm-2022.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Irving Reyes — Toalla, 2023",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/irving-reyes/irving-reyes-toalla-2023.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "bad-bunny": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Bad Bunny — Caro, 2018",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/bad-bunny/bad-bunny-caro-2018.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Bad Bunny — Como Antes, 2018",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/bad-bunny/bad-bunny-como-antes-2018.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Bad Bunny — Cuando Perriabas, 2018",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/bad-bunny/bad-bunny-cuando-perriabas-2018.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Bad Bunny × Diplo — 200 MPH, 2018",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/bad-bunny/bad-bunny-diplo-200-mph-2018.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Bad Bunny × Diplo — 200 MPH visualizer, 2018",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/bad-bunny/bad-bunny-diplo-200-mph-visualizer-2018.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Bad Bunny — Tenemos Que Hablar, 2018",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/bad-bunny/bad-bunny-tenemos-que-hablar-2018.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "jhay-cortez": {
+      "photos": [],
+      "videos": [
+        {
+          "title": "Jhay Cortez — Apple Music, 2022",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/jhay-cortez/jhay-cortez-apple-music-2022.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Jhay Cortez — BTS, 2022",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/jhay-cortez/jhay-cortez-bts-2022.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "music-video-sets": {
+      "photos": [
+        {
+          "full": "assets/img/music-video-sets/01.jpg",
+          "thumb": "assets/img/music-video-sets/thumbs/01.jpg",
+          "alt": "Puerto Rican concert, New York City, 2024"
+        }
+      ],
+      "videos": [
+        {
+          "title": "Ednita Nazario — Pedir Perdón, 2021",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/music-video-sets/ednita-nazario-pedir-perdon-2021.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Enyel C, 2022",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/music-video-sets/enyel-c-2022.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Gigolo y La Exce — Rolia, 2022",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/music-video-sets/gigolo-y-la-exce-rolia-2022.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Jotaerre & Lil JouJou — Flamenco, 2022",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/music-video-sets/jotaerre-lil-joujou-flamenco-2022.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Rauw Alejandro & Chencho Corleone — El Efecto, 2019",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/music-video-sets/rauw-alejandro-chencho-corleone-el-efecto-2019.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Wisin & Jhay Cortez — Fiel, 2022",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/music-video-sets/wisin-jhay-cortez-fiel-2022.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Wisin, Jowell & Randy — Baja Sube Sube, 2023",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/music-video-sets/wisin-jowell-randy-baja-sube-sube-2023.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Wisin & Myke Towers — Mi Niña, 2022",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/music-video-sets/wisin-myke-towers-mi-nina-2022.jpg",
+          "ratio": "16 / 9"
+        },
+        {
+          "title": "Wisin, Yandel & Bad Bunny — Dame Algo, 2019",
+          "livid": "",
+          "mp4": "",
+          "poster": "assets/img/music-video-sets/wisin-yandel-bad-bunny-dame-algo-2019.jpg",
+          "ratio": "16 / 9"
+        }
+      ]
+    },
+    "concerts-photography": {
+      "photos": [
+        {
+          "full": "assets/img/concerts-photography/01.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/01.jpg",
+          "alt": "Cultura Profética, concert photography, 2017"
+        },
+        {
+          "full": "assets/img/concerts-photography/02.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/02.jpg",
+          "alt": "Cultura Profética, concert photography, 2017"
+        },
+        {
+          "full": "assets/img/concerts-photography/03.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/03.jpg",
+          "alt": "Cultura Profética, concert photography, 2017"
+        },
+        {
+          "full": "assets/img/concerts-photography/04.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/04.jpg",
+          "alt": "Dúo Deleite, concert photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/05.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/05.jpg",
+          "alt": "Dúo Deleite, documentary photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/06.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/06.jpg",
+          "alt": "Dúo Deleite, documentary photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/07.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/07.jpg",
+          "alt": "Dúo Deleite, documentary photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/08.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/08.jpg",
+          "alt": "Los Walters, concert photography, 2017"
+        },
+        {
+          "full": "assets/img/concerts-photography/09.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/09.jpg",
+          "alt": "Puerto Rican concert, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/10.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/10.jpg",
+          "alt": "Puerto Rican concert, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/11.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/11.jpg",
+          "alt": "Puerto Rican concert, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/12.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/12.jpg",
+          "alt": "Puerto Rican concert, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/13.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/13.jpg",
+          "alt": "Puerto Rican concert, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/14.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/14.jpg",
+          "alt": "Puerto Rican concert, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/15.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/15.jpg",
+          "alt": "Puerto Rican concert, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/16.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/16.jpg",
+          "alt": "Puerto Rican concert, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/17.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/17.jpg",
+          "alt": "Puerto Rican concert, New York City, 2024"
+        },
+        {
+          "full": "assets/img/concerts-photography/18.jpg",
+          "thumb": "assets/img/concerts-photography/thumbs/18.jpg",
+          "alt": "Teatro Breve, Coliseo de Puerto Rico"
+        }
+      ],
+      "videos": []
+    },
+    "portraits": {
+      "photos": [
+        {
+          "full": "assets/img/portraits/01.jpg",
+          "thumb": "assets/img/portraits/thumbs/01.jpg",
+          "alt": "Bendi La Bendición, portrait, New York City, 2025"
+        },
+        {
+          "full": "assets/img/portraits/02.jpg",
+          "thumb": "assets/img/portraits/thumbs/02.jpg",
+          "alt": "Bendi La Bendición, portrait, New York City, 2025"
+        },
+        {
+          "full": "assets/img/portraits/03.jpg",
+          "thumb": "assets/img/portraits/thumbs/03.jpg",
+          "alt": "Bendi La Bendición, portrait, New York City, 2025"
+        },
+        {
+          "full": "assets/img/portraits/04.jpg",
+          "thumb": "assets/img/portraits/thumbs/04.jpg",
+          "alt": "DLA Piper, portrait, Puerto Rico, 2023"
+        },
+        {
+          "full": "assets/img/portraits/05.jpg",
+          "thumb": "assets/img/portraits/thumbs/05.jpg",
+          "alt": "Enyel C, portrait, New York City, 2024"
+        },
+        {
+          "full": "assets/img/portraits/06.jpg",
+          "thumb": "assets/img/portraits/thumbs/06.jpg",
+          "alt": "Enyel C, portrait, New York City, 2024"
+        },
+        {
+          "full": "assets/img/portraits/07.jpg",
+          "thumb": "assets/img/portraits/thumbs/07.jpg",
+          "alt": "Enyel C, portrait, New York City, 2024"
+        },
+        {
+          "full": "assets/img/portraits/08.jpg",
+          "thumb": "assets/img/portraits/thumbs/08.jpg",
+          "alt": "Enyel C, portrait, New York City, 2024"
+        }
+      ],
+      "videos": []
+    },
+    "street-travel": {
+      "photos": [
+        {
+          "full": "assets/img/street-travel/01.jpg",
+          "thumb": "assets/img/street-travel/thumbs/01.jpg",
+          "alt": "Street, New York City"
+        },
+        {
+          "full": "assets/img/street-travel/02.jpg",
+          "thumb": "assets/img/street-travel/thumbs/02.jpg",
+          "alt": "Street, New York City — Kodak 400 B&W, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/03.jpg",
+          "thumb": "assets/img/street-travel/thumbs/03.jpg",
+          "alt": "Street, New York City — Kodak 400 B&W, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/04.jpg",
+          "thumb": "assets/img/street-travel/thumbs/04.jpg",
+          "alt": "Street, New York City — Kodak 400 B&W, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/05.jpg",
+          "thumb": "assets/img/street-travel/thumbs/05.jpg",
+          "alt": "Street, New York City — Kodak 400, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/06.jpg",
+          "thumb": "assets/img/street-travel/thumbs/06.jpg",
+          "alt": "Street, New York City — Kodak 400, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/07.jpg",
+          "thumb": "assets/img/street-travel/thumbs/07.jpg",
+          "alt": "Street, New York City — Kodak 400, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/08.jpg",
+          "thumb": "assets/img/street-travel/thumbs/08.jpg",
+          "alt": "Street photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/09.jpg",
+          "thumb": "assets/img/street-travel/thumbs/09.jpg",
+          "alt": "Street photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/10.jpg",
+          "thumb": "assets/img/street-travel/thumbs/10.jpg",
+          "alt": "Street photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/11.jpg",
+          "thumb": "assets/img/street-travel/thumbs/11.jpg",
+          "alt": "Street photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/12.jpg",
+          "thumb": "assets/img/street-travel/thumbs/12.jpg",
+          "alt": "Street photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/13.jpg",
+          "thumb": "assets/img/street-travel/thumbs/13.jpg",
+          "alt": "Street photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/14.jpg",
+          "thumb": "assets/img/street-travel/thumbs/14.jpg",
+          "alt": "Street photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/15.jpg",
+          "thumb": "assets/img/street-travel/thumbs/15.jpg",
+          "alt": "Street photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/16.jpg",
+          "thumb": "assets/img/street-travel/thumbs/16.jpg",
+          "alt": "Street photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/17.jpg",
+          "thumb": "assets/img/street-travel/thumbs/17.jpg",
+          "alt": "Street photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/18.jpg",
+          "thumb": "assets/img/street-travel/thumbs/18.jpg",
+          "alt": "Street photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/19.jpg",
+          "thumb": "assets/img/street-travel/thumbs/19.jpg",
+          "alt": "Street photography, New York City, 2024"
+        },
+        {
+          "full": "assets/img/street-travel/20.jpg",
+          "thumb": "assets/img/street-travel/thumbs/20.jpg",
+          "alt": "Alaska, 2020"
+        },
+        {
+          "full": "assets/img/street-travel/21.jpg",
+          "thumb": "assets/img/street-travel/thumbs/21.jpg",
+          "alt": "Alaska, 2020"
+        },
+        {
+          "full": "assets/img/street-travel/22.jpg",
+          "thumb": "assets/img/street-travel/thumbs/22.jpg",
+          "alt": "Alaska, 2020"
+        },
+        {
+          "full": "assets/img/street-travel/23.jpg",
+          "thumb": "assets/img/street-travel/thumbs/23.jpg",
+          "alt": "Alaska, 2020"
+        },
+        {
+          "full": "assets/img/street-travel/24.jpg",
+          "thumb": "assets/img/street-travel/thumbs/24.jpg",
+          "alt": "Alaska, 2020"
+        },
+        {
+          "full": "assets/img/street-travel/25.jpg",
+          "thumb": "assets/img/street-travel/thumbs/25.jpg",
+          "alt": "Alaska, 2020"
+        },
+        {
+          "full": "assets/img/street-travel/26.jpg",
+          "thumb": "assets/img/street-travel/thumbs/26.jpg",
+          "alt": "Barcelona, 2025"
+        },
+        {
+          "full": "assets/img/street-travel/27.jpg",
+          "thumb": "assets/img/street-travel/thumbs/27.jpg",
+          "alt": "Barcelona, 2025"
+        },
+        {
+          "full": "assets/img/street-travel/28.jpg",
+          "thumb": "assets/img/street-travel/thumbs/28.jpg",
+          "alt": "Barcelona, 2025"
+        },
+        {
+          "full": "assets/img/street-travel/29.jpg",
+          "thumb": "assets/img/street-travel/thumbs/29.jpg",
+          "alt": "Barcelona, 2025"
+        },
+        {
+          "full": "assets/img/street-travel/30.jpg",
+          "thumb": "assets/img/street-travel/thumbs/30.jpg",
+          "alt": "Barcelona, 2025"
+        },
+        {
+          "full": "assets/img/street-travel/31.jpg",
+          "thumb": "assets/img/street-travel/thumbs/31.jpg",
+          "alt": "Barcelona, 2025"
+        },
+        {
+          "full": "assets/img/street-travel/32.jpg",
+          "thumb": "assets/img/street-travel/thumbs/32.jpg",
+          "alt": "Barcelona, 2025"
+        },
+        {
+          "full": "assets/img/street-travel/33.jpg",
+          "thumb": "assets/img/street-travel/thumbs/33.jpg",
+          "alt": "Barcelona, 2025"
+        },
+        {
+          "full": "assets/img/street-travel/34.jpg",
+          "thumb": "assets/img/street-travel/thumbs/34.jpg",
+          "alt": "Barcelona, 2025"
+        },
+        {
+          "full": "assets/img/street-travel/35.jpg",
+          "thumb": "assets/img/street-travel/thumbs/35.jpg",
+          "alt": "Barcelona, 2025"
+        },
+        {
+          "full": "assets/img/street-travel/36.jpg",
+          "thumb": "assets/img/street-travel/thumbs/36.jpg",
+          "alt": "Barcelona, 2025"
+        },
+        {
+          "full": "assets/img/street-travel/37.jpg",
+          "thumb": "assets/img/street-travel/thumbs/37.jpg",
+          "alt": "Puerto Rico, 2020"
+        },
+        {
+          "full": "assets/img/street-travel/38.jpg",
+          "thumb": "assets/img/street-travel/thumbs/38.jpg",
+          "alt": "Puerto Rico, 2020"
+        },
+        {
+          "full": "assets/img/street-travel/39.jpg",
+          "thumb": "assets/img/street-travel/thumbs/39.jpg",
+          "alt": "Puerto Rico, 2023"
+        },
+        {
+          "full": "assets/img/street-travel/40.jpg",
+          "thumb": "assets/img/street-travel/thumbs/40.jpg",
+          "alt": "Puerto Rico, 2023"
+        },
+        {
+          "full": "assets/img/street-travel/41.jpg",
+          "thumb": "assets/img/street-travel/thumbs/41.jpg",
+          "alt": "Puerto Rico sunset, 2017"
+        }
+      ],
+      "videos": []
+    },
+    "la-lucha-continua": {
+      "photos": [
+        {
+          "full": "assets/img/la-lucha-continua/01.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/01.jpg",
+          "alt": "LL—0003 · Family Day — #AuditNow · 2017-04-23 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/02.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/02.jpg",
+          "alt": "LL—0012 · May Day National Strike · 2017-05-01 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/03.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/03.jpg",
+          "alt": "LL—0024 · May Day National Strike · 2017-05-01 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/04.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/04.jpg",
+          "alt": "LL—0022 · May Day National Strike · 2017-05-01 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/05.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/05.jpg",
+          "alt": "LL—0036 · Family Day — #AuditNow · 2017-04-23 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/06.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/06.jpg",
+          "alt": "LL—0031 · National Assembly · 2017-04-05 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/07.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/07.jpg",
+          "alt": "LL—0030 · May Day National Strike · 2017-05-01 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/08.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/08.jpg",
+          "alt": "LL—0002 · National Assembly · 2017-04-05 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/09.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/09.jpg",
+          "alt": "LL—0060 · Picket · 2017-03-29 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/10.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/10.jpg",
+          "alt": "LL—0078 · May Day National Strike · 2017-05-01 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/11.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/11.jpg",
+          "alt": "LL—0104 · 3rd General Student Assembly · 2017-05-10 · UPR Río Piedras, San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/12.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/12.jpg",
+          "alt": "LL—0110 · May Day National Strike · 2017-05-01 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/13.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/13.jpg",
+          "alt": "LL—0152 · May Day National Strike · 2017-05-01 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/14.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/14.jpg",
+          "alt": "LL—0242 · Picket · 2017-03-29 · San Juan, PR"
+        },
+        {
+          "full": "assets/img/la-lucha-continua/15.jpg",
+          "thumb": "assets/img/la-lucha-continua/thumbs/15.jpg",
+          "alt": "LL—0251 · National Assembly · 2017-04-05 · San Juan, PR"
+        }
+      ],
+      "videos": []
+    },
+    "the-french-workshop": {
+      "photos": [
+        {
+          "full": "assets/img/the-french-workshop/01.jpg",
+          "thumb": "assets/img/the-french-workshop/thumbs/01.jpg",
+          "alt": "The French Workshop pastry"
+        },
+        {
+          "full": "assets/img/the-french-workshop/02.jpg",
+          "thumb": "assets/img/the-french-workshop/thumbs/02.jpg",
+          "alt": "The French Workshop pastry"
+        },
+        {
+          "full": "assets/img/the-french-workshop/03.jpg",
+          "thumb": "assets/img/the-french-workshop/thumbs/03.jpg",
+          "alt": "Carrot cake"
+        },
+        {
+          "full": "assets/img/the-french-workshop/04.jpg",
+          "thumb": "assets/img/the-french-workshop/thumbs/04.jpg",
+          "alt": "Carrot cake"
+        }
+      ],
       "videos": []
     }
   }

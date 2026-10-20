@@ -215,6 +215,269 @@
       "description": "[Planned spec shoot: bench work and materials, focus-stacked macro product, pieces worn, founder behind the scenes, three reels, one AI-assisted ad checked against the real piece.]",
       "draft_only": true,
       "category": "commercial-corporate"
+    },
+    {
+      "slug": "supermax",
+      "client": "Supermax",
+      "title": "Online commercial",
+      "oneliner": "An online commercial for Supermax in Puerto Rico.",
+      "role": "Camera operator",
+      "years": "2022",
+      "location": "Puerto Rico",
+      "tags": [
+        "product",
+        "campaigns"
+      ],
+      "description": "Camera operator on an online commercial for Supermax in Puerto Rico, 2022.",
+      "category": "food-beverage"
+    },
+    {
+      "slug": "ninja-bear",
+      "client": "Ninja Bear",
+      "title": "Fitness content, New York and Puerto Rico",
+      "oneliner": "Vertical fitness videos for Ninja Bear in New York City, plus a fitness piece for Norberto NMZ in Puerto Rico.",
+      "role": "Videographer",
+      "years": "2021, 2023–2024",
+      "location": "New York City · Puerto Rico",
+      "tags": [
+        "social",
+        "motion"
+      ],
+      "description": "Vertical fitness videos for Ninja Bear in New York City across 2023 and 2024, and a fitness video for Norberto NMZ in Puerto Rico in 2021.",
+      "category": "commercial-corporate"
+    },
+    {
+      "slug": "bldm",
+      "client": "BLDM",
+      "title": "Corporate video for a construction company",
+      "oneliner": "Five cuts of corporate video for a construction company in Puerto Rico.",
+      "role": "Videographer",
+      "years": "2023",
+      "location": "Puerto Rico",
+      "tags": [
+        "campaigns"
+      ],
+      "description": "Corporate video for BLDM, a construction company in Puerto Rico, 2023.",
+      "category": "commercial-corporate"
+    },
+    {
+      "slug": "cooperativa-hidroelectrica",
+      "client": "Cooperativa Hidroeléctrica de la Montaña",
+      "title": "Renewable energy cooperative, video",
+      "oneliner": "Two videos for a renewable energy cooperative in Puerto Rico.",
+      "role": "Videographer",
+      "years": "2023",
+      "location": "Puerto Rico",
+      "tags": [
+        "campaigns"
+      ],
+      "description": "Video for the Cooperativa Hidroeléctrica de la Montaña, a renewable energy cooperative in Puerto Rico, 2023.",
+      "category": "commercial-corporate"
+    },
+    {
+      "slug": "vrm-companies",
+      "client": "VRM Companies",
+      "title": "Corporate photography",
+      "oneliner": "Corporate photography for VRM Companies in Puerto Rico.",
+      "role": "Photographer",
+      "years": "2022",
+      "location": "Puerto Rico",
+      "tags": [],
+      "description": "Corporate photography for VRM Companies in Puerto Rico, 2022.",
+      "category": "commercial-corporate"
+    },
+    {
+      "slug": "taller-salud",
+      "client": "Taller Salud",
+      "title": "Commercial, camera operator",
+      "oneliner": "A commercial for Taller Salud in Puerto Rico.",
+      "role": "Camera operator",
+      "years": "2021",
+      "location": "Puerto Rico",
+      "tags": [
+        "campaigns"
+      ],
+      "description": "Camera operator on a commercial for Taller Salud in Puerto Rico, 2021.",
+      "category": "commercial-corporate"
+    },
+    {
+      "slug": "san-pa",
+      "client": "San Patricio Plaza",
+      "title": "FIFA World Cup 2026 commercial",
+      "oneliner": "A 24-second commercial promoting San Patricio Plaza as the place to watch the World Cup.",
+      "role": "Editor · colorist",
+      "years": "2026",
+      "location": "Puerto Rico",
+      "tags": [
+        "campaigns",
+        "motion"
+      ],
+      "description": "A 24-second commercial that ran on San Patricio Plaza's social channels and at the mall itself, promoting the mall as a spot to watch the FIFA World Cup in Puerto Rico. I edited and color graded it.",
+      "category": "commercial-corporate"
+    },
+    {
+      "slug": "chente-ydrach-coliseo",
+      "client": "Chente Ydrach × Coliseo de Puerto Rico",
+      "title": "Commercial, two cuts",
+      "oneliner": "A 30-second cut and a 2:11 cut of a commercial for the Coliseo de Puerto Rico.",
+      "role": "Camera operator",
+      "years": "2022",
+      "location": "Puerto Rico",
+      "tags": [
+        "campaigns",
+        "motion"
+      ],
+      "description": "Camera operator on a commercial for Chente Ydrach at the Coliseo de Puerto Rico, 2022, in a 30-second cut and a 2:11 cut.",
+      "category": "concerts-events"
+    },
+    {
+      "slug": "lunay-recap",
+      "client": "Lunay",
+      "title": "Recap",
+      "oneliner": "A one-minute recap video for Lunay in Puerto Rico.",
+      "role": "Videographer",
+      "years": "2019",
+      "location": "Puerto Rico",
+      "tags": [
+        "social",
+        "motion"
+      ],
+      "description": "Recap video for Lunay in Puerto Rico, 2019.",
+      "category": "concerts-events"
+    },
+    {
+      "slug": "tv-film-sets",
+      "client": "Gina Yei · MLB · Exatlón",
+      "title": "TV, film and sports sets",
+      "oneliner": "Camera work on a Disney+ series, an MLB Roberto Clemente piece, and Exatlón.",
+      "role": "Camera operator · gimbal operator",
+      "years": "2019–2022",
+      "location": "Puerto Rico",
+      "tags": [
+        "motion"
+      ],
+      "description": "Camera operator on Gina Yei (Disney+, 2022), gimbal operator on an MLB Roberto Clemente piece (2022), and videographer on Exatlón (2019).",
+      "category": "film-tv"
+    },
+    {
+      "slug": "irving-reyes",
+      "client": "Irving Reyes",
+      "title": "Music videos, director",
+      "oneliner": "Three music videos directed for Irving Reyes.",
+      "role": "Director",
+      "years": "2022–2023",
+      "location": "Puerto Rico",
+      "tags": [
+        "motion"
+      ],
+      "description": "Director on Baby Uuu (2023), KTM (2022), and Toalla (2023) for Irving Reyes.",
+      "category": "music-videos"
+    },
+    {
+      "slug": "bad-bunny",
+      "client": "Bad Bunny",
+      "title": "Visualizers and the 200 MPH video",
+      "oneliner": "Four visualizers, plus 200 MPH with Diplo and its visualizer.",
+      "role": "Producer · talent producer · cinematographer · colorist · key production assistant",
+      "years": "2018",
+      "location": "Puerto Rico",
+      "tags": [
+        "motion"
+      ],
+      "description": "Producer on the Caro and Cuando Perriabas visualizers, talent producer on Como Antes, cinematographer on Tenemos Que Hablar, key production assistant on the 200 MPH music video with Diplo, and colorist on its visualizer.",
+      "category": "music-videos"
+    },
+    {
+      "slug": "jhay-cortez",
+      "client": "Jhay Cortez",
+      "title": "Apple Music and behind the scenes",
+      "oneliner": "An Apple Music interview, an Apple Music video, and music video behind the scenes.",
+      "role": "Videographer",
+      "years": "2020–2022",
+      "location": "Puerto Rico",
+      "tags": [
+        "motion",
+        "social"
+      ],
+      "description": "Videographer on an Apple Music interview with Jhay Cortez (2020), an Apple Music video (2022), and a music video behind-the-scenes piece (2022).",
+      "category": "music-videos"
+    },
+    {
+      "slug": "music-video-sets",
+      "client": "Wisin · Rauw Alejandro · Ednita Nazario · more",
+      "title": "Music video sets",
+      "oneliner": "Camera, gimbal, and production work across nine music videos.",
+      "role": "Camera operator · gimbal operator · producer · production assistant",
+      "years": "2019–2023",
+      "location": "Puerto Rico",
+      "tags": [
+        "motion"
+      ],
+      "description": "Work on music videos for Wisin, Rauw Alejandro & Chencho Corleone, Ednita Nazario, Jotaerre & Lil JouJou, Gigolo y La Exce, and Enyel C, plus a Cosculluela behind-the-scenes photo.",
+      "category": "music-videos"
+    },
+    {
+      "slug": "concerts-photography",
+      "client": "Cultura Profética · Dúo Deleite · more",
+      "title": "Concert photography",
+      "oneliner": "Concert and documentary photography in Puerto Rico and New York City.",
+      "role": "Photographer",
+      "years": "2017–2024",
+      "location": "Puerto Rico · New York City",
+      "tags": [],
+      "description": "Concert photography for Cultura Profética, Los Walters, and Teatro Breve at the Coliseo de Puerto Rico; concert and documentary photography for Dúo Deleite; and concert photography from New York City, 2017–2024.",
+      "category": "concerts-events"
+    },
+    {
+      "slug": "portraits",
+      "client": "Bendi La Bendición · DLA Piper · Enyel C",
+      "title": "Portraits",
+      "oneliner": "Portrait sessions in New York City and Puerto Rico.",
+      "role": "Photographer",
+      "years": "2023–2025",
+      "location": "New York City · Puerto Rico",
+      "tags": [],
+      "description": "Portraits of Bendi La Bendición (New York City, 2025), DLA Piper (Puerto Rico, 2023), and Enyel C (New York City, 2024).",
+      "category": "portraits"
+    },
+    {
+      "slug": "street-travel",
+      "client": "Street & travel",
+      "title": "Street and travel photography",
+      "oneliner": "Street photography in New York City and travel work from Alaska, Barcelona, and Puerto Rico.",
+      "role": "Photographer",
+      "years": "2017–2025",
+      "location": "New York City · Alaska · Barcelona · Puerto Rico",
+      "tags": [],
+      "description": "Street photography in New York City (2024, including Kodak 400 film) and travel photography from Alaska (2020), Barcelona (2025), and Puerto Rico.",
+      "category": "street-travel"
+    },
+    {
+      "slug": "la-lucha-continua",
+      "client": "La Lucha Continua",
+      "title": "2017 protest archive",
+      "oneliner": "Fifteen frames from a 2017 protest archive in San Juan.",
+      "role": "Photographer",
+      "years": "2017",
+      "location": "San Juan, Puerto Rico",
+      "tags": [],
+      "description": "Documentary photographs from 2017 protest events in San Juan, Puerto Rico: national assemblies, the May Day national strike, pickets, Family Day #AuditNow, and the 3rd General Student Assembly at UPR Río Piedras.",
+      "category": "photojournalism"
+    },
+    {
+      "slug": "the-french-workshop",
+      "client": "The French Workshop",
+      "title": "Product photography and reels",
+      "oneliner": "A set of images and two reels made for their social media.",
+      "role": "Photographer · videographer",
+      "years": "2026",
+      "location": "",
+      "tags": [
+        "product",
+        "social"
+      ],
+      "description": "A set of product images and two reels for The French Workshop in 2026, delivered for their social media.",
+      "category": "food-beverage"
     }
   ]
 }
