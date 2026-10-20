@@ -18,7 +18,7 @@
       "brief": "Chip City sells a rotating weekly menu across its stores, its app, and the delivery platforms. Every weekly drop, new product, and brand collaboration needed photo and video, organic and paid, on a fixed schedule.",
       "did": [
         "Concepted, shot, and edited all photo and video except graphic design, and partnered with the Creative Director to keep every channel on brand.",
-        "Shot collab launches with Eggo, Pop-Tarts, Pringles, Peeps, Philadelphia Cream Cheese, and JetBlue.",
+        "Shot collab launches with Eggo, Pop-Tarts, Pringles, Peeps, Philadelphia Cream Cheese, Recess, Graza, Bee Dolce, Loverboy, SNL 50th Anniversary and TBS.",
         "Produced paid video and static ads every month, and made AI-assisted creative that ran live.",
         "Made training and internal videos, an HR hiring video, new-location architecture photos, and brand activation coverage.",
         "In my final months, built an AI chatbot that lets store staff look up baking procedures in plain language."
@@ -56,7 +56,8 @@
       "scope": [],
       "result": "[Time saved, only if timed: e.g. 4-cam sync, X min to Y min]",
       "demo": "[60–90s screen recording: the agent syncing a multicam shoot or building an After Effects animation. Hide file paths and logins.]",
-      "category": ""
+      "category": "",
+      "standalone": "ai.html#assistant"
     },
     {
       "slug": "rodowita-water",
