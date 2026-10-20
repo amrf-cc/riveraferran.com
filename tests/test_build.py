@@ -83,16 +83,16 @@ class TestPlaceholderHelpers(unittest.TestCase):
                 "assets-manifest.json": {"projects": {}},
                 "media.json": {"paid_social": {
                     "video_ads": [{"title": "V", "campaign": "C", "ratio": "4 / 5",
-                                   "mp4": "assets/video/reels/baklava.mp4",
-                                   "poster": "assets/img/posters/reels/baklava.jpg"}],
+                                   "mp4": "assets/video/motion/pride.mp4",
+                                   "poster": "assets/img/posters/motion/pride.jpg"}],
                     "static_ads": [{"title": "S", "campaign": "C", "ratio": "1 / 1",
-                                    "image": "assets/img/posters/reels/birthday.jpg"}]}}}
+                                    "image": "assets/img/posters/motion/world-water-day.jpg"}]}}}
         site = build.Site(data, release=True)
         site.build_paid()
         page = site.pages["paid-social.html"]
         self.assertEqual(site.generated, [])
         self.assertIn('style="aspect-ratio:4 / 5"><button type="button" class="reel-play"', page)
-        self.assertIn('style="aspect-ratio:1 / 1"><img src="assets/img/posters/reels/birthday.jpg?v=', page)
+        self.assertIn('style="aspect-ratio:1 / 1"><img src="assets/img/posters/motion/world-water-day.jpg?v=', page)
         self.assertNotIn("ph-box", page)
 
     def test_release_render_hides_draft_layer(self):

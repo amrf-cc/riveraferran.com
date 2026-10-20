@@ -155,9 +155,9 @@ def strip_drafts(node):
 # placeholders (no data string behind them), so the clean release can pass.
 RELEASE_AI_STEPS = "Real shot, AI step, final ad (release test)."
 RELEASE_VIDEO_AD = {"title": "Release test video ad", "campaign": "Test campaign", "ratio": "9 / 16",
-                    "mp4": "assets/video/reels/baklava.mp4", "poster": "assets/img/posters/reels/baklava.jpg"}
+                    "mp4": "assets/video/motion/pride.mp4", "poster": "assets/img/posters/motion/pride.jpg"}
 RELEASE_STATIC_AD = {"title": "Release test static ad", "campaign": "Test campaign", "ratio": "4 / 5",
-                     "image": "assets/img/posters/reels/birthday.jpg"}
+                     "image": "assets/img/posters/motion/world-water-day.jpg"}
 
 
 def make_release_ready(root):
