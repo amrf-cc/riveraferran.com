@@ -11,7 +11,7 @@ import re
 
 from support import (ROOT, NAME_UNACCENTED, EMAIL_OR_DOMAIN, RELEASE_AI_STEPS, RELEASE_STATIC_AD,
                      RELEASE_VIDEO_AD, expected_work_groups, html_pages, load, make_release_ready,
-                     make_temp_repo, run_build, work_sequence)
+                     make_temp_repo, run_build, standalone, work_sequence)
 import build  # noqa: E402  (support puts the repo root on sys.path)
 
 
@@ -94,6 +94,51 @@ class TestPlaceholderHelpers(unittest.TestCase):
         self.assertIn('style="aspect-ratio:4 / 5"><button type="button" class="reel-play"', page)
         self.assertIn('style="aspect-ratio:1 / 1"><img src="assets/img/posters/motion/world-water-day.jpg?v=', page)
         self.assertNotIn("ph-box", page)
+
+    def test_project_href_and_work_list(self):
+        data = {"site-config.json": {"name": "N", "categories": [{"key": "k", "label": "K"}]},
+                "projects.json": {"projects": [
+                    {"slug": "a", "category": "k"},
+                    {"slug": "b", "category": "", "standalone": "ai.html#assistant"},
+                    {"slug": "c", "category": ""},
+                    {"slug": "d", "category": "k", "standalone": "[later]"}]},
+                "media.json": {}, "assets-manifest.json": {"projects": {}}}
+        site = build.Site(data)
+        by = {p["slug"]: p for p in site.visible}
+        self.assertEqual(site.project_href(by["a"], "../"), "../work/a.html")
+        self.assertEqual(site.project_href(by["b"], ""), "ai.html#assistant")
+        self.assertEqual(site.project_href(by["b"], "../"), "../ai.html#assistant")
+        # A placeholder target is not a target: the project stays Work.
+        self.assertEqual(site.project_href(by["d"], ""), "work/d.html")
+        self.assertEqual([p["slug"] for p in site.work], ["a", "c", "d"])
+        groups = [(c["key"] if c else None, [p["slug"] for p in m]) for c, m in site.work_groups()]
+        self.assertEqual(groups, [("k", ["a", "d"]), (None, ["c"])])
+        pages = site.build_all()
+        self.assertNotIn("work/b.html", pages)
+        self.assertEqual(sorted(k for k in pages if k.startswith("work/")),
+                         ["work/a.html", "work/c.html", "work/d.html"])
+        for k in ("work/a.html", "work/c.html", "work/d.html"):
+            self.assertNotIn('href="b.html"', pages[k], k)
+        # Only standalone b was ungrouped besides c; drop c and "Other work" goes.
+        data["projects.json"]["projects"] = [q for q in data["projects.json"]["projects"] if q["slug"] != "c"]
+        site = build.Site(data)
+        site.build_work()
+        self.assertNotIn(build.OTHER_WORK_LABEL, site.pages["work.html"])
+
+    def test_ai_feature_without_standalone_keeps_case_link(self):
+        data = build.load_data()
+        for p in data["projects.json"]["projects"]:
+            if p["slug"] == build.AI_FEATURE:
+                p.pop("standalone", None)
+        site = build.Site(data)
+        pages = site.build_all()
+        self.assertIn("work/%s.html" % build.AI_FEATURE, pages)
+        ai = pages["ai.html"]
+        feature = ai[ai.index('<section class="ai-feature"'):]
+        feature = feature[:feature.index("</section>")]
+        self.assertTrue(feature.startswith('<section class="ai-feature">'), feature[:60])
+        self.assertIn('href="work/%s.html">View project</a>' % build.AI_FEATURE, feature)
+        self.assertNotIn("ai-result", feature)
 
     def test_release_render_hides_draft_layer(self):
         data = build.load_data()
@@ -221,6 +266,61 @@ class TestReleaseGate(unittest.TestCase):
         other = (self.tmp / "work" / (movable[2]["slug"] + ".html")).read_text(encoding="utf-8")
         self.assertNotIn("case-cat", other)
         self.assertNotIn(note, (self.tmp / "work" / (movable[1]["slug"] + ".html")).read_text(encoding="utf-8"))
+
+    def test_second_standalone_project(self):
+        """Fixture: make a featured, AI "Ran live" project standalone (target
+        reels.html#motion) in the temp copy only, then check the draft build."""
+        projects = load("projects.json", self.tmp)
+        slug = build.AI_LIVE[0]
+        target = "reels.html#motion"
+        p = [q for q in projects["projects"] if q["slug"] == slug][0]
+        self.assertFalse(p.get("hidden") or p.get("draft_only") or p.get("standalone"))
+        self.assertTrue(p.get("featured"), "fixture needs a featured project")
+        p["standalone"] = target
+        (self.tmp / "projects.json").write_text(json.dumps(projects, ensure_ascii=False, indent=2),
+                                                encoding="utf-8")
+        (self.tmp / "work").mkdir()
+        (self.tmp / "work" / (slug + ".html")).write_text("stale", encoding="utf-8")
+        r = run_build(self.tmp)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        standalones = [q for q in projects["projects"] if standalone(q) and not q.get("hidden")]
+        self.assertGreaterEqual(len(standalones), 2)
+        work_slugs = [q["slug"] for q in projects["projects"] if not q.get("hidden") and not standalone(q)]
+        self.assertIn("(%d case studies)" % len(work_slugs), r.stdout)
+        self.assertEqual(sorted(f.stem for f in (self.tmp / "work").glob("*.html")), sorted(work_slugs))
+        for q in standalones:
+            self.assertFalse((self.tmp / "work" / (q["slug"] + ".html")).exists(), q["slug"])
+        for page in html_pages(self.tmp):
+            text = page.read_text(encoding="utf-8")
+            for q in standalones:
+                self.assertNotIn("work/%s.html" % q["slug"], text, page.name)
+                self.assertNotIn('href="%s.html"' % q["slug"], text, page.name)
+        # Work: no card, groups exclude it.
+        work = (self.tmp / "work.html").read_text(encoding="utf-8")
+        cats = load("site-config.json", self.tmp)["categories"]
+        visible = [q for q in projects["projects"] if not q.get("hidden")]
+        groups = expected_work_groups(visible, cats)
+        got = [(i[1], []) for i in work_sequence(work) if i[0] == "heading"]
+        cur = None
+        for item in work_sequence(work):
+            if item[0] == "heading":
+                cur = [g for g in got if g[0] == item[1]][0]
+            else:
+                cur[1].append(item[1])
+        self.assertEqual(got, groups)
+        self.assertNotIn(slug, [s for _, slugs in got for s in slugs])
+        # Home card and AI "Ran live" card link to the standalone target.
+        index = (self.tmp / "index.html").read_text(encoding="utf-8")
+        title = build.esc(p["title"])
+        card = re.search(r'<article class="(?:card|feature)[^"]*"[^>]*>(?:(?!</article>).)*?%s.*?</article>'
+                         % re.escape(title), index, re.S).group(0)
+        self.assertEqual(set(re.findall(r'href="([^"]+)"', card)), {target})
+        ai = (self.tmp / "ai.html").read_text(encoding="utf-8")
+        live = re.search(r'<article class="card live-card"[^>]*>\s*<a class="thumb[^"]*" href="([^"]+)"', ai)
+        self.assertEqual(live.group(1), target)
+        self.assertIn('id="motion"', (self.tmp / "reels.html").read_text(encoding="utf-8"))
+        # The AI feature keeps its own anchor and content.
+        self.assertIn('<section class="ai-feature" id="assistant">', ai)
 
     def test_real_data_untouched_by_tests(self):
         # The temp copy shares no data files with the repo.

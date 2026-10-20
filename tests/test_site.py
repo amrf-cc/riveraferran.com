@@ -6,7 +6,8 @@ import unittest
 
 from support import (ROOT, TOP_PAGES, EMAIL_OR_DOMAIN, NAME_UNACCENTED, built_pages,
                      expected_work_groups, is_draft_build, is_ph, load, local_links, meta_tags,
-                     read, visible_projects, work_sequence)
+                     project_href, read, standalone, standalone_projects, visible_projects,
+                     work_projects, work_sequence)
 
 NAV_LABELS = ("Work", "Reels", "AI &amp; Workflow", "Paid Social", "About", "Contact")
 
@@ -21,12 +22,12 @@ class TestPages(BuiltSite):
     def test_expected_pages_exist(self):
         for n in TOP_PAGES + ("404.html",):
             self.assertTrue((ROOT / n).exists(), "missing %s" % n)
-        for p in visible_projects():
+        for p in work_projects():
             self.assertTrue((ROOT / "work" / (p["slug"] + ".html")).exists(),
                             "missing work/%s.html" % p["slug"])
 
     def test_no_stale_or_hidden_case_pages(self):
-        expected = {p["slug"] + ".html" for p in visible_projects()}
+        expected = {p["slug"] + ".html" for p in work_projects()}
         actual = {f.name for f in (ROOT / "work").glob("*.html")}
         self.assertEqual(actual, expected)
 
@@ -42,7 +43,7 @@ class TestPages(BuiltSite):
         draft = is_draft_build()
         work = read(ROOT / "work.html")
         for p in load("projects.json")["projects"]:
-            if p.get("draft_only") and not p.get("hidden"):
+            if p.get("draft_only") and not p.get("hidden") and not standalone(p):
                 page = ROOT / "work" / (p["slug"] + ".html")
                 self.assertEqual(page.exists(), draft, p["slug"])
                 if draft:
@@ -144,7 +145,7 @@ class TestDraftLayer(BuiltSite):
     def test_placeholders_and_confirm_pills_render_in_draft(self):
         if not is_draft_build():
             self.skipTest("release build")
-        for p in visible_projects():
+        for p in work_projects():
             text = read(ROOT / "work" / (p["slug"] + ".html"))
             for key in ("result", "bts", "demo", "ai_steps", "description", "brief"):
                 v = p.get(key)
@@ -227,12 +228,13 @@ class TestHome(BuiltSite):
                 self.assertIn(html.escape(sr[s]["livid"]), reel)
 
     def test_featured_order(self):
+        # Standalone projects stay featured; their card links to the standalone target.
         featured = sorted([p for p in visible_projects() if p.get("featured")], key=lambda p: p["featured"])
-        lead = re.search(r'<article class="feature"[^>]*>\s*<a class="thumb[^"]*" href="work/([^"]+)\.html"', self.text)
-        self.assertEqual(lead.group(1), featured[0]["slug"])
+        lead = re.search(r'<article class="feature"[^>]*>\s*<a class="thumb[^"]*" href="([^"]+)"', self.text)
+        self.assertEqual(html.unescape(lead.group(1)), project_href(featured[0]))
         grid = re.search(r'<div class="grid featured-grid">(.*?)\n    </div>', self.text, re.S).group(1)
-        cards = re.findall(r'<a class="thumb[^"]*" href="work/([^"]+)\.html"', grid)
-        self.assertEqual(cards, [p["slug"] for p in featured[1:4]])
+        cards = re.findall(r'<a class="thumb[^"]*" href="([^"]+)"', grid)
+        self.assertEqual([html.unescape(c) for c in cards], [project_href(p) for p in featured[1:4]])
 
     def test_home_covers_use_full_photos(self):
         manifest = load("assets-manifest.json")["projects"]
@@ -291,11 +293,12 @@ class TestWork(BuiltSite):
         self.categories = load("site-config.json").get("categories", [])
         self.groups = expected_work_groups(visible_projects(), self.categories)
 
-    def test_one_card_per_visible_project(self):
+    def test_one_card_per_work_project(self):
         cards = [i for i in work_sequence(self.text) if i[0] == "card"]
-        self.assertEqual(sorted(c[1] for c in cards), sorted(p["slug"] for p in visible_projects()))
+        self.assertEqual(sorted(c[1] for c in cards), sorted(p["slug"] for p in work_projects()))
+        self.assertEqual(self.text.count('<article class="card"'), len(cards))
         keys = {c["key"] for c in self.categories}
-        for p in visible_projects():
+        for p in work_projects():
             card = [c for c in cards if c[1] == p["slug"]][0]
             want = p.get("category") if p.get("category") in keys else ""
             self.assertEqual(card[2], want, p["slug"])
@@ -362,6 +365,54 @@ class TestWork(BuiltSite):
             self.assertIn(marker, js)
 
 
+class TestStandalone(BuiltSite):
+    """Standalone projects ("standalone": "<page>#<anchor>") are not Work."""
+
+    def setUp(self):
+        super().setUp()
+        self.projects = standalone_projects()
+        if not self.projects:
+            self.skipTest("no standalone project in the data")
+
+    def test_no_work_page_and_no_work_links(self):
+        for p in self.projects:
+            self.assertFalse((ROOT / "work" / (p["slug"] + ".html")).exists(), p["slug"])
+            for page in built_pages():
+                self.assertNotIn("work/%s.html" % p["slug"], read(page),
+                                 "%s links the old case study of %s" % (page.name, p["slug"]))
+
+    def test_not_on_the_work_page(self):
+        work = read(ROOT / "work.html")
+        slugs = [i[1] for i in work_sequence(work) if i[0] == "card"]
+        for p in self.projects:
+            self.assertNotIn(p["slug"], slugs)
+            self.assertNotIn('href="%s"' % html.escape(standalone(p)), work, p["slug"])
+            self.assertNotIn(html.escape(p["title"]), work, p["slug"])
+
+    def test_other_work_heading_only_for_ungrouped_work(self):
+        keys = {c["key"] for c in load("site-config.json").get("categories", [])}
+        ungrouped = [p for p in work_projects() if p.get("category") not in keys]
+        self.assertEqual("Other work" in read(ROOT / "work.html"), bool(ungrouped))
+
+    def test_target_resolves_to_an_anchor(self):
+        for p in self.projects:
+            page, _, anchor = standalone(p).partition("#")
+            self.assertTrue((ROOT / page).is_file(), "%s -> %s missing" % (p["slug"], page))
+            if anchor:
+                self.assertIn('id="%s"' % anchor, read(ROOT / page), "%s: no #%s on %s" % (p["slug"], anchor, page))
+
+    def test_home_card_links_to_target(self):
+        text = read(ROOT / "index.html")
+        for p in self.projects:
+            if not p.get("featured"):
+                continue
+            card = re.search(r'<article class="(?:card|feature)[^"]*"[^>]*>(?:(?!</article>).)*?%s.*?</article>'
+                             % re.escape(html.escape(p["title"])), text, re.S)
+            self.assertTrue(card, "no home card for %s" % p["slug"])
+            hrefs = set(re.findall(r'href="([^"]+)"', card.group(0)))
+            self.assertEqual(hrefs, {html.escape(standalone(p))}, p["slug"])
+
+
 class TestNoCapabilityPillsOnCards(BuiltSite):
     def test_home_and_ai_cards(self):
         for name in ("index.html", "work.html", "ai.html"):
@@ -372,11 +423,13 @@ class TestNoCapabilityPillsOnCards(BuiltSite):
     def test_home_cards_carry_category(self):
         text = read(ROOT / "index.html")
         cats = {c["key"]: c for c in load("site-config.json").get("categories", [])}
+        by_href = {project_href(p): p["slug"] for p in visible_projects()}
         projects = {p["slug"]: p for p in visible_projects()}
         found = re.findall(r'<article class="(?:card|feature)[^"]*" data-tags="([^"]*)">\s*'
-                           r'<a class="thumb[^"]*" href="work/([^"]+)\.html"(.*?)</article>', text, re.S)
+                           r'<a class="thumb[^"]*" href="([^"]+)"(.*?)</article>', text, re.S)
         self.assertTrue(found)
-        for tags, slug, body in found:
+        for tags, href, body in found:
+            slug = by_href[html.unescape(href)]
             key = projects[slug].get("category") or ""
             self.assertEqual(tags, key if key in cats else "", slug)
             self.assertEqual('class="kicker card-cat"' in body, key in cats, slug)
@@ -387,7 +440,7 @@ class TestCaseStudies(BuiltSite):
         import build
         cats = {c["key"]: c for c in load("site-config.json").get("categories", [])}
         labels = {c["tag"]: c["label"] for c in load("site-config.json")["capabilities"]}
-        for p in visible_projects():
+        for p in work_projects():
             text = read(ROOT / "work" / (p["slug"] + ".html"))
             head = text[text.index('<div class="wrap project-head">'):text.index("<h1>")]
             key = p.get("category") or ""
@@ -405,7 +458,7 @@ class TestCaseStudies(BuiltSite):
                 self.assertEqual(href, ("../" + target) if target else "", "%s pill %s" % (p["slug"], t))
 
     def test_body_sections(self):
-        for p in visible_projects():
+        for p in work_projects():
             text = read(ROOT / "work" / (p["slug"] + ".html"))
             if p.get("brief"):
                 self.assertIn('<h2 class="kicker">The brief</h2>', text, p["slug"])
@@ -420,7 +473,7 @@ class TestCaseStudies(BuiltSite):
     def test_videos_reels_and_photos(self):
         manifest = load("assets-manifest.json")["projects"]
         reels = load("media.json").get("reels", [])
-        for p in visible_projects():
+        for p in work_projects():
             text = read(ROOT / "work" / (p["slug"] + ".html"))
             data = manifest[p["slug"]]
             for v in data["videos"]:
@@ -445,10 +498,15 @@ class TestCaseStudies(BuiltSite):
         groups = expected_work_groups(vis, load("site-config.json").get("categories", []))
         vis = [by_slug[s] for _, slugs in groups for s in slugs]
         n = len(vis)
+        self.assertEqual(sorted(p["slug"] for p in vis), sorted(p["slug"] for p in work_projects()))
         for i, p in enumerate(vis):
             text = read(ROOT / "work" / (p["slug"] + ".html"))
             self.assertIn('<a class="prev" href="%s.html">' % vis[(i - 1) % n]["slug"], text)
             self.assertIn('<a class="next" href="%s.html">' % vis[(i + 1) % n]["slug"], text)
+            pager = text[text.index('<nav class="case-nav"'):]
+            for s in standalone_projects():
+                self.assertNotIn('href="%s.html"' % s["slug"], pager, "%s pager lists standalone %s"
+                                 % (p["slug"], s["slug"]))
 
     def test_lightbox_controls(self):
         for page in (ROOT / "work").glob("*.html"):
@@ -673,13 +731,40 @@ class TestAI(BuiltSite):
         p = self.projects.get(self.build.AI_FEATURE)
         if not p:
             self.skipTest("feature project not visible")
-        feature = re.search(r'<section class="ai-feature">(.*?)</section>', self.text, re.S).group(1)
-        self.assertIn('href="work/%s.html"' % p["slug"], feature)
+        m = re.search(r'<section class="ai-feature"(?: id="([^"]+)")?>(.*?)</section>', self.text, re.S)
+        sid, feature = m.group(1), m.group(2)
         self.assertIn(ph_or_text(p["title"]), feature)
         for d in p.get("did", []):
             self.assertIn("<li>%s</li>" % ph_or_text(d), feature)
         if p.get("demo"):
             self.assertIn(ph_or_text(p["demo"]), feature)
+        target = standalone(p)
+        if not target:
+            self.assertIn('href="work/%s.html"' % p["slug"], feature)
+            return
+        # Standalone: anchor id, case-study content in the block, no self link.
+        self.assertEqual(sid, target.partition("#")[2])
+        self.assertNotIn("View project", feature)
+        self.assertNotIn("work/%s.html" % p["slug"], feature)
+        copy = feature[:feature.index('<div class="ai-feature-media">')]
+        did_at = copy.index('<ul class="did">') if p.get("did") else len(copy)
+        if p.get("brief"):
+            self.assertIn(ph_or_text(p["brief"]), copy)
+            self.assertLess(copy.index(ph_or_text(p["brief"])), did_at, "brief must come before the bullets")
+        if p.get("scope"):
+            for x in p["scope"]:
+                self.assertIn("<li>%s</li>" % ph_or_text(x), copy)
+        else:
+            self.assertNotIn("ai-scope", copy)
+        if p.get("result"):
+            res = copy.index('<div class="ai-result"><p class="kicker">Result</p>')
+            self.assertGreater(res, did_at, "result must come after the bullets")
+            if is_ph(p["result"]):
+                if is_draft_build():
+                    self.assertIn('<div class="ph-box"><span class="ph-label">To add</span><p>%s</p></div>'
+                                  % ph_or_text(p["result"]), copy[res:])
+            else:
+                self.assertIn(html.escape(p["result"]), copy[res:])
 
     def test_process_strip(self):
         steps = re.findall(r'<li><span class="step-num">(\d\d)</span><span class="step-label">([^<]+)</span></li>',

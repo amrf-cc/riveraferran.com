@@ -191,6 +191,18 @@ def asset_url(rel):
     return "%s?v=%s" % (rel, v) if v else rel
 
 
+def standalone_target(p):
+    """The page#anchor a standalone project lives at, or "" for a normal
+    (Work) project. Root-relative to the site, no leading slash."""
+    v = p.get("standalone") if isinstance(p, dict) else None
+    return v.strip() if isinstance(v, str) and v.strip() and not is_ph(v) else ""
+
+
+def standalone_anchor(p):
+    """The anchor part of a standalone target ("assistant"), or ""."""
+    return standalone_target(p).partition("#")[2]
+
+
 def is_remote(url):
     return url.startswith(("http://", "https://", "//"))
 
@@ -232,6 +244,10 @@ class Site(object):
         self.projects = (data.get("projects.json") or {}).get("projects", [])
         self.visible = [p for p in self.projects if not p.get("hidden")
                         and not (release and p.get("draft_only"))]
+        # Work = visible projects that are not standalone. A standalone
+        # project ("standalone": "<page>#<anchor>") lives on its own page: no
+        # Work card, no work/<slug>.html, not in the pager or the groups.
+        self.work = [p for p in self.visible if not standalone_target(p)]
         self.cap_labels = {c.get("tag"): c.get("label", c.get("tag"))
                            for c in self.config.get("capabilities", [])}
         # Work groups, in display order. A project whose category is "" or a
@@ -329,16 +345,25 @@ class Site(object):
         note = (" " + self.personal_note()) if c.get("personal") else ""
         return label + note
 
+    def project_href(self, p, rp):
+        """Every project link goes through here: work/<slug>.html normally,
+        the standalone target (e.g. ai.html#assistant) otherwise."""
+        target = standalone_target(p)
+        if target:
+            return esc(target if is_remote(target) else rp + target)
+        return "%swork/%s.html" % (rp, esc(p["slug"]))
+
     def work_groups(self):
         """[(category or None, [projects])] for the Work page: categories in
-        config order (only those with a visible project), projects in data
-        order within each; projects without a group last, under None."""
+        config order (only those with a Work project), projects in data
+        order within each; projects without a group last, under None.
+        Standalone projects are not Work and never appear here."""
         groups = []
         for c in self.categories:
-            members = [p for p in self.visible if self.cat_key(p) == c["key"]]
+            members = [p for p in self.work if self.cat_key(p) == c["key"]]
             if members:
                 groups.append((c, members))
-        rest = [p for p in self.visible if not self.cat_key(p)]
+        rest = [p for p in self.work if not self.cat_key(p)]
         if rest:
             groups.append((None, rest))
         return groups
@@ -366,7 +391,7 @@ class Site(object):
         return None, ""
 
     def cover_html(self, p, rp, use_full):
-        href = "%swork/%s.html" % (rp, p["slug"])
+        href = self.project_href(p, rp)
         src, alt = self.cover(p, use_full)
         if src:
             inner = ('<img src="%s%s" alt="%s" loading="lazy" draggable="false">'
@@ -379,7 +404,7 @@ class Site(object):
                 % (cls, href, inner, self.ribbon(p)))
 
     def card_html(self, p, rp, use_full=False, extra="", cls="card"):
-        href = "%swork/%s.html" % (rp, p["slug"])
+        href = self.project_href(p, rp)
         lines = ['          <p class="kicker">%s</p>' % self.txt(p.get("client")),
                  '          <h3><a href="%s">%s</a></h3>' % (href, self.txt(p.get("title")))]
         if p.get("oneliner"):
@@ -401,7 +426,7 @@ class Site(object):
                 % (cls, esc(self.cat_key(p)), self.cover_html(p, rp, use_full), "\n".join(lines)))
 
     def feature_html(self, p, rp):
-        href = "%swork/%s.html" % (rp, p["slug"])
+        href = self.project_href(p, rp)
         lines = ['        <p class="kicker">%s</p>' % self.txt(p.get("client")),
                  '        <h3><a href="%s">%s</a></h3>' % (href, self.txt(p.get("title")))]
         if p.get("oneliner"):
@@ -787,30 +812,49 @@ class Site(object):
                   self.intro_desc("reels", "Reels"), "reels")
 
     def ai_feature_html(self):
+        """The AI page feature. A standalone feature project has no case
+        study, so the block carries that content itself (brief, did, scope,
+        result, demo), takes its section id from the standalone anchor and
+        drops the "View project" link (it would point at itself)."""
         p = self.project(AI_FEATURE)
         if not p:
             return ""
-        href = "work/%s.html" % p["slug"]
+        standalone = bool(standalone_target(p))
+        href = "" if standalone else self.project_href(p, "")
+        title = self.txt(p.get("title"))
+        if href:
+            title = '<a href="%s">%s</a>' % (href, title)
         copy = ['        <p class="kicker">%s</p>' % self.txt(p.get("client")),
-                '        <h2><a href="%s">%s</a></h2>%s' % (href, self.txt(p.get("title")), self.ribbon(p))]
+                '        <h2>%s</h2>%s' % (title, self.ribbon(p))]
         if p.get("oneliner"):
             copy.append("        " + self.para(p["oneliner"], "desc"))
+        if standalone and p.get("brief"):
+            copy.append("        " + self.para(p["brief"], "desc brief"))
         if p.get("did"):
             copy.append('        <ul class="did">%s</ul>' % "".join(
                 "<li>%s</li>" % self.txt(d) for d in p["did"]))
+        if standalone and p.get("scope"):
+            copy.append('        <div class="ai-scope"><p class="kicker">Scope</p><ul class="did">%s</ul></div>'
+                        % "".join("<li>%s</li>" % self.txt(x) for x in p["scope"]))
+        if standalone and p.get("result"):
+            copy.append('        <div class="ai-result"><p class="kicker">Result</p>%s</div>'
+                        % self.para(p["result"], "desc"))
         confirm = self.confirm_pill(p.get("confirm"))
         if confirm:
             copy.append("        " + confirm)
-        copy.append('        <p class="more"><a class="link-arrow" href="%s">View project</a></p>' % href)
+        if href:
+            copy.append('        <p class="more"><a class="link-arrow" href="%s">View project</a></p>' % href)
         media = [b for b in (video_block_html(v, "") for v in
                              self.manifest.get(p["slug"], {}).get("videos", [])) if b]
         if p.get("demo"):
             media.append("      " + (self.box(p["demo"]) if is_ph(p["demo"])
                                      else '<p class="desc">%s</p>' % esc(p["demo"])))
-        return ('<section class="ai-feature">\n  <div class="wrap">\n    <article class="ai-feature-card">\n'
+        anchor = standalone_anchor(p)
+        sid = (' id="%s"' % esc(anchor)) if anchor else ""
+        return ('<section class="ai-feature"%s>\n  <div class="wrap">\n    <article class="ai-feature-card">\n'
                 '      <div class="ai-feature-copy">\n%s\n      </div>\n'
                 '      <div class="ai-feature-media">\n%s\n      </div>\n'
-                '    </article>\n  </div>\n</section>' % ("\n".join(copy), "\n".join(media)))
+                '    </article>\n  </div>\n</section>' % (sid, "\n".join(copy), "\n".join(media)))
 
     def build_ai(self):
         c = self.config
@@ -986,7 +1030,7 @@ class Site(object):
     def build_all(self):
         self.build_home()
         self.build_work()
-        for i, p in enumerate(self.visible):
+        for i, p in enumerate(self.work):
             self.build_case(i, p)
         self.build_reels()
         self.build_ai()
@@ -1007,8 +1051,8 @@ def write_pages(pages, config):
         path = ROOT / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
-    # Stale case-study pages (hidden, draft-only in release, deleted projects)
-    # must not linger pointing at nothing.
+    # Stale case-study pages (hidden, draft-only in release, standalone,
+    # deleted projects) must not linger pointing at nothing.
     work_dir = ROOT / "work"
     if work_dir.is_dir():
         for f in work_dir.glob("*.html"):
@@ -1037,14 +1081,14 @@ def main(argv=None):
                 print("  %s → %s → %s" % (fname, path, fmt_value(value)))
             return 1
         write_pages(pages, site.config)
-        print("Built %d pages (%d case studies). BUILD_OK (release)" % (len(pages), len(site.visible)))
+        print("Built %d pages (%d case studies). BUILD_OK (release)" % (len(pages), len(site.work)))
         return 0
 
     write_pages(pages, site.config)
     blocking = len(scan_release(data)) + len(site.generated)
     print("Draft build: %d item(s) still block a release (python3 build.py --release lists them)."
           % blocking)
-    print("Built %d pages (%d case studies). BUILD_OK" % (len(pages), len(site.visible)))
+    print("Built %d pages (%d case studies). BUILD_OK" % (len(pages), len(site.work)))
     return 0
 
 

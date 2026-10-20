@@ -1033,6 +1033,8 @@ a.cap:hover .cap-label { color: var(--accent); }
 }
 
 /* ---- AI & Workflow ------------------------------------------------------ */
+/* ai.html#assistant (home card target): clear the sticky header + draft banner. */
+.ai-feature { scroll-margin-top: 100px; }
 .ai-feature-card { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
 .ai-feature-copy h2 { font-size: clamp(28px, 3.6vw, 44px); margin: 12px 0 16px; }
 .ai-feature-copy h2 a { transition: color .16s ease; }
@@ -1041,6 +1043,13 @@ a.cap:hover .cap-label { color: var(--accent); }
 .ai-feature-copy .did { padding-left: 1.2em; margin-top: 18px; color: var(--body); max-width: 58ch; }
 .ai-feature-copy .did li { margin: 0.45em 0; }
 .ai-feature-copy .more { margin-top: 22px; }
+/* Standalone feature: the block carries the case-study content itself. */
+.ai-feature-copy .brief { margin-top: 14px; }
+.ai-feature-copy .ai-scope,
+.ai-feature-copy .ai-result { margin-top: 24px; max-width: 58ch; }
+.ai-feature-copy .ai-scope .did { margin-top: 8px; }
+.ai-feature-copy .ai-result .desc { margin-top: 8px; }
+.ai-feature-copy .ai-result .ph-box { margin: 10px 0 0; }
 .ai-feature-media .ph-box { margin-top: 0; }
 .ai-feature-media .videos { margin-top: 0; }
 .process {

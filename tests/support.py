@@ -41,6 +41,27 @@ def visible_projects(draft=None):
             if not p.get("hidden") and (draft or not p.get("draft_only"))]
 
 
+def standalone(p):
+    """A standalone project's page#anchor target ("" for a Work project)."""
+    v = p.get("standalone")
+    return v.strip() if isinstance(v, str) and not is_ph(v) else ""
+
+
+def work_projects(draft=None):
+    """Visible projects that are Work (have a card and a work/<slug>.html):
+    standalone projects live on their own page instead."""
+    return [p for p in visible_projects(draft) if not standalone(p)]
+
+
+def standalone_projects(draft=None):
+    return [p for p in visible_projects(draft) if standalone(p)]
+
+
+def project_href(p, rp=""):
+    """Where every link to a project points (mirrors build.Site.project_href)."""
+    return rp + (standalone(p) or "work/%s.html" % p["slug"])
+
+
 def built_pages(include_404=False):
     pages = [ROOT / n for n in TOP_PAGES if (ROOT / n).exists()]
     pages += sorted((ROOT / "work").glob("*.html"))
@@ -204,7 +225,9 @@ def work_sequence(text):
 
 
 def expected_work_groups(projects, categories):
-    """[(key or "", [slugs])] the Work page should show, in display order."""
+    """[(key or "", [slugs])] the Work page should show, in display order.
+    Standalone projects are not Work and are left out."""
+    projects = [p for p in projects if not standalone(p)]
     keys = [c["key"] for c in categories]
     out = []
     for k in keys:
