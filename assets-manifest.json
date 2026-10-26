@@ -1058,7 +1058,15 @@
     },
     "ai-production-assistant": {
       "photos": [],
-      "videos": []
+      "videos": [
+        {
+          "title": "AI production assistant, workflow overview",
+          "livid": "https://livid.com/embed/HGGzzr4EBITa?livid_logo=0&fullscreen=1&title=0",
+          "poster": "assets/img/ai-production-assistant/ai-workflow-poster.jpg",
+          "ratio": "16 / 9",
+          "mp4": ""
+        }
+      ]
     },
     "rodowita-water": {
       "photos": [
@@ -1220,10 +1228,6 @@
           ]
         }
       ]
-    },
-    "spec-jewelry": {
-      "photos": [],
-      "videos": []
     },
     "supermax": {
       "photos": [],

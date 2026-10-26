@@ -355,6 +355,9 @@ class TestFixtureBuild(unittest.TestCase):
 
     def test_release_still_blocks_and_writes_nothing(self):
         self.write_manifest()
+        cfg = load("site-config.json", self.tmp)
+        cfg["subline"] = "[Subline to confirm]"      # one unresolved item is enough to block
+        (self.tmp / "site-config.json").write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
         r = run_build(self.tmp, "--release")
         self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
         self.assertIn("RELEASE BLOCKED", r.stdout)

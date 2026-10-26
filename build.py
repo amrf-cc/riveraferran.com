@@ -36,6 +36,20 @@ NAV_ITEMS = (
 AI_FEATURE = "ai-production-assistant"
 AI_LIVE = ("rodowita-water", "chip-city")
 
+# Pages that can be switched off while their content is still being gathered
+# ("hidden_pages": ["paid-social"] in site-config.json). A hidden page is not
+# built, is deleted if an earlier build left it behind, drops out of the nav, and
+# every link that pointed at it (home capability strip, case-study tag pills)
+# becomes plain text. Nothing else about the release gate changes.
+HIDEABLE_PAGES = ("paid-social",)
+
+
+def ai_live_slugs(media):
+    """Projects shown as 'Ran live' on the AI page: media.json `ai_live` when it
+    is a list (an empty list shows none), else the AI_LIVE default."""
+    listed = (media or {}).get("ai_live")
+    return tuple(listed) if isinstance(listed, list) else AI_LIVE
+
 # Ad placement sizes the Paid Social page asks for while a list is empty.
 AD_SIZES = "9:16, 4:5, 1:1"
 
@@ -156,7 +170,9 @@ def scan_release(data):
                 out.append((fname, path, value))
     config = data.get("site-config.json") or {}
     showreel = config.get("showreel") or {}
-    for slot in ("vertical", "horizontal"):
+    # "hidden": true is the owner's call to publish without a showreel for now:
+    # the section and the hero button are left out, so there is nothing to demand.
+    for slot in (() if showreel.get("hidden") else ("vertical", "horizontal")):
         s = showreel.get(slot) or {}
         if not (s.get("livid") or s.get("mp4")):
             out.append(("site-config.json", "showreel.%s" % slot,
@@ -249,6 +265,9 @@ class Site(object):
         self.cat_by_key = {c["key"]: c for c in self.categories}
         self.hero_paths = {self.config.get("hero_image"),
                            self.config.get("hero_image_phone")} - {None, ""}
+        self.hidden_pages = {x for x in (self.config.get("hidden_pages") or [])
+                             if x in HIDEABLE_PAGES}
+        self.live_slugs = ai_live_slugs(self.media)
         # Placeholders the templates had to invent (no data string behind
         # them). They block a release exactly like data placeholders.
         self.generated = []
@@ -293,6 +312,13 @@ class Site(object):
             return '<span class="draft-ribbon">Draft</span>'
         return ""
 
+    def page_hidden(self, target):
+        """True when a link target ("paid-social.html#x") is a hidden page."""
+        stem = (target or "").partition("#")[0]
+        if stem.endswith(".html"):
+            stem = stem[:-5]
+        return stem in self.hidden_pages
+
     def facts(self, p):
         return " · ".join(self.txt(p.get(k)) for k in ("role", "years", "location") if p.get(k))
 
@@ -305,6 +331,8 @@ class Site(object):
         for t in tags:
             label = esc(self.cap_labels.get(t, t))
             target = CAP_LINKS.get(t) or ""
+            if self.page_hidden(target):
+                target = ""
             if root_prefix is None or not target:
                 items.append('<li class="pill">%s</li>' % label)
             else:
@@ -596,6 +624,8 @@ class Site(object):
     def nav_html(self, rp, page_key):
         links = []
         for key, label, href in NAV_ITEMS:
+            if self.page_hidden(href):
+                continue
             active = (key == page_key) or (key == "work" and page_key == "project")
             attrs = ' class="active" aria-current="page"' if active else ""
             links.append('      <a href="%s%s"%s>%s</a>' % (rp, href, attrs, label))
@@ -675,8 +705,13 @@ class Site(object):
         rest = " ".join('<span class="w">%s</span>' % esc(w) for w in words[1:])
         return first + '<span class="last"> %s</span>' % rest
 
+    def reel_hidden(self):
+        return bool((self.config.get("showreel") or {}).get("hidden"))
+
     def showreel_html(self, rp):
         sr = self.config.get("showreel") or {}
+        if sr.get("hidden"):
+            return ""
         blocks = []
         missing = False
         for slot in ("vertical", "horizontal"):
@@ -701,9 +736,22 @@ class Site(object):
         inner = ('<span class="cap-label">%s</span><span class="cap-line">%s</span>'
                  % (self.txt(cap.get("label")), self.txt(cap.get("line"))))
         target = CAP_LINKS.get(cap.get("tag", "")) or ""
+        if self.page_hidden(target):
+            target = ""
         if target:
             return '      <a class="cap" href="%s">%s</a>' % (esc(target), inner)
         return '      <div class="cap cap-plain">%s</div>' % inner
+
+    def hero_actions(self):
+        see = 'href="${ROOT_PREFIX}work.html"'
+        if self.reel_hidden():
+            return '<a class="btn" %s>See work</a>' % see
+        return '<a class="btn" href="#reel">Watch reel</a><a class="btn btn-ghost" %s>See work</a>' % see
+
+    def reel_section(self):
+        if self.reel_hidden():
+            return ""
+        return tmpl("home.reel.tmpl").safe_substitute(SHOWREEL=self.showreel_html("")) + "\n"
 
     def build_home(self):
         c = self.config
@@ -736,7 +784,8 @@ class Site(object):
             NAME_MASTHEAD=self.masthead_name(),
             HEADLINE=self.txt(c.get("headline")),
             SUBLINE=self.txt(c.get("subline")),
-            SHOWREEL=self.showreel_html(""),
+            ACTIONS=self.hero_actions(),
+            REEL_SECTION=self.reel_section(),
             FEATURE=lead,
             FEATURED_CARDS=cards,
             CAPABILITIES=caps,
@@ -989,7 +1038,7 @@ class Site(object):
                        '    <div class="sec-head">\n      <div>\n        <h2>Process</h2>\n      </div>\n    </div>\n'
                        '    <ol class="process">\n%s\n    </ol>\n  </div>\n</section>' % steps)
         live = []
-        for slug in AI_LIVE:
+        for slug in self.live_slugs:
             p = self.project(slug)
             if not p:
                 continue
@@ -1010,7 +1059,7 @@ class Site(object):
             # Comparison sets for the live projects sit under the cards (inside
             # this section, as divs, so the section stays one block).
             live_sets = []
-            for slug in AI_LIVE:
+            for slug in self.live_slugs:
                 p = self.project(slug)
                 if not p:
                     continue
@@ -1181,7 +1230,8 @@ class Site(object):
             self.build_case(i, p)
         self.build_reels()
         self.build_ai()
-        self.build_paid()
+        if "paid-social" not in self.hidden_pages:
+            self.build_paid()
         self.build_about()
         self.build_contact()
         self.build_legal()
@@ -1205,6 +1255,10 @@ def write_pages(pages, config):
         for f in work_dir.glob("*.html"):
             if "work/" + f.name not in pages:
                 f.unlink()
+    # A hidden page must not linger from an earlier build.
+    for stem in config.get("hidden_pages") or []:
+        if stem in HIDEABLE_PAGES:
+            (ROOT / (stem + ".html")).unlink(missing_ok=True)
     # CNAME only when a domain is set; never an empty or guessed one.
     domain = (config.get("domain") or "").strip()
     if domain:
@@ -1213,7 +1267,8 @@ def write_pages(pages, config):
 
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
-    release = "--release" in argv
+    check = "--check" in argv            # the release gate, writes nothing either way
+    release = "--release" in argv or check
     data = load_data()
     site = Site(data, release=release)
     pages = site.build_all()          # rendered in memory; nothing written yet
@@ -1227,6 +1282,9 @@ def main(argv=None):
             for fname, path, value in offenders:
                 print("  %s → %s → %s" % (fname, path, fmt_value(value)))
             return 1
+        if check:
+            print("RELEASE READY: nothing left to resolve.")
+            return 0
         write_pages(pages, site.config)
         print("Built %d pages (%d case studies). BUILD_OK (release)" % (len(pages), len(site.work)))
         return 0

@@ -13,8 +13,14 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-TOP_PAGES = ("index.html", "work.html", "reels.html", "ai.html", "paid-social.html",
-             "about.html", "contact.html", "privacy.html", "terms.html")
+_ALL_TOP_PAGES = ("index.html", "work.html", "reels.html", "ai.html", "paid-social.html",
+                  "about.html", "contact.html", "privacy.html", "terms.html")
+with open(ROOT / "site-config.json", encoding="utf-8") as _cfg:
+    _CONFIG = json.load(_cfg)
+# Pages the owner switched off ("hidden_pages") are not built, so they are not expected.
+HIDDEN_PAGES = frozenset(_CONFIG.get("hidden_pages") or [])
+SHOWREEL_HIDDEN = bool((_CONFIG.get("showreel") or {}).get("hidden"))
+TOP_PAGES = tuple(n for n in _ALL_TOP_PAGES if n[:-5] not in HIDDEN_PAGES)
 
 
 def load(name, root=ROOT):
@@ -138,8 +144,9 @@ def make_temp_repo():
         shutil.copy2(str(ROOT / name), str(tmp / name))
     shutil.copytree(str(ROOT / "templates"), str(tmp / "templates"))
     (tmp / "assets").mkdir()
-    for sub in ("css", "js", "fonts"):
-        shutil.copytree(str(ROOT / "assets" / sub), str(tmp / "assets" / sub))
+    for sub in ("css", "js", "fonts", "docs"):
+        if (ROOT / "assets" / sub).is_dir():
+            shutil.copytree(str(ROOT / "assets" / sub), str(tmp / "assets" / sub))
     # Media is read-only input: link it rather than copy ~200MB.
     for sub in ("img", "video"):
         os.symlink(str(ROOT / "assets" / sub), str(tmp / "assets" / sub))
@@ -183,27 +190,36 @@ RELEASE_STATIC_AD = {"title": "Release test static ad", "campaign": "Test campai
                      "image": "assets/img/posters/motion/world-water-day.jpg"}
 
 
-def make_release_ready(root):
+def make_release_ready(root, keep_hidden=False):
+    """A release-clean copy of the data. By default every "hidden until ready" switch
+    (showreel, hidden_pages, ai_live) is turned off and filled in, so the full site is
+    exercised; keep_hidden=True leaves the switches as they are in the data."""
     import build  # the repo's build.py (support puts ROOT on sys.path)
     for name in DATA_FILES:
         data = strip_drafts(load(name, root))
         if name == "site-config.json":
             data["domain"] = "example.com"
             data["resume_pdf"] = "assets/resume.pdf"
-            for slot in ("vertical", "horizontal"):
-                data["showreel"][slot]["livid"] = "https://livid.com/embed/test-" + slot
+            if not keep_hidden:
+                data.pop("hidden_pages", None)
+                data["showreel"].pop("hidden", None)
+                for slot in ("vertical", "horizontal"):
+                    data["showreel"][slot]["livid"] = "https://livid.com/embed/test-" + slot
         elif name == "projects.json":
-            # ai.html "Ran live": a project without ai_steps gets a generated placeholder.
-            for p in data["projects"]:
-                if p.get("slug") in build.AI_LIVE and not p.get("ai_steps"):
-                    p["ai_steps"] = RELEASE_AI_STEPS
+            if not keep_hidden:
+                # ai.html "Ran live": a project without ai_steps gets a generated placeholder.
+                for p in data["projects"]:
+                    if p.get("slug") in build.AI_LIVE and not p.get("ai_steps"):
+                        p["ai_steps"] = RELEASE_AI_STEPS
         elif name == "media.json":
-            # paid-social.html: an empty ad list gets a generated placeholder.
-            ps = data.setdefault("paid_social", {})
-            if not ps.get("video_ads"):
-                ps["video_ads"] = [dict(RELEASE_VIDEO_AD)]
-            if not ps.get("static_ads"):
-                ps["static_ads"] = [dict(RELEASE_STATIC_AD)]
+            if not keep_hidden:
+                data.pop("ai_live", None)
+                # paid-social.html: an empty ad list gets a generated placeholder.
+                ps = data.setdefault("paid_social", {})
+                if not ps.get("video_ads"):
+                    ps["video_ads"] = [dict(RELEASE_VIDEO_AD)]
+                if not ps.get("static_ads"):
+                    ps["static_ads"] = [dict(RELEASE_STATIC_AD)]
         (root / name).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     (root / "assets" / "resume.pdf").write_bytes(b"%PDF-1.4 test\n")
 

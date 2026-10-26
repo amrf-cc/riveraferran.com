@@ -67,14 +67,15 @@ class TestPlaceholderHelpers(unittest.TestCase):
         site = build.Site(data, release=True)
         site.build_all()
         where = {w for w, _ in site.generated}
-        live_missing = [s for s in build.AI_LIVE
+        live_missing = [s for s in build.ai_live_slugs(data["media.json"])
                         if site.project(s) and not site.project(s).get("ai_steps")
                         and not (site.manifest.get(s) or {}).get("sets")]
         for slug in live_missing:
             self.assertIn("ai.html#ran-live → %s.ai_steps" % slug, where)
         ps = data["media.json"].get("paid_social", {})
-        self.assertEqual("paid-social.html#video-ads" in where, not ps.get("video_ads"))
-        self.assertEqual("paid-social.html#static-ads" in where, not ps.get("static_ads"))
+        paid_built = "paid-social" not in site.hidden_pages
+        self.assertEqual("paid-social.html#video-ads" in where, paid_built and not ps.get("video_ads"))
+        self.assertEqual("paid-social.html#static-ads" in where, paid_built and not ps.get("static_ads"))
         self.assertEqual("about.html#resume" in where, not data["site-config.json"].get("resume_pdf"))
         for _, text in site.generated:
             self.assertTrue(build.is_ph(text), text)
@@ -173,6 +174,9 @@ class TestReleaseGate(unittest.TestCase):
         self.assertFalse((self.tmp / "CNAME").exists())
 
     def test_draft_build_in_copy(self):
+        cfg = load("site-config.json", self.tmp)
+        cfg["domain"] = ""          # an empty domain must never write a CNAME
+        (self.tmp / "site-config.json").write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
         r = run_build(self.tmp)
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         self.assertTrue(r.stdout.strip().endswith("BUILD_OK"), r.stdout)
@@ -329,6 +333,120 @@ class TestReleaseGate(unittest.TestCase):
         # The temp copy shares no data files with the repo.
         for name in ("site-config.json", "projects.json", "media.json"):
             self.assertFalse((self.tmp / name).samefile(ROOT / name))
+
+
+class TestSwitches(unittest.TestCase):
+    """The "hidden until ready" switches (showreel.hidden, hidden_pages, ai_live) and --check.
+    Each runs a real build in a temp copy; the repo's own data and pages are never touched."""
+
+    def setUp(self):
+        self.tmp = make_temp_repo()
+
+    def tearDown(self):
+        shutil.rmtree(str(self.tmp), ignore_errors=True)
+
+    def edit(self, name, fn):
+        data = load(name, self.tmp)
+        fn(data)
+        (self.tmp / name).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    def ready(self):
+        """Release-clean data in the state the site ships in: showreel and Paid Social
+        page switched off, only Rodowita on the AI page. Self-contained, so these tests
+        do not depend on what the real data has switched on today."""
+        make_release_ready(self.tmp, keep_hidden=True)
+        self.edit("site-config.json", lambda d: (d.update(hidden_pages=["paid-social"]),
+                                                  d["showreel"].update(hidden=True, placeholder="")))
+        self.edit("media.json", lambda d: d.update(ai_live=["rodowita-water"]))
+
+    def page(self, name):
+        return (self.tmp / name).read_text(encoding="utf-8")
+
+    def test_check_writes_nothing_and_reports_the_gate(self):
+        self.ready()
+        self.edit("site-config.json", lambda d: d.update(subline="[Subline to confirm]"))
+        r = run_build(self.tmp, "--check")
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("RELEASE BLOCKED", r.stdout)
+        self.edit("site-config.json", lambda d: d.update(subline="A real subline."))
+        r = run_build(self.tmp, "--check")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("RELEASE READY", r.stdout)
+        self.assertEqual(list(self.tmp.glob("*.html")), [], "--check wrote pages")
+        self.assertFalse((self.tmp / "CNAME").exists(), "--check wrote a CNAME")
+
+    def test_hidden_showreel_is_not_demanded_and_leaves_no_trace(self):
+        self.ready()
+        self.edit("site-config.json", lambda d: d["showreel"].update(hidden=True, placeholder=""))
+        r = run_build(self.tmp, "--release")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        home = self.page("index.html")
+        for gone in ("Watch reel", 'id="reel"', "reel-slot", ">Showreel<", "ph-box"):
+            self.assertNotIn(gone, home, gone)
+        self.assertIn('<a class="btn" href="work.html">See work</a>', home)
+        self.assertNotIn("btn-ghost", home.split('<p class="actions">')[1].split("</p>")[0])
+
+    def test_showreel_not_hidden_is_still_demanded(self):
+        self.ready()
+        self.edit("site-config.json", lambda d: d["showreel"].pop("hidden", None))
+        r = run_build(self.tmp, "--release")
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("showreel.vertical", r.stdout)
+        self.assertEqual(list(self.tmp.glob("*.html")), [])
+
+    def test_showreel_visible_markup_is_unchanged(self):
+        make_release_ready(self.tmp)               # showreel filled, nothing hidden
+        r = run_build(self.tmp, "--release")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        home = self.page("index.html")
+        self.assertIn('<a class="btn" href="#reel">Watch reel</a><a class="btn btn-ghost" href="work.html">See work</a>', home)
+        self.assertIn('<section class="reel" id="reel">', home)
+        self.assertIn('<span class="kicker">Showreel</span>', home)
+
+    def test_hidden_page_is_not_built_linked_or_left_behind(self):
+        self.ready()
+        self.edit("site-config.json", lambda d: d.update(hidden_pages=["paid-social"]))
+        (self.tmp / "paid-social.html").write_text("stale page from an earlier build", encoding="utf-8")
+        r = run_build(self.tmp, "--release")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertFalse((self.tmp / "paid-social.html").exists(), "stale hidden page survived the build")
+        for page in html_pages(self.tmp):
+            text = page.read_text(encoding="utf-8")
+            self.assertNotIn("paid-social", text, page.name)
+            self.assertNotIn(">Paid Social<", text, page.name)
+        home = self.page("index.html")
+        cap = re.search(r'<div class="cap cap-plain"><span class="cap-label">Paid social</span>', home)
+        self.assertTrue(cap, "the Paid social capability should stay, as plain text")
+
+    def test_unknown_hidden_page_names_are_ignored(self):
+        self.ready()
+        self.edit("site-config.json", lambda d: d.update(hidden_pages=["paid-social", "index", "about", "../x"]))
+        r = run_build(self.tmp, "--release")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        for name in ("index.html", "about.html"):
+            self.assertTrue((self.tmp / name).exists(), name)
+
+    def test_ai_live_list_chooses_the_cards(self):
+        make_release_ready(self.tmp)
+        self.edit("media.json", lambda d: d.update(ai_live=["rodowita-water"]))
+        r = run_build(self.tmp, "--release")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        live = re.search(r'<section class="ai-live" id="ran-live">(.*?)</section>', self.page("ai.html"), re.S).group(1)
+        self.assertIn('href="work/rodowita-water.html"', live)
+        self.assertNotIn("chip-city", live)
+
+    def test_empty_ai_live_list_drops_the_section(self):
+        make_release_ready(self.tmp)
+        self.edit("media.json", lambda d: d.update(ai_live=[]))
+        r = run_build(self.tmp, "--release")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertNotIn('id="ran-live"', self.page("ai.html"))
+
+    def test_live_cards_without_a_list_default_to_the_two_projects(self):
+        self.assertEqual(build.ai_live_slugs({}), build.AI_LIVE)
+        self.assertEqual(build.ai_live_slugs({"ai_live": ["x"]}), ("x",))
+        self.assertEqual(build.ai_live_slugs({"ai_live": []}), ())
+        self.assertEqual(build.ai_live_slugs({"ai_live": "nope"}), build.AI_LIVE)
 
 
 if __name__ == "__main__":

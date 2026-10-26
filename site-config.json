@@ -5,11 +5,11 @@
   "subline": "Photographer, videographer, and content lead. Nine years with consumer brands in New York and Puerto Rico.",
   "based": "New York City",
   "email": "adrian@riveraferran.com",
-  "domain": "",
+  "domain": "riveraferran.com",
   "formspree_endpoint": "https://formspree.io/f/mgaoebdr",
   "instagram": "",
   "linkedin": "",
-  "resume_pdf": "",
+  "resume_pdf": "assets/docs/Adrián-Rivera-Ferrán-Resume.pdf",
   "showreel": {
     "vertical": {
       "livid": "",
@@ -25,7 +25,8 @@
       "ratio": "16 / 9",
       "title": "Showreel (horizontal)"
     },
-    "placeholder": "[Showreel: cut a 45–60s vertical and a 60–90s horizontal from your best hooks]"
+    "placeholder": "",
+    "hidden": true
   },
   "hero_image": "assets/img/masthead/tbs-desktop-back.jpg",
   "hero_image_phone": "assets/img/masthead/tbs-phone-back.jpg",
@@ -124,7 +125,7 @@
     "work": "Grouped by the kind of work. Pick a group, or open any project for the brief, the work, and the result.",
     "reels": "Short-form video for Instagram and paid social. Filter by format. Motion work in After Effects below.",
     "ai": "AI is part of how I work, from setup to final ad. Every generated piece starts from real product photography and gets checked against the real thing.",
-    "paid": "[Paid social: the Chip City ads that ran, shown in their real placement sizes]",
+    "paid": "",
     "about": "Photo and video for consumer brands since 2017, in New York and Puerto Rico."
   },
   "experience": [
@@ -195,5 +196,8 @@
       "label": "Street & Travel",
       "personal": true
     }
+  ],
+  "hidden_pages": [
+    "paid-social"
   ]
 }

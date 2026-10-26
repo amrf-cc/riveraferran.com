@@ -94,7 +94,20 @@
 </main>
 
 <script>
-const S = { data:null, categories:[], stamp:0, open:null };
+const S = { data:null, categories:[], stamp:0, open:null, version:"" };
+
+// Every write carries the data version this page loaded with. If something else changed
+// the files since (another tab, a script) the server answers 409 and nothing is overwritten.
+async function post(path, body) {
+  const r = await fetch(path, {method:"POST", headers:{"Content-Type":"application/json"},
+                               body:JSON.stringify(Object.assign({version:S.version}, body))});
+  const d = await r.json().catch(() => ({}));
+  if (r.status === 409) {
+    alert(d.error || "The site data changed. Reloading.");
+    await load();
+  }
+  return {ok:r.ok, status:r.status, d};
+}
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
 const lines = v => (v || []).join("\n");
@@ -106,8 +119,10 @@ async function load() {
   const r = await fetch("/api/content");
   const d = await r.json();
   if (!r.ok) { alert(d.error || "Could not load"); return; }
-  S.data = d; S.categories = d.categories || []; S.stamp = Date.now();
-  $("#build").textContent = d.build.ok ? "last build ok" : "last build failed";
+  S.data = d; S.categories = d.categories || []; S.stamp = Date.now(); S.version = d.version;
+  const b = d.build || {};
+  $("#build").textContent = b.ready ? "Release-ready · nothing left to resolve"
+    : ("Draft · " + (b.blockers == null ? "some" : b.blockers) + " item(s) left to resolve before a release");
   render(); renderCopy();
 }
 
@@ -115,7 +130,9 @@ function option(sel, val, label) {
   return `<option value="${esc(val)}"${sel === val ? " selected" : ""}>${esc(label)}</option>`;
 }
 function catSelect(p) {
-  const opts = S.categories.map(c => option(p.category, c.key, c.label)).join("");
+  const known = S.categories.some(c => c.key === p.category);
+  const blank = (!known && p.slug !== "_new") ? option(p.category || "", p.category || "", "No Work group (standalone)") : "";
+  const opts = blank + S.categories.map(c => option(p.category, c.key, c.label)).join("");
   return `<select data-f="category">${opts}</select>`;
 }
 
@@ -140,7 +157,7 @@ function card(p, i) {
       <div class="grid g3">
         <div><label>Category</label>${catSelect(p)}</div>
         <div><label>Tags <span class="hint">(comma)</span></label><input data-f="tags" value="${esc((p.tags||[]).join(", "))}"></div>
-        <div><label>&nbsp;</label><label class="chk"><input type="checkbox" data-f="featured"${p.featured ? " checked" : ""}> Featured on the home page</label></div>
+        <div><label>Featured order <span class="hint">(1 = lead, blank = not featured)</span></label><input type="number" min="1" step="1" data-f="featured" value="${p.featured && p.featured !== true ? esc(p.featured) : (p.featured === true ? 1 : "")}"></div>
       </div>
       <label>Brief <span class="hint">(what the client needed)</span></label>
       <textarea data-f="brief" rows="4">${esc(p.brief)}</textarea>
@@ -223,6 +240,7 @@ function payload(i) {
   el.querySelectorAll("[data-f]").forEach(f => {
     const k = f.dataset.f;
     if (f.type === "checkbox") out[k] = f.checked;
+    else if (k === "featured") out[k] = f.value.trim();
     else if (k === "tags") out[k] = f.value.split(",").map(s => s.trim()).filter(Boolean);
     else if (k === "did" || k === "scope") out[k] = f.value.split("\n").map(s => s.trim()).filter(Boolean);
     else out[k] = f.value;
@@ -299,9 +317,9 @@ document.addEventListener("click", async e => {
   if (t.dataset.save !== undefined) {
     const i = +t.dataset.save, st = document.querySelector(`[data-st="${i}"]`);
     status(st, "saving…");
-    const r = await fetch("/api/project", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload(i))});
-    const d = await r.json();
-    if (!r.ok) return status(st, d.error || "Save failed", "bad");
+    const res = await post("/api/project", payload(i));
+    const d = res.d;
+    if (!res.ok) return status(st, d.error || "Save failed", "bad");
     status(st, d.action === "created" ? "created · site rebuilt" : "saved · site rebuilt", "good");
     await load();
     return;
@@ -316,9 +334,9 @@ document.addEventListener("click", async e => {
     body.bio = $("#copyform [data-k=bio]").value.split("\n").map(s => s.trim()).filter(Boolean);
     body.collaborations = { names: $("#copyform [data-k=collabnames]").value.split("\n").map(s => s.trim()).filter(Boolean) };
     const st = $("#copystatus"); status(st, "saving…");
-    const r = await fetch("/api/config", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
-    const d = await r.json();
-    if (!r.ok) return status(st, d.error || "Save failed", "bad");
+    const res = await post("/api/config", body);
+    const d = res.d;
+    if (!res.ok) return status(st, d.error || "Save failed", "bad");
     status(st, "saved · site rebuilt", "good"); load();
   }
 });
@@ -365,9 +383,9 @@ function renderCopy() {
 
 async function mediaAction(body) {
   S.open = body.slug;
-  const r = await fetch("/api/media", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
-  const d = await r.json();
-  if (!r.ok) { alert(d.error || "Media change failed"); return null; }
+  const res = await post("/api/media", body);
+  const d = res.d;
+  if (!res.ok) { if (res.status !== 409) alert(d.error || "Media change failed"); return null; }
   await load();
   return d;
 }

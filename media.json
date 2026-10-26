@@ -231,7 +231,7 @@
       "year": "2024"
     }
   ],
-  "reel_formats_note": "[Anatomy of a reel: pick one reel and break down the hook (0–2s), the pacing, and the last frame, in your words]",
+  "reel_formats_note": "",
   "motion": [
     {
       "slug": "acai-express-logo",
@@ -280,13 +280,9 @@
     {
       "slug": "gallera",
       "title": "Gallera",
-      "client": "[Client]",
+      "client": "",
       "year": "",
       "ratio": "1 / 1",
-      "confirm": [
-        "client",
-        "year"
-      ],
       "livid": "https://livid.com/embed/CHV4VPFbCj9s?livid_logo=0&fullscreen=1&title=1",
       "role": "Animator",
       "mp4": "",
@@ -295,12 +291,9 @@
     {
       "slug": "promo-animation-2020",
       "title": "Promotional animation",
-      "client": "[Client]",
+      "client": "",
       "year": "2020",
       "ratio": "16 / 9",
-      "confirm": [
-        "client"
-      ],
       "livid": "https://livid.com/embed/ohGOSOxfRpPJ?livid_logo=0&fullscreen=1&title=1",
       "role": "Animator",
       "mp4": "",
@@ -319,7 +312,7 @@
     }
   ],
   "paid_social": {
-    "intro": "[Paid social: the Chip City ads that ran, shown in their real placement sizes]",
+    "intro": "",
     "video_ads": [],
     "static_ads": []
   },
@@ -492,5 +485,8 @@
       "year": "2021"
     }
   ],
-  "credits_confirm": false
+  "credits_confirm": false,
+  "ai_live": [
+    "rodowita-water"
+  ]
 }

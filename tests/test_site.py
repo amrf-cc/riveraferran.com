@@ -4,12 +4,18 @@ import html
 import re
 import unittest
 
-from support import (ROOT, TOP_PAGES, EMAIL_OR_DOMAIN, NAME_UNACCENTED, built_pages,
+from support import (ROOT, TOP_PAGES, HIDDEN_PAGES, SHOWREEL_HIDDEN, EMAIL_OR_DOMAIN, NAME_UNACCENTED, built_pages,
                      expected_work_groups, is_draft_build, is_ph, load, local_links, meta_tags,
                      project_href, read, standalone, standalone_projects, visible_projects,
                      work_projects, work_sequence)
 
-NAV_LABELS = ("Work", "Reels", "AI &amp; Workflow", "Paid Social", "About", "Contact")
+NAV_LABELS = tuple(l for l in ("Work", "Reels", "AI &amp; Workflow", "Paid Social", "About", "Contact")
+                   if not (l == "Paid Social" and "paid-social" in HIDDEN_PAGES))
+
+
+def live_target(target):
+    """A capability/pill link target, or "" when it points at a hidden page."""
+    return "" if target.partition("#")[0][:-5] in HIDDEN_PAGES else target
 
 
 class BuiltSite(unittest.TestCase):
@@ -108,7 +114,7 @@ class TestNav(BuiltSite):
             text = read(page)
             nav = text[text.index('<nav class="main"'):text.index("</nav>", text.index('<nav class="main"'))]
             labels = re.findall(r">([^<>]+?)(?:<span[^>]*>[^<]*</span>)?</a>", nav)
-            self.assertEqual(tuple(labels[:6]), NAV_LABELS, page.name)
+            self.assertEqual(tuple(labels[:len(NAV_LABELS)]), NAV_LABELS, page.name)
             self.assertIn("Résumé", nav, page.name)
             self.assertIn('class="nav-toggle"', text, page.name)
             if not config.get("resume_pdf"):
@@ -117,6 +123,7 @@ class TestNav(BuiltSite):
     def test_active_state(self):
         cases = {"work.html": "Work", "about.html": "About", "contact.html": "Contact",
                  "reels.html": "Reels", "ai.html": "AI &amp; Workflow", "paid-social.html": "Paid Social"}
+        cases = {n: l for n, l in cases.items() if n[:-5] not in HIDDEN_PAGES}
         for name, label in cases.items():
             active = re.findall(r'<a [^>]*class="active"[^>]*>([^<]+)</a>', read(ROOT / name))
             self.assertEqual(active, [label], name)
@@ -211,11 +218,21 @@ class TestHome(BuiltSite):
         self.assertRegex(m.group(1), r"\.masthead\s+\.front\s*\{\s*display:\s*none;?\s*\}")
 
     def test_intro_and_buttons(self):
-        self.assertIn('<a class="btn" href="#reel">Watch reel</a>', self.text)
         self.assertIn('href="work.html">See work</a>', self.text)
+        if SHOWREEL_HIDDEN:
+            self.assertNotIn("Watch reel", self.text)
+            self.assertNotIn('id="reel"', self.text)
+            return
+        self.assertIn('<a class="btn" href="#reel">Watch reel</a>', self.text)
         self.assertIn('id="reel"', self.text)
 
     def test_showreel_or_placeholder(self):
+        if SHOWREEL_HIDDEN:
+            # Switched off by the owner: no section, no button, no dashed box, no leftover copy.
+            self.assertNotIn('class="reel"', self.text)
+            self.assertNotIn("reel-slot", self.text)
+            self.assertNotIn("Showreel", self.text)
+            return
         reel = re.search(r'<section class="reel" id="reel">(.*?)</section>', self.text, re.S).group(1)
         sr = self.config["showreel"]
         empty = [s for s in ("vertical", "horizontal") if not (sr[s].get("livid") or sr[s].get("mp4"))]
@@ -254,7 +271,7 @@ class TestHome(BuiltSite):
         cat_keys = {c["key"] for c in self.config.get("categories", [])}
         for (tag, href, label), cap in zip(items, caps):
             self.assertEqual(label, html.escape(cap["label"]))
-            target = build.CAP_LINKS.get(cap["tag"]) or ""
+            target = live_target(build.CAP_LINKS.get(cap["tag"]) or "")
             if not target:
                 self.assertEqual((tag, href), ("div", ""), "%s should be plain text" % cap["tag"])
                 continue
@@ -454,7 +471,7 @@ class TestCaseStudies(BuiltSite):
             pills = re.findall(r'<li(?: class="pill")?>(?:<a class="pill" href="([^"]+)">)?([^<]+)', tags_html)
             self.assertEqual([x[1] for x in pills], [html.escape(labels.get(t, t)) for t in p.get("tags", [])])
             for (href, _), t in zip(pills, p.get("tags", [])):
-                target = build.CAP_LINKS.get(t) or ""
+                target = live_target(build.CAP_LINKS.get(t) or "")
                 self.assertEqual(href, ("../" + target) if target else "", "%s pill %s" % (p["slug"], t))
 
     def test_body_sections(self):
@@ -779,7 +796,7 @@ class TestAI(BuiltSite):
     def test_ran_live(self):
         live = re.search(r'<section class="ai-live" id="ran-live">(.*?)</section>', self.text, re.S).group(1)
         draft = is_draft_build()
-        for slug in self.build.AI_LIVE:
+        for slug in self.build.ai_live_slugs(self.media):
             p = self.projects.get(slug)
             if not p:
                 continue
@@ -804,7 +821,16 @@ class TestAI(BuiltSite):
 
 
 class TestPaidSocial(BuiltSite):
+    def test_hidden_page_is_gone_everywhere(self):
+        if "paid-social" not in HIDDEN_PAGES:
+            self.skipTest("the Paid Social page is switched on")
+        self.assertFalse((ROOT / "paid-social.html").exists())
+        for page in built_pages(include_404=True):
+            self.assertNotIn("paid-social", read(page), page.name)
+
     def test_sections_and_size_placeholders(self):
+        if "paid-social" in HIDDEN_PAGES:
+            self.skipTest("the Paid Social page is switched off")
         text = read(ROOT / "paid-social.html")
         ps = load("media.json").get("paid_social", {})
         for key, anchor, heading in (("video_ads", "video-ads", "Video ads"), ("static_ads", "static-ads", "Static ads")):
@@ -821,6 +847,8 @@ class TestPaidSocial(BuiltSite):
                 self.assertIn('aspect-ratio:%s' % item.get("ratio", ""), sec)
 
     def test_intro(self):
+        if "paid-social" in HIDDEN_PAGES:
+            self.skipTest("the Paid Social page is switched off")
         intro = load("site-config.json")["page_intros"].get("paid")
         if intro:
             self.assertIn(ph_or_text(intro), read(ROOT / "paid-social.html"))
