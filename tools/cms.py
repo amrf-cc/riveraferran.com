@@ -14,6 +14,7 @@ Every write keeps a copy of the previous file in tools/backups/ (20 kept) and is
 rolled back when the rebuild fails, so a bad edit can never leave the site broken.
 """
 import json
+import mimetypes
 import os
 import re
 import shutil
@@ -22,7 +23,7 @@ import sys
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 REPO = Path(os.environ.get("CMS_REPO", Path(__file__).resolve().parent.parent)).resolve()
 BACKUPS = REPO / "tools" / "backups"
@@ -33,6 +34,10 @@ KEEP_BACKUPS = 20
 
 # First day the editor is used: the files it is allowed to write.
 FILES = {"projects": REPO / "projects.json", "config": REPO / "site-config.json"}
+MANIFEST = REPO / "assets-manifest.json"
+TRASH = REPO / "tools" / "removed-media"
+PHOTO_FULL_EDGE = 2000
+PHOTO_THUMB_EDGE = 852
 
 # Project fields the editor owns, with their type.
 TEXT = ["client", "title", "oneliner", "role", "years", "location", "brief", "result", "category", "bts"]
@@ -69,13 +74,18 @@ def write_json(path, data):
 
 def manifest_counts():
     try:
-        man = read(REPO / "assets-manifest.json")["projects"]
+        man = read(MANIFEST)["projects"]
     except (OSError, ValueError, KeyError):
         return {}
-    out = {}
-    for slug, d in man.items():
-        out[slug] = {"photos": len(d.get("photos", [])), "videos": len(d.get("videos", []))}
-    return out
+    return {slug: {"photos": len(d.get("photos", [])), "videos": len(d.get("videos", []))} for slug, d in man.items()}
+
+
+def manifest_media():
+    try:
+        man = read(MANIFEST)["projects"]
+    except (OSError, ValueError, KeyError):
+        return {}
+    return {slug: {"photos": d.get("photos", []), "videos": d.get("videos", [])} for slug, d in man.items()}
 
 
 def content():
@@ -87,6 +97,7 @@ def content():
         "categories": cfg.get("categories", []),
         "projects": projects,
         "manifest": manifest_counts(),
+        "media": manifest_media(),
         "build": {"ok": ok, "output": out},
     }
 
@@ -184,6 +195,139 @@ def save_config(raw):
     return {"ok": True, "changed": touched, "build": out}
 
 
+def safe_asset(rel):
+    """Resolve a repo-relative asset path, refusing anything outside assets/."""
+    if not rel or ".." in Path(rel).parts:
+        raise ValueError("Bad path.")
+    p = (REPO / rel).resolve()
+    if not str(p).startswith(str((REPO / "assets").resolve()) + os.sep):
+        raise ValueError("Path outside assets/.")
+    return p
+
+
+def sips_resize(path, edge):
+    """Shrink an image in place to a maximum edge, keeping the aspect ratio."""
+    subprocess.run(["sips", "-Z", str(edge), str(path), "--out", str(path)],
+                   check=True, capture_output=True)
+
+
+def media_entry(man, slug):
+    if not SLUG.match(slug or ""):
+        raise ValueError("Unknown project.")
+    e = man["projects"].setdefault(slug, {})
+    e.setdefault("photos", [])
+    e.setdefault("videos", [])
+    return e
+
+
+def trash_files(paths):
+    """Move files out of assets/ instead of deleting them."""
+    TRASH.mkdir(parents=True, exist_ok=True)
+    for rel in paths:
+        try:
+            src = safe_asset(rel)
+        except ValueError:
+            continue
+        if src.exists() and src.is_file():
+            dest = TRASH / ("%s-%s" % (time.strftime("%Y%m%d-%H%M%S"), src.name))
+            shutil.move(str(src), str(dest))
+
+
+def media_edit(payload):
+    slug = (payload.get("slug") or "").strip()
+    kind = payload.get("kind")
+    action = payload.get("action")
+    man = read(MANIFEST)
+    entry = media_entry(man, slug)
+    key = "photos" if kind == "photo" else "videos" if kind == "video" else None
+    if not key:
+        raise ValueError("kind must be photo or video.")
+    items = entry[key]
+    idx = payload.get("index")
+    if action == "add":
+        new = payload.get("items") or ([payload.get("item")] if payload.get("item") else [])
+        if not new:
+            raise ValueError("Nothing to add.")
+        items.extend(new)
+    elif action == "remove":
+        if idx is None or not (0 <= int(idx) < len(items)):
+            raise ValueError("No such item.")
+        gone = items.pop(int(idx))
+        files = [gone.get("full"), gone.get("thumb")] if key == "photos" else [gone.get("poster")]
+        trash_files([f for f in files if f])
+    elif action == "move":
+        a, b = int(payload.get("from", -1)), int(payload.get("to", -1))
+        if not (0 <= a < len(items) and 0 <= b < len(items)):
+            raise ValueError("Bad move.")
+        items.insert(b, items.pop(a))
+    elif action == "update":
+        if idx is None or not (0 <= int(idx) < len(items)):
+            raise ValueError("No such item.")
+        row = items[int(idx)]
+        for k in ("alt", "title", "livid", "poster", "ratio"):
+            if k in payload:
+                row[k] = str(payload[k])
+        if key == "videos" and payload.get("livid"):
+            row["livid"] = embed_url(str(payload["livid"]))
+    else:
+        raise ValueError("Unknown action.")
+    dest = backup(MANIFEST)
+    write_json(MANIFEST, man)
+    ok, out = build()
+    if not ok:
+        shutil.copy2(dest, MANIFEST)
+        build()
+        raise RuntimeError("The site did not build. Reverted. %s" % out)
+    return {"ok": True, "photos": len(entry["photos"]), "videos": len(entry["videos"]), "build": out}
+
+
+def embed_url(value):
+    """Accept an embed link, a watch link or a bare id, return the embed link with our params."""
+    v = value.strip()
+    vid = ""
+    for pattern in (r"/embed/([A-Za-z0-9_-]+)", r"/([A-Za-z0-9_-]{6,})/?$"):
+        m = re.search(pattern, v)
+        if m:
+            vid = m.group(1)
+            break
+    if not vid:
+        vid = v
+    vid = re.sub(r"[^A-Za-z0-9_-]", "", vid)
+    if len(vid) < 6:
+        raise ValueError("That does not look like a Livid video id or link.")
+    return "https://livid.com/embed/%s?livid_logo=0&fullscreen=1&title=1" % vid
+
+
+def save_upload(params, body):
+    slug = (params.get("slug") or "").strip()
+    kind = params.get("kind") or "photo"
+    if not SLUG.match(slug):
+        raise ValueError("Unknown project.")
+    name = params.get("name") or "upload"
+    stem = re.sub(r"[^a-z0-9]+", "-", Path(name).stem.lower()).strip("-")[:50] or "upload"
+    suffix = Path(name).suffix.lower()
+    if suffix not in (".jpg", ".jpeg", ".png", ".webp"):
+        raise ValueError("Only jpg, png and webp are accepted.")
+    folder = REPO / "assets" / "img" / slug
+    folder.mkdir(parents=True, exist_ok=True)
+    (folder / "thumbs").mkdir(exist_ok=True)
+    base, n = stem, 1
+    while (folder / (stem + suffix)).exists():
+        n += 1
+        stem = "%s-%d" % (base, n)
+    dest = folder / (stem + suffix)
+    dest.write_bytes(body)
+    sips_resize(dest, PHOTO_FULL_EDGE if kind == "photo" else 2400)
+    out = {"full": str(dest.relative_to(REPO))}
+    if kind == "photo":
+        thumb = folder / "thumbs" / (stem + ".jpg")
+        shutil.copy2(dest, thumb)
+        sips_resize(thumb, PHOTO_THUMB_EDGE)
+        out["thumb"] = str(thumb.relative_to(REPO))
+        out["alt"] = params.get("alt", "")
+    return out
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "PortfolioCMS/1"
 
@@ -220,6 +364,16 @@ class Handler(BaseHTTPRequestHandler):
         if path in ("/", "/index.html"):
             body = (Path(__file__).parent / "cms.html").read_bytes()
             return self._send(200, body, "text/html; charset=utf-8")
+        if path == "/media":
+            q = {k: v[0] for k, v in parse_qs(urlparse(self.path).query).items()}
+            try:
+                f = safe_asset(q.get("p", ""))
+            except ValueError as e:
+                return self._json(403, {"ok": False, "error": str(e)})
+            if not f.exists() or not f.is_file():
+                return self._json(404, {"ok": False, "error": "No such file."})
+            ctype = mimetypes.guess_type(f.name)[0] or "application/octet-stream"
+            return self._send(200, f.read_bytes(), ctype)
         if path == "/api/content":
             try:
                 return self._json(200, content())
@@ -231,20 +385,31 @@ class Handler(BaseHTTPRequestHandler):
         if not self._guard():
             return
         n = int(self.headers.get("Content-Length") or 0)
-        if n <= 0 or n > MAX_BODY:
+        if n <= 0 or n > MAX_BODY * 20:
             return self._json(400, {"ok": False, "error": "Empty or oversized request."})
+        u = urlparse(self.path)
+        if u.path == "/api/upload":
+            q = {k: v[0] for k, v in parse_qs(u.query).items()}
+            try:
+                return self._json(200, save_upload(q, self.rfile.read(n)))
+            except ValueError as e:
+                return self._json(400, {"ok": False, "error": str(e)})
+            except Exception as e:  # noqa: BLE001
+                return self._json(500, {"ok": False, "error": str(e)})
         try:
             raw = json.loads(self.rfile.read(n))
         except ValueError:
             return self._json(400, {"ok": False, "error": "Bad JSON."})
         if not isinstance(raw, dict):
             return self._json(400, {"ok": False, "error": "Expected an object."})
-        path = urlparse(self.path).path
+        path = u.path
         try:
             if path == "/api/project":
                 return self._json(200, save_project(raw))
             if path == "/api/config":
                 return self._json(200, save_config(raw))
+            if path == "/api/media":
+                return self._json(200, media_edit(raw))
             if path == "/api/build":
                 ok, out = build()
                 return self._json(200, {"ok": ok, "build": out})

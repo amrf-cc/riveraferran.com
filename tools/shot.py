@@ -6,6 +6,7 @@
 Kept in tools/ so it survives the scratch cache being pruned.
 """
 import base64
+import os
 import json
 import shutil
 import subprocess
@@ -62,6 +63,10 @@ try:
     call("Emulation.setDeviceMetricsOverride", width=w, height=h, deviceScaleFactor=1, mobile=False)
     call("Page.navigate", url=url)
     time.sleep(2.5)
+    extra = os.environ.get("SHOT_JS")
+    if extra:
+        call("Runtime.evaluate", expression=extra, awaitPromise=True)
+        time.sleep(1.5)
     if full:
         size = call("Runtime.evaluate", expression="JSON.stringify({h:document.documentElement.scrollHeight})",
                     returnByValue=True)["result"]["value"]

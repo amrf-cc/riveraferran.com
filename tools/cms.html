@@ -45,6 +45,27 @@
   #build { font-size:12px; color:var(--muted); margin-left:10px; }
   .copy-block { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:14px 16px; margin-bottom:14px; }
   .copy-block h2 { font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 6px; font-weight:600; }
+  .media { margin-top:18px; border-top:1px solid var(--line); padding-top:12px; }
+  .media h3 { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; display:flex; gap:10px; align-items:center; }
+  .media h3 button { font-size:11px; padding:4px 9px; }
+  .strip { display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; }
+  .tile { flex:0 0 132px; background:var(--paper); border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  .tile img { display:block; width:100%; height:110px; object-fit:cover; background:#e8e2d5; }
+  .tile .ctl { display:flex; gap:2px; padding:4px; align-items:center; justify-content:space-between; }
+  .tile .ctl button { border:1px solid var(--line); background:var(--card); border-radius:4px; padding:1px 6px; cursor:pointer; font-size:12px; line-height:1.6; }
+  .tile .ctl button.del { color:var(--tomato); }
+  .tile .idx { font-size:11px; color:var(--muted); }
+  .tile input { border:0; border-top:1px solid var(--line); border-radius:0; font-size:11px; padding:5px 6px; }
+  .cover { position:relative; }
+  .cover .badge { position:absolute; top:6px; left:6px; background:var(--ink); color:var(--paper); font-size:10px; padding:2px 6px; border-radius:3px; letter-spacing:.05em; }
+  .vids { display:grid; gap:8px; }
+  .vid { display:grid; grid-template-columns:96px 1fr 150px; gap:10px; align-items:start; background:var(--paper); border:1px solid var(--line); border-radius:6px; padding:8px; }
+  .vid .poster { width:96px; height:60px; object-fit:cover; border-radius:4px; background:#e8e2d5; border:0; }
+  .vid .none { width:96px; height:60px; border:1px dashed var(--line); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--muted); cursor:pointer; text-align:center; }
+  .vid label { margin:0 0 2px; font-size:10px; }
+  .vid .ctl { display:flex; gap:4px; margin-top:6px; }
+  .vid .ctl button { border:1px solid var(--line); background:var(--card); border-radius:4px; padding:2px 7px; cursor:pointer; font-size:12px; }
+  .uploading { font-size:12px; color:var(--tomato); }
 </style>
 </head>
 <body>
@@ -73,7 +94,7 @@
 </main>
 
 <script>
-const S = { data:null, categories:[] };
+const S = { data:null, categories:[], stamp:0, open:null };
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
 const lines = v => (v || []).join("\n");
@@ -85,7 +106,7 @@ async function load() {
   const r = await fetch("/api/content");
   const d = await r.json();
   if (!r.ok) { alert(d.error || "Could not load"); return; }
-  S.data = d; S.categories = d.categories || [];
+  S.data = d; S.categories = d.categories || []; S.stamp = Date.now();
   $("#build").textContent = d.build.ok ? "last build ok" : "last build failed";
   render(); renderCopy();
 }
@@ -100,8 +121,8 @@ function catSelect(p) {
 
 function card(p, i) {
   const m = (S.data.manifest || {})[p.slug] || { photos:0, videos:0 };
-  const open = p.slug === "_new" ? " open" : "";
-  return `<details class="card" data-i="${i}"${open}>
+  const open = (p.slug === "_new" || p.slug === S.open) ? " open" : "";
+  return `<details class="card" data-i="${i}" data-slug="${esc(p.slug)}"${open}>
     <summary><span class="who">${esc(p.client)}</span><span class="what">${esc(p.title)}</span>
       <span class="meta">${m.photos} photos · ${m.videos} videos · ${esc(p.slug)}</span></summary>
     <div class="body">
@@ -134,8 +155,61 @@ function card(p, i) {
         <span class="status" data-st="${i}"></span>
       </div>
       <p class="hint">Placeholders like <span class="ph">[Placeholder: …]</span> block publishing until they are replaced.</p>
+      ${mediaHTML(p.slug)}
     </div>
   </details>`;
+}
+
+const murl = p => "/media?p=" + encodeURIComponent(p) + "&t=" + (S.stamp || 0);
+
+function mediaHTML(slug) {
+  if (!slug || slug === "_new") return "";
+  const m = (S.data.media || {})[slug] || { photos: [], videos: [] };
+  const photos = m.photos || [], videos = m.videos || [];
+  const tiles = photos.map((ph, i) => `
+    <div class="tile${i === 0 ? " cover" : ""}">
+      ${i === 0 ? '<span class="badge">Cover</span>' : ""}
+      <img loading="lazy" src="${murl(ph.thumb || ph.full)}" alt="">
+      <div class="ctl">
+        <button data-pmove="${slug}|${i}|-1" title="Move left"${i === 0 ? " disabled" : ""}>‹</button>
+        <span class="idx">${i + 1}/${photos.length}</span>
+        <button data-pmove="${slug}|${i}|1" title="Move right"${i === photos.length - 1 ? " disabled" : ""}>›</button>
+        <button class="del" data-pdel="${slug}|${i}" title="Remove">✕</button>
+      </div>
+      <input value="${esc(ph.alt || "")}" data-palt="${slug}|${i}" placeholder="Alt text">
+    </div>`).join("");
+  const rows = videos.map((v, i) => `
+    <div class="vid">
+      ${v.poster ? `<img class="poster" src="${murl(v.poster)}" alt="">`
+                 : `<div class="none" data-vposter="${slug}|${i}">Add poster</div>`}
+      <div>
+        <label>Title</label><input data-vtitle="${slug}|${i}" value="${esc(v.title || "")}">
+        <label>Livid link</label><input data-vlivid="${slug}|${i}" value="${esc(v.livid || "")}">
+      </div>
+      <div>
+        <label>Ratio</label>
+        <select data-vratio="${slug}|${i}">
+          ${["9 / 16", "16 / 9", "1 / 1", "4 / 5"].map(r => `<option${(v.ratio || "") === r ? " selected" : ""}>${r}</option>`).join("")}
+        </select>
+        <div class="ctl">
+          <button data-vmove="${slug}|${i}|-1"${i === 0 ? " disabled" : ""}>↑</button>
+          <button data-vmove="${slug}|${i}|1"${i === videos.length - 1 ? " disabled" : ""}>↓</button>
+          <button data-vdel="${slug}|${i}">✕</button>
+        </div>
+      </div>
+    </div>`).join("");
+  return `<div class="media" data-media="${slug}">
+    <h3>Photos · ${photos.length}
+      <button class="ghost" data-addphotos="${slug}">Add photos</button>
+      <input type="file" accept="image/*" multiple hidden data-fileinput="${slug}">
+      <span class="uploading" data-up="${slug}"></span>
+    </h3>
+    <div class="strip">${tiles || '<span class="hint">No photos in this project yet.</span>'}</div>
+    <h3 style="margin-top:14px">Videos · ${videos.length}
+      <button class="ghost" data-addvideo="${slug}">Add video</button>
+    </h3>
+    <div class="vids">${rows || '<span class="hint">No videos in this project yet.</span>'}</div>
+  </div>`;
 }
 
 function render() {
@@ -163,6 +237,52 @@ document.addEventListener("click", async e => {
   if (t.dataset.tab) {
     document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b === t));
     document.querySelectorAll(".tab").forEach(s => s.classList.toggle("on", s.id === t.dataset.tab));
+    return;
+  }
+  if (t.dataset.addphotos !== undefined) {
+    document.querySelector(`[data-fileinput="${t.dataset.addphotos}"]`).click();
+    return;
+  }
+  if (t.dataset.addvideo !== undefined) {
+    const link = prompt("Livid link or video id");
+    if (!link) return;
+    const title = prompt("Video title") || "Untitled";
+    await mediaAction({ slug: t.dataset.addvideo, kind: "video", action: "add",
+      item: { title, livid: link, poster: "", ratio: "9 / 16" } });
+    return;
+  }
+  if (t.dataset.pmove !== undefined) {
+    const [slug, i, d] = t.dataset.pmove.split("|");
+    await mediaAction({ slug, kind: "photo", action: "move", from: +i, to: +i + +d });
+    return;
+  }
+  if (t.dataset.pdel !== undefined) {
+    const [slug, i] = t.dataset.pdel.split("|");
+    if (!confirm("Remove this photo from the project? The file moves to tools/removed-media.")) return;
+    await mediaAction({ slug, kind: "photo", action: "remove", index: +i });
+    return;
+  }
+  if (t.dataset.vmove !== undefined) {
+    const [slug, i, d] = t.dataset.vmove.split("|");
+    await mediaAction({ slug, kind: "video", action: "move", from: +i, to: +i + +d });
+    return;
+  }
+  if (t.dataset.vdel !== undefined) {
+    const [slug, i] = t.dataset.vdel.split("|");
+    if (!confirm("Remove this video from the project?")) return;
+    await mediaAction({ slug, kind: "video", action: "remove", index: +i });
+    return;
+  }
+  if (t.dataset.vposter !== undefined) {
+    const [slug, i] = t.dataset.vposter.split("|");
+    const pick = document.createElement("input");
+    pick.type = "file"; pick.accept = "image/*";
+    pick.onchange = async () => {
+      const f = pick.files[0]; if (!f) return;
+      const up = await upload(slug, f, "poster");
+      if (up) await mediaAction({ slug, kind: "video", action: "update", index: +i, poster: up.full });
+    };
+    pick.click();
     return;
   }
   if (t.id === "newbtn") {
@@ -242,6 +362,73 @@ function renderCopy() {
       ${Object.keys(intros).map(k => field("intro:"+k, k, intros[k], "area")).join("")}
     </div>`;
 }
+
+async function mediaAction(body) {
+  S.open = body.slug;
+  const r = await fetch("/api/media", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+  const d = await r.json();
+  if (!r.ok) { alert(d.error || "Media change failed"); return null; }
+  await load();
+  return d;
+}
+
+async function upload(slug, file, kind) {
+  const up = document.querySelector(`[data-up="${slug}"]`);
+  if (up) up.textContent = "uploading " + file.name + "…";
+  try {
+    const r = await fetch(`/api/upload?slug=${encodeURIComponent(slug)}&kind=${kind}&name=${encodeURIComponent(file.name)}`,
+      {method: "POST", headers: {"Content-Type": "application/octet-stream"}, body: file});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "upload failed");
+    return d;
+  } catch (err) {
+    alert("Upload failed: " + err.message);
+    return null;
+  } finally {
+    if (up) up.textContent = "";
+  }
+}
+
+document.addEventListener("change", async e => {
+  const t = e.target;
+  if (!t.dataset) return;
+  if (t.dataset.fileinput !== undefined) {
+    const slug = t.dataset.fileinput, files = [...t.files];
+    if (!files.length) return;
+    const items = [];
+    for (const f of files) { const d = await upload(slug, f, "photo"); if (d) items.push(d); }
+    t.value = "";
+    if (items.length) await mediaAction({ slug, kind: "photo", action: "add", items });
+    return;
+  }
+  if (t.dataset.palt !== undefined) {
+    const [slug, i] = t.dataset.palt.split("|");
+    await mediaAction({ slug, kind: "photo", action: "update", index: +i, alt: t.value });
+    return;
+  }
+  if (t.dataset.vtitle !== undefined) {
+    const [slug, i] = t.dataset.vtitle.split("|");
+    await mediaAction({ slug, kind: "video", action: "update", index: +i, title: t.value });
+    return;
+  }
+  if (t.dataset.vlivid !== undefined) {
+    const [slug, i] = t.dataset.vlivid.split("|");
+    await mediaAction({ slug, kind: "video", action: "update", index: +i, livid: t.value });
+    return;
+  }
+  if (t.dataset.vratio !== undefined) {
+    const [slug, i] = t.dataset.vratio.split("|");
+    await mediaAction({ slug, kind: "video", action: "update", index: +i, ratio: t.value });
+  }
+});
+
+document.addEventListener("toggle", e => {
+  const el = e.target;
+  if (el.matches && el.matches("details.card")) {
+    if (el.open) S.open = el.dataset.slug;
+    else if (S.open === el.dataset.slug) S.open = null;
+  }
+}, true);
 
 $("#q").addEventListener("input", render);
 load();

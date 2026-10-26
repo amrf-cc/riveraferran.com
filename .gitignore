@@ -5,3 +5,4 @@ staging/
 .claude/
 tools/backups/
 tools/*.tmp
+tools/removed-media/
