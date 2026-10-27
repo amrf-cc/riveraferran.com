@@ -255,7 +255,8 @@
       "scope": [],
       "result": "",
       "brief": "Vertical fitness videos for Ninja Bear in New York City across 2023 and 2024, and a fitness video for Norberto NMZ in Puerto Rico in 2021.",
-      "did": []
+      "did": [],
+      "hidden": true
     },
     {
       "slug": "bldm",
