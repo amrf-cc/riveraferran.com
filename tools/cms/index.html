@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Site Manager — brand portfolio</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Site Manager<span class="dot"></span><span class="site-name">brand portfolio</span></div>
+  <div class="status" id="status">Loading…</div>
+  <div class="actions">
+    <button id="btn-preview" class="btn ghost">Preview ↗</button>
+    <button id="btn-build" class="btn ghost">Rebuild</button>
+    <button id="btn-release" class="btn primary">Release check</button>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="sidebar">
+    <button id="btn-new" class="btn new">+ New project</button>
+    <p class="side-head">Site</p>
+    <ul class="list" id="site-list"></ul>
+    <p class="side-head">Projects <span class="count" id="proj-count"></span></p>
+    <div class="side-tools">
+      <input type="search" id="q" placeholder="Filter projects" autocomplete="off" spellcheck="false">
+      <div class="seg" id="seg" role="group" aria-label="Show">
+        <button type="button" data-seg="all" class="on">All</button>
+        <button type="button" data-seg="live">Live</button>
+        <button type="button" data-seg="hidden">Hidden</button>
+      </div>
+    </div>
+    <p class="side-hint">Drag to set the order inside a group. The lowest featured number leads the homepage. The eye hides a project from the whole site.</p>
+    <ul class="list" id="proj-list"></ul>
+  </aside>
+  <main class="pane" id="pane"></main>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-inner">
+    <div class="sheet-head">
+      <strong id="sheet-title">Output</strong>
+      <button class="btn ghost small" id="sheet-close">Close</button>
+    </div>
+    <div class="sheet-body" id="sheet-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="app.js"></script>
+<script src="project.js"></script>
+<script src="site.js"></script>
+</body>
+</html>

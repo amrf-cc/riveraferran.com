@@ -6,3 +6,4 @@ staging/
 tools/backups/
 tools/*.tmp
 tools/removed-media/
+tools/removed-projects/

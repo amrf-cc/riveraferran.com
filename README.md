@@ -16,6 +16,16 @@
 >   résumé) block a release like data placeholders and are listed as `(generated)`.
 >   No `gallery*` output. `CNAME` is written only when `domain` is set; with no domain,
 >   `og:url` is omitted and `og:image` is relative.
+> - `python3 build.py --check` — the same release gate, writes nothing: `RELEASE READY` or
+>   the list. Switches that keep unfinished parts off the site without weakening the gate:
+>   `showreel.hidden`, `hidden_pages: ["paid-social"]` (site-config.json), `ai_live` (media.json),
+>   and `hidden: true` on a project.
+> - **Site Manager** — `env -u PYTHONPATH /usr/bin/python3 tools/cms.py 8820`, then
+>   http://127.0.0.1:8820/. A local copy of the riveraferran.com manager: projects in a sidebar
+>   (drag to order, the eye hides one), photos and videos, site settings, reels, credits, résumé,
+>   Preview, Rebuild and a release check. Every save backs up, rebuilds (release-first) and
+>   restores on failure; removed media goes to `tools/removed-media/`. Notes for developers:
+>   `tools/cms.py` docstring, tests in `tests/test_cms.py` and `tests/test_cms_ui.py`.
 
 Food & beverage portfolio of Adrian Rivera Ferran. Static site, generated in place.
 
