@@ -248,6 +248,9 @@ class TestHome(BuiltSite):
         # Standalone projects stay featured; their card links to the standalone target.
         featured = sorted([p for p in visible_projects() if p.get("featured")], key=lambda p: p["featured"])
         lead = re.search(r'<article class="feature"[^>]*>\s*<a class="thumb[^"]*" href="([^"]+)"', self.text)
+        if not featured:           # every featured project is hidden: no lead block, no featured cards
+            self.assertIsNone(lead)
+            return
         self.assertEqual(html.unescape(lead.group(1)), project_href(featured[0]))
         grid = re.search(r'<div class="grid featured-grid">(.*?)\n    </div>', self.text, re.S).group(1)
         cards = re.findall(r'<a class="thumb[^"]*" href="([^"]+)"', grid)
@@ -444,6 +447,8 @@ class TestNoCapabilityPillsOnCards(BuiltSite):
         projects = {p["slug"]: p for p in visible_projects()}
         found = re.findall(r'<article class="(?:card|feature)[^"]*" data-tags="([^"]*)">\s*'
                            r'<a class="thumb[^"]*" href="([^"]+)"(.*?)</article>', text, re.S)
+        if not any(p.get("featured") for p in visible_projects()):
+            return                 # every featured project is hidden: the home page has no project cards
         self.assertTrue(found)
         for tags, href, body in found:
             slug = by_href[html.unescape(href)]
@@ -794,12 +799,14 @@ class TestAI(BuiltSite):
         self.assertEqual([s[1] for s in steps], [html.escape(s) for s in self.media["ai_process"]])
 
     def test_ran_live(self):
+        shown = [s for s in self.build.ai_live_slugs(self.media) if s in self.projects]
+        if not shown:             # every "Ran live" project is hidden or none is listed: no section at all
+            self.assertNotIn('id="ran-live"', self.text)
+            return
         live = re.search(r'<section class="ai-live" id="ran-live">(.*?)</section>', self.text, re.S).group(1)
         draft = is_draft_build()
-        for slug in self.build.ai_live_slugs(self.media):
-            p = self.projects.get(slug)
-            if not p:
-                continue
+        for slug in shown:
+            p = self.projects[slug]
             card = re.search(r'<article class="card live-card"[^>]*>\s*<a class="thumb[^"]*" href="work/%s\.html".*?</article>'
                              % re.escape(slug), live, re.S)
             self.assertTrue(card, slug)

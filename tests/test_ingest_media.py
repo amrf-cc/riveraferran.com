@@ -11,7 +11,7 @@ import shutil
 import unittest
 
 from support import (ROOT, is_ph, load, local_links, make_temp_repo, read,
-                     run_build, work_projects)
+                     run_build, visible_projects, work_projects)
 import build  # noqa: E402  (support puts the repo root on sys.path)
 
 AI = "AI-assisted"
@@ -323,7 +323,9 @@ class TestBuiltBadgesMatchTheManifest(BuiltSite):
     def test_ai_page_shows_sets_inside_ran_live_only_when_they_exist(self):
         sets = self.manifest["rodowita-water"].get("sets") or []
         text = read(ROOT / "ai.html")
-        if not sets:
+        on_the_page = "rodowita-water" in {p["slug"] for p in visible_projects()} and \
+            "rodowita-water" in build.ai_live_slugs(load("media.json"))
+        if not sets or not on_the_page:       # no sets, or the project is hidden / not listed: nothing to show
             self.assertNotIn("compare-list", text)
             return
         live = re.search(r'<section class="ai-live" id="ran-live">(.*?)</section>', text, re.S).group(1)

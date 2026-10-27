@@ -137,6 +137,27 @@ def meta_tags(page):
 DATA_FILES = ("site-config.json", "projects.json", "media.json", "assets-manifest.json")
 
 
+# Projects the fixtures name directly (Chip City, the AI "Ran live" projects, the AI assistant).
+FIXTURE_SUBJECTS = ("chip-city",)
+
+
+def show_fixture_subjects(tmp):
+    """Adrián hides and shows projects in the site manager, so whatever is hidden in the real data must not
+    change what a temp copy assumes. Show the projects the fixtures name; every other project keeps the state
+    it has. Hidden-project behaviour has its own test (test_build.TestHiddenProjects)."""
+    import build
+    subjects = set(FIXTURE_SUBJECTS) | set(build.AI_LIVE) | {build.AI_FEATURE}
+    path = tmp / "projects.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    changed = False
+    for p in data["projects"]:
+        if p.get("slug") in subjects and p.get("hidden"):
+            p.pop("hidden")
+            changed = True
+    if changed:
+        path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
 def make_temp_repo():
     tmp = Path(tempfile.mkdtemp(prefix="portfolio-build-"))
     shutil.copy2(str(ROOT / "build.py"), str(tmp / "build.py"))
@@ -150,6 +171,7 @@ def make_temp_repo():
     # Media is read-only input: link it rather than copy ~200MB.
     for sub in ("img", "video"):
         os.symlink(str(ROOT / "assets" / sub), str(tmp / "assets" / sub))
+    show_fixture_subjects(tmp)
     return tmp
 
 

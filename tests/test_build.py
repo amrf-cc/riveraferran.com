@@ -132,6 +132,7 @@ class TestPlaceholderHelpers(unittest.TestCase):
         for p in data["projects.json"]["projects"]:
             if p["slug"] == build.AI_FEATURE:
                 p.pop("standalone", None)
+                p.pop("hidden", None)          # the subject of this test must be visible, whatever Adrián hid
         site = build.Site(data)
         pages = site.build_all()
         self.assertIn("work/%s.html" % build.AI_FEATURE, pages)
@@ -333,6 +334,94 @@ class TestReleaseGate(unittest.TestCase):
         # The temp copy shares no data files with the repo.
         for name in ("site-config.json", "projects.json", "media.json"):
             self.assertFalse((self.tmp / name).samefile(ROOT / name))
+
+
+class TestHiddenProjects(unittest.TestCase):
+    """What `hidden: true` does to the generated site, on a temp copy of the real data. The copy shows the
+    projects the fixtures name (support.show_fixture_subjects), so these tests do not depend on what Adrián
+    has hidden in the site manager."""
+
+    def setUp(self):
+        self.tmp = make_temp_repo()
+
+    def tearDown(self):
+        shutil.rmtree(str(self.tmp), ignore_errors=True)
+
+    def projects(self):
+        return load("projects.json", self.tmp)["projects"]
+
+    def set_hidden(self, slugs, hidden=True):
+        data = load("projects.json", self.tmp)
+        for p in data["projects"]:
+            if p["slug"] in slugs:
+                if hidden:
+                    p["hidden"] = True
+                else:
+                    p.pop("hidden", None)
+        (self.tmp / "projects.json").write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    def build(self):
+        r = run_build(self.tmp)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        return r
+
+    def plain_work_project(self):
+        subjects = {"chip-city", build.AI_FEATURE} | set(build.AI_LIVE)
+        return next(p for p in self.projects() if not p.get("hidden") and not standalone(p)
+                    and p["slug"] not in subjects and not p.get("featured"))
+
+    def test_a_hidden_project_has_no_page_card_or_link_and_showing_it_brings_them_back(self):
+        slug = self.plain_work_project()["slug"]
+        self.set_hidden([slug])
+        self.build()
+        self.assertFalse((self.tmp / "work" / (slug + ".html")).exists())
+        for page in html_pages(self.tmp):
+            self.assertNotIn("work/%s.html" % slug, page.read_text(encoding="utf-8"), page.name)
+        for p in self.projects():
+            if not p.get("hidden") and not standalone(p):
+                self.assertTrue((self.tmp / "work" / (p["slug"] + ".html")).exists(), p["slug"])
+        self.set_hidden([slug], hidden=False)
+        self.build()
+        self.assertTrue((self.tmp / "work" / (slug + ".html")).exists())
+        self.assertIn("work/%s.html" % slug, (self.tmp / "work.html").read_text(encoding="utf-8"))
+
+    def test_hiding_the_lead_hands_the_home_page_to_the_next_featured_project(self):
+        featured = sorted((p for p in self.projects() if p.get("featured") and not p.get("hidden")),
+                          key=lambda p: p["featured"])
+        self.assertGreaterEqual(len(featured), 2, "fixture needs two featured projects")
+        lead, nxt = featured[0], featured[1]
+        self.set_hidden([lead["slug"]])
+        self.build()
+        index = (self.tmp / "index.html").read_text(encoding="utf-8")
+        self.assertNotIn('href="%s"' % (standalone(lead) or "work/%s.html" % lead["slug"]), index)
+        self.assertIn('href="%s"' % (standalone(nxt) or "work/%s.html" % nxt["slug"]), index)
+
+    def test_a_group_with_nothing_visible_loses_its_filter_pill(self):
+        cats = load("site-config.json", self.tmp)["categories"]
+        groups = [(c["key"], [p for p in self.projects() if not standalone(p) and p.get("category") == c["key"]
+                              and not p.get("hidden")]) for c in cats]
+        key, members = min((g for g in groups if g[1]), key=lambda g: len(g[1]))
+        self.build()
+        self.assertIn('data-filter="%s"' % key, (self.tmp / "work.html").read_text(encoding="utf-8"))
+        self.set_hidden([p["slug"] for p in members])
+        self.build()
+        work = (self.tmp / "work.html").read_text(encoding="utf-8")
+        self.assertNotIn('data-filter="%s"' % key, work)
+
+    def test_a_hidden_standalone_project_takes_its_block_off_its_page(self):
+        self.build()
+        self.assertIn('id="assistant"', (self.tmp / "ai.html").read_text(encoding="utf-8"))
+        self.set_hidden([build.AI_FEATURE])
+        self.build()
+        self.assertNotIn('id="assistant"', (self.tmp / "ai.html").read_text(encoding="utf-8"))
+
+    def test_a_hidden_ran_live_project_drops_its_card(self):
+        slug = build.AI_LIVE[0]
+        self.build()
+        self.assertIn('href="work/%s.html"' % slug, (self.tmp / "ai.html").read_text(encoding="utf-8"))
+        self.set_hidden([slug])
+        self.build()
+        self.assertNotIn('href="work/%s.html"' % slug, (self.tmp / "ai.html").read_text(encoding="utf-8"))
 
 
 class TestSwitches(unittest.TestCase):
