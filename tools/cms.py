@@ -24,6 +24,7 @@ API (JSON unless noted). Mutating calls carry the `version` the page was loaded 
     DELETE /api/projects/<slug>              archive the project, trash its files
     POST /api/media                          photos: add / remove / reorder / update
     PUT  /api/project/<slug>/videos          the whole video list, in order
+    PUT  /api/project/<slug>/sets            the whole comparison-set list, in order
     POST /api/upload?slug=&kind=&scope=&name=    raw image bytes -> derivatives
     POST /api/config                         site settings, showreel, hidden pages, AI page cards
     PUT  /api/lists/<name>                   reels, motion, credits, experience, side_projects
@@ -61,6 +62,15 @@ from urllib.parse import parse_qs, unquote, urlparse
 
 REPO = Path(os.environ.get("CMS_REPO", Path(__file__).resolve().parent.parent)).resolve()
 TOOLS = Path(__file__).resolve().parent
+# Feature modules sit next to cms.py and own one route each. cms.py is loaded by path in the tests,
+# so its own directory has to be importable before the first sibling import below.
+_TOOLS_DIR = str(Path(__file__).resolve().parent)
+if _TOOLS_DIR not in sys.path:
+    sys.path.insert(0, _TOOLS_DIR)   # cms.py is loaded by path in tests, so sibling imports need this
+
+import cms_sets  # noqa: E402  (needs _TOOLS_DIR on the path first)
+EXTENSIONS = (cms_sets,)  # noqa: E402  one module per feature; each owns one route
+
 UI_DIR = TOOLS / "cms"
 BACKUPS = REPO / "tools" / "backups"
 TRASH = REPO / "tools" / "removed-media"
@@ -78,7 +88,8 @@ UPLOAD_CAP = 120 * 1024 * 1024
 FULL_EDGE, FULL_Q = 2000, 72
 THUMB_EDGE, THUMB_Q = 1280, 55
 POSTER_Q = 70
-POSTER_EDGE = {"project": 1920, "showreel": 1920, "reel": 1280, "motion": 1280}
+POSTER_EDGE = {"project": 1920, "showreel": 1920, "reel": 1280, "motion": 1280,
+               "set": 1920}
 POSTER_DIR = {"reel": "posters/reels", "motion": "posters/motion", "showreel": "posters/showreel"}
 IMAGE_SUFFIXES = (".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif", ".tif", ".tiff", ".gif")
 RATIOS = ("9 / 16", "16 / 9", "4 / 5", "1 / 1")
@@ -363,14 +374,14 @@ def save_upload(q, body):
     """Raw image bytes -> full + thumb for a photo, or one poster. Does not touch the data files."""
     kind = q.get("kind") or "photo"
     scope = q.get("scope") or "project"
-    if kind not in ("photo", "poster") or scope not in ("project", "reel", "motion", "showreel"):
+    if kind not in ("photo", "poster") or scope not in ("project", "reel", "motion", "showreel", "set"):
         bad("Unknown upload type.")
     name = q.get("name") or "upload"
     suffix = Path(name).suffix.lower()
     if suffix not in IMAGE_SUFFIXES:
         bad("That file type is not accepted. Use JPEG, PNG, WebP or HEIC.")
     stem = slugify(Path(name).stem)[:50] or "upload"
-    if kind == "photo" or scope == "project":
+    if kind == "photo" or scope in ("project", "set"):
         slug = (q.get("slug") or "").strip()
         if not SLUG.match(slug) or not any(p.get("slug") == slug for p in read(FILES["projects"])["projects"]):
             bad("Unknown project.")
@@ -1464,6 +1475,12 @@ def ui_manifest(projects):
         e["photos"] = [dict(p, v=file_token(p.get("thumb") or p.get("full") or "")) for p in d.get("photos", [])]
         e["videos"] = [dict(v, v=file_token(v["poster"])) if v.get("poster") else dict(v)
                        for v in d.get("videos", [])]
+        # A replaced step image must never show from cache. Only for projects that have sets, so no
+        # project gains an empty key.
+        if d.get("sets"):
+            e["sets"] = [dict(s, steps=[dict(st, v=file_token(st.get("image") or ""))
+                                        for st in s.get("steps", [])])
+                         for s in d["sets"]]
         out[slug] = e
     return out
 
@@ -1501,10 +1518,25 @@ def state():
 
 
 # --------------------------------------------------------------------------- HTTP
-UI_FILES = {"/": "index.html", "/index.html": "index.html", "/app.css": "app.css", "/app.js": "app.js",
-            "/project.js": "project.js", "/site.js": "site.js", "/publish.js": "publish.js",
-            "/favicon.svg": "favicon.svg"}
+UI_FILES = {"/": "index.html", "/index.html": "index.html", "/favicon.svg": "favicon.svg"}
 PREVIEW_OK = re.compile(r"^(?:[A-Za-z0-9_-]+\.html|work/[A-Za-z0-9_-]+\.html|robots\.txt)$")
+
+
+_EXT_API = None
+
+
+def ext_api():
+    """cms.py itself, handed to the feature modules in EXTENSIONS.
+
+    `python cms.py` is in sys.modules as __main__; the tests load this file by path, so then its own
+    globals stand in — same LOCK, same functions, same FILES, so nothing is copied in effect."""
+    global _EXT_API
+    if _EXT_API is None:
+        _EXT_API = sys.modules.get(__name__)
+        if _EXT_API is None:
+            _EXT_API = type(sys)("cms_api")
+            _EXT_API.__dict__.update(globals())
+    return _EXT_API
 
 
 def preview_target(path):
@@ -1597,12 +1629,21 @@ class Handler(BaseHTTPRequestHandler):
         q = {k: v[0] for k, v in parse_qs(u.query).items()}
         path = u.path
         try:
+            # Feature modules (cms_sets, ...) own their routes; None means "not mine".
+            for ext in EXTENSIONS:
+                out = ext.dispatch(ext_api(), self, method, path, q)
+                if out is not None:
+                    return self._json(200, out)
             if method == "GET":
                 if path in UI_FILES:
                     f = UI_DIR / UI_FILES[path]
                     if not f.is_file():
                         bad("The editor UI is missing (tools/cms/%s)." % UI_FILES[path], 404)
                     return self.serve_file(f)
+                if re.fullmatch(r"/[a-z0-9_-]+\.(?:js|css)", path):
+                    f = UI_DIR / path[1:]
+                    if f.is_file():
+                        return self.serve_file(f)
                 if path == "/preview" or path.startswith("/preview/"):
                     target = preview_target(path)
                     if target is None:

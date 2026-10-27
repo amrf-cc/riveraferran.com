@@ -58,6 +58,7 @@ function renderProject(p, isNew) {
   pane.appendChild(photos);
   drawPhotos(photos, p);
   pane.appendChild(videoEditor(p));
+  if (typeof setsEditor === 'function') pane.appendChild(setsEditor(p));
 }
 
 function categoryField(p) {

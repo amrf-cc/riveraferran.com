@@ -95,7 +95,13 @@ def site_data():
         "beta": {"photos": [_photo("beta", 1)], "videos": []},
         "gamma": {"photos": [], "videos": []},
         "ai-production-assistant": {"photos": [], "videos": []},
-        "rodowita-water": {"photos": [_photo("rodowita-water", 1)], "videos": []},
+        "rodowita-water": {"photos": [_photo("rodowita-water", 1)], "videos": [],
+                           "sets": [{"title": "Studio shot → final",
+                                     "steps": [{"label": "Studio shot",
+                                                "image": "assets/img/rodowita-water/01.jpg"},
+                                               {"label": "Final",
+                                                "image": "assets/img/rodowita-water/02.jpg",
+                                                "ai": True}]}]},
     }}
     media = {
         "reels": [{"slug": "alpha-film", "title": "Alpha film", "brand": "Alpha", "project": "alpha",
@@ -112,7 +118,8 @@ def site_data():
 ASSET_FILES = ["assets/img/hero.jpg", "assets/img/hero-cutout.png", "assets/img/alpha/film.jpg",
                "assets/img/alpha/01.jpg", "assets/img/alpha/02.jpg", "assets/img/alpha/thumbs/01.jpg",
                "assets/img/alpha/thumbs/02.jpg", "assets/img/beta/01.jpg", "assets/img/beta/thumbs/01.jpg",
-               "assets/img/rodowita-water/01.jpg", "assets/img/rodowita-water/thumbs/01.jpg",
+               "assets/img/rodowita-water/01.jpg", "assets/img/rodowita-water/02.jpg",
+               "assets/img/rodowita-water/thumbs/01.jpg", "assets/img/rodowita-water/thumbs/02.jpg",
                "assets/img/posters/reels/spare.jpg"]
 
 
