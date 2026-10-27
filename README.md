@@ -14,12 +14,14 @@
 >   Motion), `ai.html`, `paid-social.html`, `about.html`, `contact.html`, legal, 404.
 >   Template-made placeholders (Ran-live cards without `ai_steps`, empty ad lists, missing
 >   résumé) block a release like data placeholders and are listed as `(generated)`.
->   No `gallery*` output. `CNAME` is written only when `domain` is set; with no domain,
+>   No `gallery*` output except the legacy-redirect stubs (below). `CNAME` is written only when `domain` is set; with no domain,
 >   `og:url` is omitted and `og:image` is relative.
 > - `python3 build.py --check` — the same release gate, writes nothing: `RELEASE READY` or
 >   the list. Switches that keep unfinished parts off the site without weakening the gate:
 >   `showreel.hidden`, `hidden_pages: ["paid-social"]` (site-config.json), `ai_live` (media.json),
 >   and `hidden: true` on a project.
+> - `.nojekyll` — `build.py` writes an empty one at the repo root so GitHub Pages serves every file untouched (no Jekyll).
+> - `legacy_redirects` (`site-config.json`: `{"to": "https://host", "paths": ["gallery.html", …]}`) — `build.py` writes one tiny `<!-- legacy-redirect -->` stub per path forwarding to `to/<path>`, fails the build before writing anything on a bad config, and deletes only marked stubs whose path left the list.
 > - **Site Manager** — `env -u PYTHONPATH /usr/bin/python3 tools/cms.py 8820`, then
 >   http://127.0.0.1:8820/. A local copy of the riveraferran.com manager: projects in a sidebar
 >   (drag to order, the eye hides one), photos and videos, site settings, reels, credits, résumé,

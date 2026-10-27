@@ -60,14 +60,37 @@ class TestPages(BuiltSite):
                                     "no Draft ribbon on the %s card" % p["slug"])
 
     def test_gallery_output_removed(self):
-        self.assertFalse((ROOT / "gallery.html").exists())
-        self.assertFalse((ROOT / "gallery").exists())
+        # The old food-site gallery URLs are legacy-redirect stubs now (site-config
+        # `legacy_redirects`): any gallery file left must be one of those, never a real page.
+        stubs = [ROOT / "gallery.html"] + sorted((ROOT / "gallery").glob("*"))
+        for f in stubs:
+            if f.exists():
+                self.assertIn("<!-- legacy-redirect -->", read(f), "%s is not a redirect stub" % f.name)
         for page in built_pages():
             self.assertNotRegex(read(page), r'href="[^"]*gallery', page.name)
 
     def test_no_cname_without_domain(self):
         if not (load("site-config.json").get("domain") or "").strip():
             self.assertFalse((ROOT / "CNAME").exists(), "CNAME written with an empty domain")
+
+    def test_nojekyll_is_an_empty_file_at_the_root(self):
+        # Without it GitHub Pages runs Jekyll over the site (and the résumé PDF has accents in its name).
+        f = ROOT / ".nojekyll"
+        self.assertTrue(f.is_file(), ".nojekyll missing: run python3 build.py")
+        self.assertEqual(f.stat().st_size, 0)
+
+    def test_legacy_redirect_stubs_match_the_config(self):
+        block = load("site-config.json").get("legacy_redirects") or {}
+        for path in block.get("paths") or []:
+            f = ROOT / path
+            self.assertTrue(f.is_file(), "missing legacy redirect %s: run python3 build.py" % path)
+            target = block["to"] + "/" + path
+            text = read(f)
+            self.assertIn("<!-- legacy-redirect -->", text, path)
+            self.assertIn('<link rel="canonical" href="%s">' % target, text, path)
+            self.assertIn('<meta http-equiv="refresh" content="0; url=%s">' % target, text, path)
+            self.assertIn('name="robots" content="noai, noimageai"', text, path)
+            self.assertIn('http-equiv="Content-Security-Policy"', text, path)
 
     def test_social_tags(self):
         domain = (load("site-config.json").get("domain") or "").strip()

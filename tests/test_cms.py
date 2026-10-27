@@ -600,6 +600,41 @@ class TestConfig(CmsCase):
         self.assertEqual(self.cfg()["bio"], ["One.", "Two.", "Three."])
         self.assertIn("A new headline.", self.text("index.html"))
 
+    def test_a_save_keeps_keys_the_form_does_not_know_about(self):
+        """site-config.json keys the manager has no field for (legacy_redirects, anything a later
+        build adds) must come through a Site settings save untouched, stubs included."""
+        redirects = {"to": "https://rfcreativeservices.com",
+                     "paths": ["gallery.html", "gallery/chip-city.html"]}
+        cfg = self.cfg()
+        cfg["legacy_redirects"] = redirects
+        cfg["some_future_key"] = {"keep": ["me", 1]}
+        (self.tmp / "site-config.json").write_text(self.cms.dump(cfg), encoding="utf-8")
+        self.cms.run_build()
+        self.assertIn("<!-- legacy-redirect -->", self.text("gallery/chip-city.html"))
+        # The body the Site settings pane posts: every field it shows, edited.
+        body = {k: cfg[k] for k in ("name", "title", "subline", "based", "email", "instagram", "linkedin",
+                                    "ai_label", "hero_caption", "cta", "education", "languages",
+                                    "hero_image", "hero_image_phone", "hero_cutout", "domain",
+                                    "bio", "tools", "certifications", "masthead_labels", "page_intros",
+                                    "collaborations")}
+        body["headline"] = "Edited in the pane."
+        st, d = self.save(**body)
+        self.assertEqual(st, 200, d)
+        after = self.cfg()
+        self.assertEqual(after["headline"], "Edited in the pane.")
+        self.assertEqual(after["legacy_redirects"], redirects)
+        self.assertEqual(after["some_future_key"], {"keep": ["me", 1]})
+        self.assertEqual(list(after).index("legacy_redirects"), list(cfg).index("legacy_redirects"))
+        for path in redirects["paths"]:
+            self.assertIn("https://rfcreativeservices.com/" + path, self.text(path))
+        # The other panes' saves (visibility, lists) keep them as well.
+        self.save(hidden_pages=[])
+        self.assertEqual(self.cfg()["legacy_redirects"], redirects)
+        rows = [{"from": 0, "role": "Lead", "org": "Co", "years": "2024", "place": "NYC"}]
+        self.assertEqual(self.post("/api/lists/experience", {"rows": rows}, method="PUT")[0], 200)
+        self.assertEqual(self.cfg()["experience"][0]["role"], "Lead")
+        self.assertEqual(self.cfg()["legacy_redirects"], redirects)
+
     def test_domain_is_normalised_and_validated(self):
         self.save(domain="https://Riveraferran.com/work")
         self.assertEqual(self.cfg()["domain"], "riveraferran.com")

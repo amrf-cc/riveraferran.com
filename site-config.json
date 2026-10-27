@@ -199,5 +199,20 @@
   ],
   "hidden_pages": [
     "paid-social"
-  ]
+  ],
+  "legacy_redirects": {
+    "to": "https://rfcreativeservices.com",
+    "paths": [
+      "gallery.html",
+      "gallery/acai-express.html",
+      "gallery/blue-moon.html",
+      "gallery/brasa-astoria.html",
+      "gallery/chef-mia-castro.html",
+      "gallery/chip-city.html",
+      "gallery/gyro-king.html",
+      "gallery/joe-and-joe.html",
+      "gallery/massis.html",
+      "gallery/sobao-cidrines.html"
+    ]
+  }
 }

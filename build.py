@@ -14,9 +14,12 @@ A PLACEHOLDER is any string value that starts with "[" and ends with "]".
 import hashlib
 import html
 import json
+import os
+import re
 import sys
 from pathlib import Path
 from string import Template
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent
 
@@ -102,6 +105,12 @@ def tmpl(name):
 
 def esc(s):
     return html.escape(str(s), quote=True)
+
+
+def hardening_meta():
+    """CSP + referrer + robots/noai metas: ONE template, shared by every page head,
+    the 404 page and the legacy-redirect stubs, so they can never drift apart."""
+    return (ROOT / "templates" / "hardening.meta.tmpl").read_text(encoding="utf-8")
 
 
 def slugify(s):
@@ -661,8 +670,8 @@ class Site(object):
             og_image = rp + "assets/img/og-cover.jpg"
             og_url = ""
         return tmpl("head.html.tmpl").safe_substitute(
-            ROOT_PREFIX=rp, PAGE_TITLE=esc(title), META_DESCRIPTION=esc(description),
-            OG_TYPE=og_type, OG_URL_META=og_url, OG_IMAGE=esc(og_image))
+            ROOT_PREFIX=rp, HARDENING=hardening_meta(), PAGE_TITLE=esc(title),
+            META_DESCRIPTION=esc(description), OG_TYPE=og_type, OG_URL_META=og_url, OG_IMAGE=esc(og_image))
 
     def page(self, out_path, main, title, description, page_key, body_class="",
              og_type="website", after_main=""):
@@ -1221,7 +1230,7 @@ class Site(object):
 
     def build_404(self):
         self.pages["404.html"] = tmpl("404.html.tmpl").safe_substitute(
-            NAME=esc(self.config.get("name", "")))
+            HARDENING=hardening_meta(), NAME=esc(self.config.get("name", "")))
 
     def build_all(self):
         self.build_home()
@@ -1237,6 +1246,158 @@ class Site(object):
         self.build_legal()
         self.build_404()
         return self.pages
+
+
+# ---------------------------------------------------------------------------
+# Legacy redirects (old riveraferran.com food-site URLs -> rfcreativeservices.com)
+# ---------------------------------------------------------------------------
+
+LEGACY_MARKER = "legacy-redirect"
+LEGACY_COMMENT = "<!-- %s -->" % LEGACY_MARKER
+LEGACY_PATH = re.compile(r"[A-Za-z0-9_-][A-Za-z0-9._-]*(?:/[A-Za-z0-9_-][A-Za-z0-9._-]*)*\.html")
+# Directories the generator owns or that are not site output: a stub never goes
+# into them and the cleanup never looks inside them.
+LEGACY_OFF_LIMITS = ("work", "assets", "templates", "tests", "tools", "scripts", "staging")
+LEGACY_SKIP_DIRS = frozenset(LEGACY_OFF_LIMITS) | {"node_modules", "__pycache__"}
+
+
+class RedirectConfigError(ValueError):
+    """A bad `legacy_redirects` config. The message is one line, shown as is."""
+
+
+def legacy_settings(config):
+    """(to, [paths]) from site-config `legacy_redirects`, validated. ("", []) when
+    the key is absent or lists no paths. Raises RedirectConfigError."""
+    block = config.get("legacy_redirects")
+    if block is None:
+        return "", []
+    if not isinstance(block, dict):
+        raise RedirectConfigError("legacy_redirects must be an object with \"to\" and \"paths\".")
+    paths = block.get("paths")
+    if paths is None or paths == []:
+        return "", []
+    if not isinstance(paths, list):
+        raise RedirectConfigError("legacy_redirects.paths must be a list.")
+    to = block.get("to")
+    if not isinstance(to, str) or not to:
+        raise RedirectConfigError("legacy_redirects.to is missing: give the https URL to forward to.")
+    try:
+        parts = urlsplit(to)
+        host = parts.hostname or ""
+        parts.port  # noqa: B018 - raises ValueError on a bad port
+    except ValueError:
+        raise RedirectConfigError("legacy_redirects.to %r is not a valid URL." % to)
+    if (parts.scheme != "https" or not host or parts.username is not None or parts.query
+            or parts.fragment or parts.path or re.search(r"\s", to) or to.endswith(("/", "?", "#"))):
+        raise RedirectConfigError("legacy_redirects.to %r must be an https URL with no path "
+                                  "(like https://example.com)." % to)
+    own = (config.get("domain") or "").strip().lower().rstrip("/")
+    if own and host.lower() in (own, "www." + own):
+        raise RedirectConfigError("legacy_redirects.to %r is this site's own domain: "
+                                  "every redirect would loop." % to)
+    seen = set()
+    for i, path in enumerate(paths):
+        where = "legacy_redirects.paths[%d] %r" % (i, path)
+        if not isinstance(path, str) or not path:
+            raise RedirectConfigError("%s must be a non-empty text path." % where)
+        if path.startswith("/"):
+            raise RedirectConfigError("%s must be relative (no leading slash)." % where)
+        if "\\" in path:
+            raise RedirectConfigError("%s must not contain a backslash." % where)
+        if ".." in path:
+            raise RedirectConfigError("%s must not contain \"..\"." % where)
+        if not path.endswith(".html"):
+            raise RedirectConfigError("%s must end in .html." % where)
+        if not LEGACY_PATH.fullmatch(path):
+            raise RedirectConfigError("%s may only use letters, digits, - _ . and / "
+                                      "(no empty or dot-leading parts)." % where)
+        if path.split("/")[0] in LEGACY_OFF_LIMITS and "/" in path:
+            raise RedirectConfigError("%s points into %s/, which the build owns." % (where, path.split("/")[0]))
+        key = path.lower()          # macOS volumes are case-insensitive
+        if key in seen:
+            raise RedirectConfigError("%s is listed twice." % where)
+        seen.add(key)
+    return to, list(paths)
+
+
+def legacy_stubs(config, pages):
+    """{relative path: stub HTML} for every configured legacy redirect, or {}.
+
+    Validates everything BEFORE anything is written: a bad config, a path that
+    equals a page this build generates (or the hidden page it would delete), a
+    path nested under a page, or an existing file that is not one of our stubs
+    raises RedirectConfigError and the caller writes nothing."""
+    to, paths = legacy_settings(config)
+    if not paths:
+        return {}
+    reserved = {p.lower() for p in pages}
+    reserved |= {(stem + ".html").lower() for stem in HIDEABLE_PAGES}
+    stubs = {}
+    for path in paths:
+        where = "legacy_redirects path %r" % path
+        if path.lower() in reserved:
+            raise RedirectConfigError("%s is a real page of this site: a stub must never replace it." % where)
+        segs = path.split("/")
+        for i in range(1, len(segs)):
+            if "/".join(segs[:i]).lower() in reserved:
+                raise RedirectConfigError("%s sits inside a real page's name." % where)
+        existing = ROOT / path
+        if existing.is_file() and LEGACY_COMMENT.encode() not in existing.read_bytes():
+            raise RedirectConfigError("%s already exists and is not a legacy-redirect stub: "
+                                      "remove it by hand first." % where)
+        if existing.is_dir():
+            raise RedirectConfigError("%s is a directory." % where)
+        target = esc(to + "/" + path)
+        stubs[path] = tmpl("redirect.html.tmpl").safe_substitute(
+            HARDENING=hardening_meta(), TARGET=target, MARKER=LEGACY_MARKER)
+    return stubs
+
+
+def _is_legacy_stub(path):
+    try:
+        return LEGACY_COMMENT.encode() in path.read_bytes()
+    except OSError:
+        return False
+
+
+def clean_legacy_stubs(keep, pages):
+    """Delete stubs an earlier build wrote whose path is no longer configured.
+
+    ONLY files that contain the marker comment are ever deleted (and never a page
+    this build generates). A directory the cleanup leaves empty is removed too."""
+    keep = {k.lower() for k in keep}
+    protected = {p.lower() for p in pages}
+    for dirpath, dirnames, filenames in os.walk(str(ROOT)):
+        here = Path(dirpath)
+        dirnames[:] = [d for d in dirnames
+                       if not d.startswith(".") and not (here == ROOT and d in LEGACY_SKIP_DIRS)]
+        for name in filenames:
+            if not name.endswith(".html"):
+                continue
+            f = here / name
+            rel = f.relative_to(ROOT).as_posix()
+            if rel.lower() in keep or rel.lower() in protected or f.is_symlink() or not f.is_file():
+                continue
+            if _is_legacy_stub(f):
+                f.unlink()
+                parent = f.parent
+                while parent != ROOT:
+                    try:
+                        parent.rmdir()      # only succeeds when empty
+                    except OSError:
+                        break
+                    parent = parent.parent
+
+
+def write_legacy_stubs(stubs, pages):
+    """Write the stubs (skipping byte-identical ones), then run the cleanup."""
+    for rel, text in stubs.items():
+        path = ROOT / rel
+        if path.is_file() and path.read_text(encoding="utf-8") == text:
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+    clean_legacy_stubs(stubs, pages)
 
 
 # ---------------------------------------------------------------------------
@@ -1263,6 +1424,9 @@ def write_pages(pages, config):
     domain = (config.get("domain") or "").strip()
     if domain:
         (ROOT / "CNAME").write_text(domain + "\n", encoding="utf-8")
+    # Empty .nojekyll: GitHub Pages then serves every file untouched instead of
+    # running Jekyll over the site (the résumé PDF's name has accents).
+    (ROOT / ".nojekyll").write_text("", encoding="utf-8")
 
 
 def main(argv=None):
@@ -1272,6 +1436,11 @@ def main(argv=None):
     data = load_data()
     site = Site(data, release=release)
     pages = site.build_all()          # rendered in memory; nothing written yet
+    try:
+        stubs = legacy_stubs(site.config, pages)    # validated before any write
+    except RedirectConfigError as e:
+        print("BUILD FAILED: %s Nothing was written." % e, file=sys.stderr)
+        return 1
 
     if release:
         offenders = scan_release(data)
@@ -1286,10 +1455,14 @@ def main(argv=None):
             print("RELEASE READY: nothing left to resolve.")
             return 0
         write_pages(pages, site.config)
+        write_legacy_stubs(stubs, pages)
+        print("Legacy redirects: %d written." % len(stubs))
         print("Built %d pages (%d case studies). BUILD_OK (release)" % (len(pages), len(site.work)))
         return 0
 
     write_pages(pages, site.config)
+    write_legacy_stubs(stubs, pages)
+    print("Legacy redirects: %d written." % len(stubs))
     blocking = len(scan_release(data)) + len(site.generated)
     print("Draft build: %d item(s) still block a release (python3 build.py --release lists them)."
           % blocking)
