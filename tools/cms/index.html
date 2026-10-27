@@ -13,9 +13,11 @@
   <div class="brand">Site Manager<span class="dot"></span><span class="site-name">brand portfolio</span></div>
   <div class="status" id="status">Loading…</div>
   <div class="actions">
+    <span class="pubpill" id="pub-pill" role="status">Checking GitHub…</span>
     <button id="btn-preview" class="btn ghost">Preview ↗</button>
     <button id="btn-build" class="btn ghost">Rebuild</button>
     <button id="btn-release" class="btn primary">Release check</button>
+    <button id="btn-publish" class="btn publish" disabled title="Checking GitHub…">Publish</button>
   </div>
 </header>
 
@@ -49,10 +51,21 @@
   </div>
 </div>
 
+<div class="sheet" id="pub-dialog" hidden role="dialog" aria-modal="true" aria-labelledby="pub-title">
+  <div class="sheet-inner pub-inner">
+    <div class="sheet-head">
+      <strong id="pub-title">Publish</strong>
+      <button class="btn ghost small" id="pub-close">Close</button>
+    </div>
+    <div class="pub-body" id="pub-body"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 
 <script src="app.js"></script>
 <script src="project.js"></script>
+<script src="publish.js"></script>
 <script src="site.js"></script>
 </body>
 </html>

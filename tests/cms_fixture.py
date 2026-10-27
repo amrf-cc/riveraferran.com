@@ -150,3 +150,77 @@ def load_cms(repo):
             os.environ.pop("CMS_REPO", None)
         else:
             os.environ["CMS_REPO"] = old
+
+
+# --------------------------------------------------------------------------- git: a site with a bare origin
+# Publish tests use REAL git and a local bare repository as `origin`; they never touch the network or
+# github.com. The site is built, committed and pushed once per process; each test gets a copy.
+import subprocess
+import tempfile
+
+FIXTURE_TESTS = '''import unittest
+
+
+class TestFixture(unittest.TestCase):
+    def test_passes(self):
+        self.assertTrue(True)
+'''
+
+
+def git_env():
+    env = {k: v for k, v in os.environ.items()
+           if k != "PYTHONPATH" and k not in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")}
+    env["GIT_TERMINAL_PROMPT"] = "0"
+    return env
+
+
+def git_try(cwd, *args):
+    """Run git in `cwd` -> (returncode, stdout stripped, stderr stripped)."""
+    r = subprocess.run(["git"] + list(args), cwd=str(cwd), capture_output=True, text=True, env=git_env())
+    return r.returncode, r.stdout.strip(), r.stderr.strip()
+
+
+def git(cwd, *args):
+    """Run git in `cwd`; return stdout stripped. A failure raises."""
+    rc, out, err = git_try(cwd, *args)
+    if rc != 0:
+        raise AssertionError("git %s failed in %s: %s" % (" ".join(args), cwd, err or out))
+    return out
+
+
+class GitSite:
+    """A built, release-ready fixture site committed on main and pushed to a local bare `origin`."""
+
+    def __init__(self):
+        from support import run_build
+        self.root = Path(tempfile.mkdtemp(prefix="publish-template-"))
+        self.site, self.bare = self.root / "site", self.root / "origin.git"
+        self.site.mkdir()
+        make_site(self.site)
+        (self.site / "tests").mkdir()
+        (self.site / "tests" / "test_fixture.py").write_text(FIXTURE_TESTS, encoding="utf-8")
+        (self.site / ".gitignore").write_text((ROOT / ".gitignore").read_text(encoding="utf-8"), encoding="utf-8")
+        built = run_build(self.site, "--release")
+        assert built.returncode == 0, built.stdout + built.stderr
+        git(self.root, "init", "--bare", "-q", "-b", "main", str(self.bare))
+        git(self.site, "init", "-q", "-b", "main")
+        git(self.site, "config", "user.name", "Publish Test")
+        git(self.site, "config", "user.email", "publish-test@example.invalid")
+        git(self.site, "config", "commit.gpgsign", "false")
+        git(self.site, "add", "-A")
+        git(self.site, "commit", "-q", "-m", "Fixture site")
+        git(self.site, "remote", "add", "origin", str(self.bare))
+        git(self.site, "push", "-q", "-u", "origin", "main")
+
+    def copy_to(self, site, bare):
+        """Reset `site` and `bare` (made if missing) to the pristine fixture, origin pointing at `bare`."""
+        for dst in (Path(site), Path(bare)):
+            dst.mkdir(parents=True, exist_ok=True)
+            for child in dst.iterdir():
+                shutil.rmtree(child) if child.is_dir() and not child.is_symlink() else child.unlink()
+        shutil.copytree(str(self.site), str(site), symlinks=True, dirs_exist_ok=True)
+        shutil.copytree(str(self.bare), str(bare), symlinks=True, dirs_exist_ok=True)
+        git(site, "remote", "set-url", "origin", str(bare))
+
+    def close(self):
+        shutil.rmtree(str(self.root), ignore_errors=True)

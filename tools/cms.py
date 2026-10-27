@@ -28,7 +28,16 @@ API (JSON unless noted). Mutating calls carry the `version` the page was loaded 
     POST /api/config                         site settings, showreel, hidden pages, AI page cards
     PUT  /api/lists/<name>                   reels, motion, credits, experience, side_projects
     PUT  /api/resume?name=                   raw PDF bytes; ligatures are repaired on the way in
+    GET  /api/publish                        can this copy go live? remote, branch, ahead/behind, dirty, ...
+    POST /api/publish                        {message?, version}: start ONE background publish job -> {job}
+    GET  /api/publish/job                    {state: idle|running|done|failed, step, log, error, commit, url}
     GET  /preview/...                        the built site (pages and assets only)
+
+Publish commits everything and pushes `HEAD:main` to the origin remote, which puts the site live (GitHub
+Pages). It never stashes, merges, resets, rebases or forces, and it refuses when GitHub has newer commits,
+when the site is not release-ready, when the unit tests fail, or when a secret-looking file or a blob of
+50 MB or more is staged. Credentials only come from the Mac's git credential helper and are scrubbed from
+every log and every response.
 """
 import hashlib
 import importlib.util
@@ -39,6 +48,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 import unicodedata
@@ -968,6 +978,484 @@ def replace_resume(name, body, version):
     return {"ok": True, "path": str(dest.relative_to(REPO)), "size": dest.stat().st_size, "note": note}
 
 
+# --------------------------------------------------------------------------- publish
+# Publishing = commit everything and push `HEAD:main` to the GitHub remote, which puts the site live.
+# Safe by construction: it never stashes, merges, resets, rebases or forces; it refuses when GitHub
+# has commits this copy has not seen; it builds a RELEASE, runs the unit tests, and refuses a secret-
+# looking file or a huge blob before anything is committed. Credentials only ever come from the
+# Mac's git credential helper; they are never read here, and anything that looks like one is scrubbed
+# from every string this module stores or returns.
+PUBLISH_BRANCH = "main"
+PUBLISH_DEFAULT_MESSAGE = "Site update (edited in the site manager)"
+PUBLISH_MAX_BLOB = 50 * 1024 * 1024           # a staged blob this size or larger is refused
+PUBLISH_FETCH_TIMEOUT = 15                    # the quick fetch behind the status
+PUBLISH_PUSH_TIMEOUT = 900
+PUBLISH_LOG_CAP = 20000
+# Test modules the gate leaves out: test_cms_ui drives headless Chrome; test_legacy_redirects takes ~40 s
+# and checks the old food-site URLs, not anything the manager edits; test_publish tests this very code on
+# temp repos (it would run the gate inside the gate). Everything else must pass.
+PUBLISH_GATE_SKIP = ("test_cms_ui", "test_legacy_redirects", "test_publish")
+PUBLISH_STEPS = ("Checking", "Fetching from GitHub", "Building the site", "Running the tests",
+                 "Preparing the commit", "Committing", "Pushing to GitHub", "Checking it landed")
+SECRET_PATH = re.compile(r"^(?:\.env.*|.*settings\.local.*|.*token.*|.*secret.*|.*credential.*|"
+                         r".*\.pem|.*\.key|id_rsa.*|id_dsa.*|id_ecdsa.*|id_ed25519.*)$", re.I)
+
+JOB_LOCK = threading.Lock()
+IDLE_JOB = {"id": "", "state": "idle", "step": "", "log": "", "error": "", "commit": "", "url": "",
+            "message": ""}
+JOB = dict(IDLE_JOB)
+_KNOWN_SECRETS = set()            # credential strings seen in the remote URL, scrubbed wherever they show up
+
+
+class Refused(Exception):
+    """A publish stopped on purpose, with a plain-language reason. Nothing was pushed."""
+
+
+# -- scrubbing
+_URL_USERINFO = re.compile(r"(?i)\b([a-z][a-z0-9+.-]*://)[^/\s@'\"<>]+@")
+_TOKEN_SHAPES = re.compile(
+    r"\b(?:gh[pousr]_[A-Za-z0-9]{16,}|github_pat_[A-Za-z0-9_]{16,}|glpat-[A-Za-z0-9_-]{16,}|"
+    r"xox[abprs]-[A-Za-z0-9-]{10,}|AKIA[0-9A-Z]{16}|sk-[A-Za-z0-9_-]{20,}|"
+    r"eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{5,})")
+_KEYED_VALUE = re.compile(r"(?i)\b(authorization|x-access-token|access[_-]?token|api[_-]?key|password|passwd|"
+                          r"secret|token)(\"?'?\s*[:=]\s*\"?'?)(?:bearer\s+|basic\s+)?[^\s\"',;&]+")
+_AUTH_SCHEME = re.compile(r"(?i)\b(bearer|basic)\s+[A-Za-z0-9._~+/=-]{8,}")
+
+
+def scrub(text):
+    """Remove anything that looks like a credential: user:pass@ in URLs, token shapes, key=value secrets."""
+    text = "" if text is None else str(text)
+    for s in sorted(_KNOWN_SECRETS, key=len, reverse=True):
+        text = text.replace(s, "***")
+    text = _URL_USERINFO.sub(r"\1***@", text)
+    text = _TOKEN_SHAPES.sub("***", text)
+    text = _KEYED_VALUE.sub(r"\1\2***", text)
+    return _AUTH_SCHEME.sub(r"\1 ***", text)
+
+
+def strip_credentials(url):
+    """A remote URL fit to show: no password, and no user name on http(s)."""
+    m = re.match(r"^([a-z][a-z0-9+.-]*://)([^/?#]*@)?(.*)$", url or "", re.I | re.S)
+    if not m or not m.group(2):
+        return url or ""
+    if m.group(1).lower().startswith("http"):
+        return m.group(1) + m.group(3)
+    return m.group(1) + m.group(2)[:-1].split(":")[0] + "@" + m.group(3)
+
+
+def _remember_secrets(url):
+    m = re.match(r"^[a-z][a-z0-9+.-]*://([^/?#]*)@", url or "", re.I)
+    if m:
+        user, _, password = m.group(1).partition(":")
+        secret = password or (user if len(user) >= 20 else "")      # a user name alone is not a secret
+        if len(secret) >= 4:
+            _KNOWN_SECRETS.add(secret)
+
+
+GITHUB_REMOTE = re.compile(r"^(?:https?://(?:[^/@]+@)?github\.com/|ssh://(?:[^/@]+@)?github\.com(?::\d+)?/|"
+                           r"(?:[^/@]+@)?github\.com:)([^/\s]+)/([^/\s]+?)(?:\.git)?/?$", re.I)
+
+
+def github_commit_url(remote_url, sha):
+    """https://github.com/<owner>/<repo>/commit/<sha> for a GitHub remote; '' for any other kind."""
+    m = GITHUB_REMOTE.match(strip_credentials(remote_url or "").strip())
+    return "https://github.com/%s/%s/commit/%s" % (m.group(1), m.group(2), sha) if m and sha else ""
+
+
+# -- git
+def _git_env(extra=None):
+    env = {k: v for k, v in os.environ.items()
+           if k != "PYTHONPATH" and k not in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR",
+                                              "GIT_OBJECT_DIRECTORY", "GIT_NAMESPACE", "GIT_PREFIX")}
+    env["GIT_TERMINAL_PROMPT"] = "0"              # never wait for a password nobody can type
+    env["GIT_OPTIONAL_LOCKS"] = "0"               # a status poll must never fight a commit for the index lock
+    env["GCM_INTERACTIVE"] = "never"
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    env.setdefault("GIT_SSH_COMMAND", "ssh -o BatchMode=yes")
+    env.update(extra or {})
+    return env
+
+
+def _git(*args, timeout=60, env=None, stdin=None):
+    """Run git in the repo -> (returncode, stdout, stderr). stderr is scrubbed here; stdout is parsed as it comes,
+    so whatever shows it to anyone scrubs it first. Never raises; a timeout is rc 124."""
+    try:
+        r = subprocess.run(["git"] + list(args), cwd=str(REPO), capture_output=True, text=True,
+                           timeout=timeout, env=_git_env(env), input=stdin)
+    except subprocess.TimeoutExpired:
+        return 124, "", "git %s timed out after %d s" % (args[0], timeout)
+    except OSError as e:
+        return 127, "", "git could not run: %s" % e
+    return r.returncode, r.stdout, scrub(r.stderr)
+
+
+def _is_own_repo():
+    """True only when REPO itself is a git work tree (not a folder that happens to sit inside another one)."""
+    rc, out, _ = _git("rev-parse", "--show-toplevel")
+    return rc == 0 and Path(out.strip()).resolve() == REPO
+
+
+def _origin_url():
+    rc, out, _ = _git("remote", "get-url", "origin")
+    url = out.strip() if rc == 0 else ""
+    _remember_secrets(url)
+    return url
+
+
+def _branch():
+    rc, out, _ = _git("symbolic-ref", "--short", "-q", "HEAD")
+    return out.strip() if rc == 0 else ""
+
+
+def _fetch(timeout):
+    """git fetch origin main -> (reachable, error text). A GitHub with no main yet still counts as reachable."""
+    rc, _, err = _git("fetch", "--quiet", "origin", PUBLISH_BRANCH, timeout=timeout)
+    if rc == 0 or "couldn't find remote ref" in err:
+        return True, ""
+    return False, err.strip()
+
+
+def _ahead_behind():
+    """(ahead, behind) of HEAD against origin/main as last fetched."""
+    rc, _, _ = _git("rev-parse", "-q", "--verify", "refs/remotes/origin/" + PUBLISH_BRANCH)
+    if rc != 0:                                    # GitHub has no main we know of: all of HEAD is ahead
+        rc, out, _ = _git("rev-list", "--count", "HEAD")
+        return (int(out.strip()) if rc == 0 and out.strip().isdigit() else 0), 0
+    rc, out, _ = _git("rev-list", "--left-right", "--count", "HEAD...refs/remotes/origin/" + PUBLISH_BRANCH)
+    parts = out.split()
+    if rc != 0 or len(parts) != 2:
+        return 0, 0
+    return int(parts[0]), int(parts[1])
+
+
+def _change_count():
+    """Uncommitted tracked changes plus new non-ignored files, as a number."""
+    rc, out, _ = _git("status", "--porcelain=v1", "-z", "--untracked-files=normal")
+    return len([p for p in out.split("\0") if p]) if rc == 0 else 0
+
+
+def _git_operation_in_progress():
+    rc, out, _ = _git("rev-parse", "--git-dir")
+    gd = Path(out.strip()) if rc == 0 else None
+    if gd is None:
+        return ""
+    gd = gd if gd.is_absolute() else REPO / gd
+    for name, what in (("MERGE_HEAD", "a merge"), ("rebase-merge", "a rebase"), ("rebase-apply", "a rebase"),
+                       ("CHERRY_PICK_HEAD", "a cherry-pick"), ("REVERT_HEAD", "a revert")):
+        if (gd / name).exists():
+            return what
+    return ""
+
+
+def _repo_blocker():
+    """Why this copy cannot publish at all, from git alone ('' when it can)."""
+    if not _is_own_repo() or not _origin_url():
+        return "No GitHub remote is set up for this site, so there is nowhere to publish to."
+    branch = _branch()
+    if branch != PUBLISH_BRANCH:
+        return "This copy is on %s, not %s. Ask Hermes to switch it back before publishing." % (
+            ("branch '%s'" % branch) if branch else "no branch (detached)", PUBLISH_BRANCH)
+    busy = _git_operation_in_progress()
+    if busy:
+        return "Git is in the middle of %s. Ask Hermes to finish it first." % busy
+    return ""
+
+
+def _jset(**kw):
+    with JOB_LOCK:
+        JOB.update(kw)
+
+
+def _jlog(text):
+    text = scrub(text).rstrip()
+    if not text:
+        return
+    with JOB_LOCK:
+        log = (JOB["log"] + text + "\n")
+        JOB["log"] = log if len(log) <= PUBLISH_LOG_CAP else "... (earlier log cut)\n" + log[-PUBLISH_LOG_CAP:]
+
+
+def _job_running():
+    with JOB_LOCK:
+        return JOB["state"] == "running"
+
+
+def job_snapshot():
+    with JOB_LOCK:
+        return dict(JOB, ok=True, steps=list(PUBLISH_STEPS))
+
+
+def publish_status(fetch=True):
+    """Everything the Publish button and its pill need. Runs a quick fetch so ahead/behind are fresh."""
+    running = _job_running()
+    st = {"ok": True, "remote": False, "remote_url": "", "branch": "", "ahead": 0, "behind": 0, "dirty": False,
+          "changed_files": 0, "release_ready": False, "last_commit": "", "live_url": "", "reachable": True,
+          "running": running, "can_publish": False, "reason": ""}
+    try:
+        domain = str(read(FILES["config"]).get("domain") or "").strip()
+    except (OSError, ValueError):
+        domain = ""
+    if domain and not domain.startswith("["):
+        st["live_url"] = "https://%s/" % domain
+    if not _is_own_repo():
+        st["reason"] = "This site is not in a git repository, so it cannot be published."
+        return st
+    raw = _origin_url()
+    st["remote"] = bool(raw)
+    st["remote_url"] = strip_credentials(raw)
+    st["branch"] = _branch()
+    if raw and fetch and not running:
+        st["reachable"], _ = _fetch(PUBLISH_FETCH_TIMEOUT)
+    if raw:
+        st["ahead"], st["behind"] = _ahead_behind()
+    st["changed_files"] = _change_count()
+    st["dirty"] = st["changed_files"] > 0
+    rc, out, _ = _git("log", "-1", "--format=%h %s")
+    st["last_commit"] = scrub(out.strip()) if rc == 0 else ""
+    if running:                                    # the job holds the data lock; use what the last build learned
+        st["release_ready"] = bool(BUILD.get("ready"))
+    else:
+        with LOCK:
+            st["release_ready"] = bool(release_status().get("ready"))
+    if not raw:
+        st["reason"] = _repo_blocker()
+    elif running:
+        st["reason"] = "A publish is already running."
+    elif not st["reachable"]:
+        st["reason"] = "Cannot reach GitHub"
+    elif st["behind"] > 0:
+        st["reason"] = "GitHub has newer commits; ask Hermes to merge them first"
+    else:
+        st["reason"] = _repo_blocker()
+    st["can_publish"] = not st["reason"]
+    return st
+
+
+# -- the job
+def clean_message(message):
+    if message is None or message == "":
+        return PUBLISH_DEFAULT_MESSAGE
+    if not isinstance(message, str):
+        bad("The commit message must be text.")
+    text = re.sub(r"[\x00-\x08\x0b-\x1f\x7f]", " ", message).strip()
+    if len(text) > 500:
+        bad("Keep the commit message under 500 characters.")
+    return text or PUBLISH_DEFAULT_MESSAGE
+
+
+def _step(i):
+    _jset(step=PUBLISH_STEPS[i])
+    _jlog("== %s" % PUBLISH_STEPS[i])
+
+
+def _run_tests():
+    """The unit tests, minus PUBLISH_GATE_SKIP, in a clean child process (no PYTHONPATH). -> (ok, names, log)."""
+    if not (REPO / "tests").is_dir():
+        return False, [], "There is no tests/ folder, so the tests cannot run."
+    script = (
+        "import sys, unittest\n"
+        "skip = set(sys.argv[1].split(','))\n"
+        "def flat(s):\n"
+        "    for t in s:\n"
+        "        if isinstance(t, unittest.TestSuite):\n"
+        "            yield from flat(t)\n"
+        "        else:\n"
+        "            yield t\n"
+        "suite = unittest.TestSuite(t for t in flat(unittest.defaultTestLoader.discover('tests'))\n"
+        "                           if type(t).__module__.split('.')[0] not in skip)\n"
+        "res = unittest.TextTestRunner(stream=sys.stdout, verbosity=1).run(suite)\n"
+        "if res.testsRun == 0:\n"
+        "    print('NO TESTS RAN')\n"
+        "    sys.exit(2)\n"
+        "sys.exit(0 if res.wasSuccessful() else 1)\n")
+    try:
+        r = subprocess.run([sys.executable, "-c", script, ",".join(PUBLISH_GATE_SKIP)], cwd=str(REPO),
+                           capture_output=True, text=True, timeout=900, env=_git_env())
+    except subprocess.TimeoutExpired:
+        return False, [], "The tests took longer than 15 minutes and were stopped."
+    log = scrub(r.stdout + r.stderr)
+    names = re.findall(r"^(?:FAIL|ERROR): (\S+) \(([\w.]+)\)", log, re.M)
+    return r.returncode == 0, ["%s (%s)" % n for n in names], log
+
+
+def _staged_guard(env=None):
+    """Refuse a secret-looking path or a blob of PUBLISH_MAX_BLOB bytes or more in the staged set. `env` points
+    git at a throwaway index, so the check can run before the real index is touched."""
+    rc, out, err = _git("diff", "--cached", "--no-renames", "--raw", "-z", "--no-abbrev", env=env)
+    if rc != 0:
+        raise Refused("Could not list what is staged: %s" % err.strip()[-300:])
+    tokens = out.split("\0")
+    paths, blobs = [], {}
+    i = 0
+    while i + 1 < len(tokens):
+        meta = tokens[i]
+        if not meta.startswith(":"):
+            i += 1
+            continue
+        fields = meta[1:].split()
+        path = tokens[i + 1]
+        i += 2
+        paths.append(path)
+        if len(fields) >= 5 and fields[1] != "160000" and set(fields[3]) != {"0"}:
+            blobs[path] = fields[3]
+    secret = [p for p in paths if any(SECRET_PATH.match(part) for part in p.split("/"))]
+    if secret:
+        raise Refused("Nothing was committed. These files look like secrets or keys and must not go on GitHub: %s. "
+                      "Ask Hermes to remove or ignore them." % ", ".join(secret[:8]))
+    if blobs:
+        rc, sizes, _ = _git("cat-file", "--batch-check=%(objectname) %(objectsize)", env=env,
+                            stdin="\n".join(blobs.values()) + "\n")
+        size_of = {}
+        for line in sizes.splitlines():
+            parts = line.split()
+            if len(parts) == 2 and parts[1].isdigit():
+                size_of[parts[0]] = int(parts[1])
+        big = ["%s (%d MB)" % (p, size_of[b] // (1024 * 1024)) for p, b in blobs.items()
+               if size_of.get(b, 0) >= PUBLISH_MAX_BLOB]
+        if big:
+            raise Refused("Nothing was committed. These files are %d MB or larger, too big for GitHub: %s."
+                          % (PUBLISH_MAX_BLOB // (1024 * 1024), ", ".join(big[:8])))
+    return paths
+
+
+def _guard_before_staging():
+    """Run the staged-set guards on a COPY of the index, so a refusal leaves the real index untouched."""
+    rc, out, _ = _git("rev-parse", "--git-path", "index")
+    index = Path(out.strip()) if rc == 0 else None
+    if index is not None and not index.is_absolute():
+        index = REPO / index
+    tmp = tempfile.mkdtemp(prefix="publish-index-")
+    try:
+        fake = Path(tmp) / "index"
+        if index is not None and index.exists():
+            shutil.copy2(str(index), str(fake))
+        env = {"GIT_INDEX_FILE": str(fake)}
+        rc, _, err = _git("add", "-A", env=env, timeout=300)
+        if rc != 0:
+            raise Refused("git add failed: %s" % err.strip()[-300:])
+        _staged_guard(env)
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def _prepare_and_commit(message):
+    """Steps a-f, under the data lock. Returns True when a new commit was made."""
+    _step(0)
+    blocker = _repo_blocker()
+    if blocker:
+        raise Refused(blocker)
+    _step(1)
+    ok, err = _fetch(120)
+    if not ok:
+        _jlog(err)
+        raise Refused("Cannot reach GitHub")
+    ahead, behind = _ahead_behind()
+    if behind > 0:
+        raise Refused("GitHub has newer commits; ask Hermes to merge them first")
+    _step(2)
+    r = _build_py("--release")
+    if r.returncode != 0:
+        head = "\n".join((r.stdout or r.stderr).strip().splitlines()[:8])
+        _jlog(head)
+        if "RELEASE BLOCKED" in r.stdout:
+            raise Refused("The site is not release-ready, so it cannot go live yet:\n" + scrub(head))
+        raise Refused("The site did not build:\n" + scrub(head))
+    BUILD.update(ok=True, ready=True, blockers=0, items=[], log=_cap(r.stdout + r.stderr),
+                 last_run=time.strftime("%Y-%m-%d %H:%M:%S"), version=data_version())
+    _step(3)
+    started = time.time()
+    passed, failing, log = _run_tests()
+    _jlog("Tests: %s in %.0f s" % ("passed" if passed else "FAILED", time.time() - started))
+    if not passed:
+        _jlog(log[-6000:])
+        last = log.strip().splitlines()[-1] if log.strip() else "no output"
+        raise Refused("The tests failed, so nothing was published: %s" % ("; ".join(failing[:10]) if failing else last))
+    _step(4)
+    _guard_before_staging()
+    rc, _, err = _git("add", "-A", timeout=300)
+    if rc != 0:
+        raise Refused("git add failed: %s" % err.strip()[-300:])
+    staged = _staged_guard()
+    if not staged:
+        _jlog("Nothing new to commit.")
+        return False
+    _step(5)
+    for key in ("user.name", "user.email"):
+        rc, out, _ = _git("config", "--get", key)
+        if rc != 0 or not out.strip():
+            raise Refused("Git has no %s set for this site, so it cannot commit. "
+                          "Ask Hermes to set it; the changes are staged, nothing was lost." % key)
+    rc, out, err = _git("commit", "-q", "-m", message, timeout=120)
+    _jlog(out + err)
+    if rc != 0:
+        raise Refused("git commit failed: %s" % (err or out).strip()[-300:])
+    _jlog("Committed %d file%s." % (len(staged), "" if len(staged) == 1 else "s"))
+    return True
+
+
+def _push_and_verify():
+    """Steps g-h, with the data lock released. -> (short sha, commit url) or ('', '') when nothing was pending."""
+    ahead, _ = _ahead_behind()
+    if ahead == 0:
+        return "", ""
+    _step(6)
+    rc, out, err = _git("push", "origin", "HEAD:main", timeout=PUBLISH_PUSH_TIMEOUT)
+    _jlog(out + err)
+    if rc != 0:
+        raise Refused("GitHub did not accept the push. Your changes are saved in a local commit and nothing "
+                      "on the site changed:\n" + (err or out).strip()[-600:])
+    _step(7)
+    ok, why = _fetch(120)
+    ahead, _ = _ahead_behind()
+    if not ok or ahead != 0:
+        raise Refused("The push finished but GitHub does not show it yet%s. Check again in a moment." % (
+            " (" + why[-200:] + ")" if why else ""))
+    rc, out, _ = _git("rev-parse", "--short", "HEAD")
+    sha = out.strip()
+    return sha, github_commit_url(_origin_url(), sha)
+
+
+def _publish_run(message):
+    try:
+        with LOCK:
+            committed = _prepare_and_commit(message)
+        sha, url = _push_and_verify()
+        if not sha:
+            _jlog("Nothing to publish.")
+            _jset(state="done", step="Done", message="Nothing to publish", commit="", url="")
+        else:
+            _jlog("Published %s. Live in about a minute." % sha)
+            _jset(state="done", step="Done", commit=sha, url=url,
+                  message="Published." if committed else "Pushed the earlier commits.")
+    except Refused as e:
+        _jlog("Stopped: %s" % e)
+        _jset(state="failed", error=scrub(str(e)))
+    except BaseException as e:  # noqa: BLE001 - the job must always end in a state the page can show
+        _jlog("Stopped: %s: %s" % (type(e).__name__, e))
+        _jset(state="failed", error=scrub("Publish stopped unexpectedly: %s: %s" % (type(e).__name__, e)))
+
+
+def publish_start(message, version):
+    """Reserve the one job slot, check the page is current, run the job in the background -> job id."""
+    msg = clean_message(message)
+    with JOB_LOCK:
+        if JOB["state"] == "running":
+            bad("A publish is already running.", 409)
+        JOB.clear()
+        JOB.update(IDLE_JOB, id="%x" % time.time_ns(), state="running", step=PUBLISH_STEPS[0])
+        jid = JOB["id"]
+    try:
+        with LOCK:
+            check_version(version)
+    except BaseException:
+        with JOB_LOCK:
+            JOB.clear()
+            JOB.update(IDLE_JOB)
+        raise
+    threading.Thread(target=_publish_run, args=(msg,), daemon=True).start()
+    return jid
+
+
 # --------------------------------------------------------------------------- state
 def ui_manifest(projects):
     out = {}
@@ -1014,7 +1502,8 @@ def state():
 
 # --------------------------------------------------------------------------- HTTP
 UI_FILES = {"/": "index.html", "/index.html": "index.html", "/app.css": "app.css", "/app.js": "app.js",
-            "/project.js": "project.js", "/site.js": "site.js", "/favicon.svg": "favicon.svg"}
+            "/project.js": "project.js", "/site.js": "site.js", "/publish.js": "publish.js",
+            "/favicon.svg": "favicon.svg"}
 PREVIEW_OK = re.compile(r"^(?:[A-Za-z0-9_-]+\.html|work/[A-Za-z0-9_-]+\.html|robots\.txt)$")
 
 
@@ -1127,6 +1616,10 @@ class Handler(BaseHTTPRequestHandler):
                         b = release_status()
                         return self._json(200, {"ok": True, "ready": b["ready"], "count": b["blockers"],
                                                 "items": b["items"], "last_run": b["last_run"]})
+                if path == "/api/publish":
+                    return self._json(200, publish_status())
+                if path == "/api/publish/job":
+                    return self._json(200, job_snapshot())
                 if path == "/api/livid":
                     vid = livid_id(q.get("url", ""))
                     playable, title = livid_status(vid)
@@ -1138,6 +1631,9 @@ class Handler(BaseHTTPRequestHandler):
                         return self._json(200, {"ok": res["ok"], "ready": res["ready"], "blockers": res["blockers"],
                                                 "log": res["log"], "last_run": res["last_run"],
                                                 "version": data_version()})
+                if path == "/api/publish":
+                    raw = self.json_body()
+                    return self._json(200, {"ok": True, "job": publish_start(raw.get("message"), raw.get("version"))})
                 if path == "/api/upload":
                     with LOCK:
                         return self._json(200, save_upload(q, self.body(UPLOAD_CAP)))

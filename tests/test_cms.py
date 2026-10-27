@@ -229,7 +229,7 @@ class TestState(CmsCase):
         self.assertFalse((self.tmp / "tools" / "backups").exists())
 
     def test_the_page_and_its_scripts_are_served(self):
-        for path in ("/", "/app.css", "/app.js", "/project.js", "/site.js"):
+        for path in ("/", "/app.css", "/app.js", "/project.js", "/site.js", "/publish.js"):
             st, body = self.call("GET", path)
             self.assertEqual(st, 200, path)
         st, body = self.call("GET", "/")

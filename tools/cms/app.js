@@ -100,6 +100,7 @@ async function api(method, path, body) {
     if (!res.ok || data.ok === false) throw new Error(data.error || (method + ' ' + path + ' → HTTP ' + res.status));
     if (data.version) S.version = data.version;
     if (data.build) { S.build = data.build; renderStatus(); }
+    if (method !== 'GET' && typeof pubPollSoon === 'function') pubPollSoon();   // a save changes what can be published
     return data;
   };
   busy(1);
@@ -117,6 +118,7 @@ function rawSend(method, path, file, versioned) {
     if (!res.ok || data.ok === false) throw new Error(data.error || ('HTTP ' + res.status));
     if (data.version) S.version = data.version;
     if (data.build) { S.build = data.build; renderStatus(); }
+    if (typeof pubPollSoon === 'function') pubPollSoon();
     return data;
   });
 }

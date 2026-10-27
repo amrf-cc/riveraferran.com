@@ -11,6 +11,7 @@ import threading
 import unittest
 import urllib.request
 from http.server import ThreadingHTTPServer
+from unittest import mock
 from pathlib import Path
 
 import cdp
@@ -354,6 +355,172 @@ class TestUi(unittest.TestCase):
         self.p.js("document.querySelector('#proj-list .eye[data-vis-slug=\"gamma\"]').click()")
         self.toast("changed since this page loaded")
         self.assertEqual((self.tmp / "projects.json").read_bytes(), changed, "the stale click must not write")
+
+
+@unittest.skipUnless(cdp.available(), "needs Chrome and websocket-client")
+class TestPublishUi(unittest.TestCase):
+    """The Publish button, its status pill and the confirm flow, against a real git repo whose `origin` is a
+    local bare repository (never the network). The fixture's own tiny tests/ folder is the publish gate."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.template = F.GitSite()
+        cls.work = Path(tempfile.mkdtemp(prefix="publish-ui-"))
+        cls.tmp, cls.bare = cls.work / "site", cls.work / "origin.git"
+        cls.template.copy_to(cls.tmp, cls.bare)
+        cls.cms = F.load_cms(cls.tmp)
+        cls.srv = ThreadingHTTPServer(("127.0.0.1", 0), cls.cms.Handler)
+        cls.base = "http://127.0.0.1:%d/" % cls.srv.server_address[1]
+        threading.Thread(target=cls.srv.serve_forever, daemon=True).start()
+        cls.browser = cdp.Browser(1440, 900).__enter__()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.__exit__(None, None, None)
+        cls.srv.shutdown()
+        cls.srv.server_close()
+        shutil.rmtree(str(cls.work), ignore_errors=True)
+        cls.template.close()
+
+    def setUp(self):
+        self.template.copy_to(self.tmp, self.bare)
+        self.cms.BUILD.update(last_run="", ok=None, ready=None, blockers=None, items=[], log="", version="")
+        self.cms.JOB.clear()
+        self.cms.JOB.update(self.cms.IDLE_JOB)
+        self.p = self.browser.open(self.base)
+        self.wait("document.querySelectorAll('#proj-list li.proj').length > 0")
+        self.p.js(DND)
+        self.wait_pill("All published")
+
+    def tearDown(self):
+        self.p.pump(0.2)
+        errors = list(self.p.errors)
+        self.p.close()
+        self.assertEqual(errors, [], "the page logged errors")
+
+    def wait(self, expr, timeout=30):
+        return self.p.wait(expr, timeout)
+
+    def pill(self):
+        return self.p.js("document.querySelector('#pub-pill').textContent")
+
+    def wait_pill(self, text):
+        self.wait("document.querySelector('#pub-pill').textContent === %s" % json.dumps(text))
+
+    def refocus(self):
+        self.p.js("window.dispatchEvent(new Event('focus'))")
+
+    def button(self):
+        return self.p.js("(()=>{const b=document.querySelector('#btn-publish');return {disabled:b.disabled,title:b.title}})()")
+
+    def hide_beta(self):
+        self.p.js("document.querySelector('#proj-list .eye[data-vis-slug=\"beta\"]').click()")
+        self.wait("/Hidden: Beta/.test(document.querySelector('#toast').textContent)")
+
+    def test_a_clean_copy_reads_all_published_and_the_button_is_ready(self):
+        self.wait_pill("All published")
+        b = self.button()
+        self.assertFalse(b["disabled"])
+        self.assertIn("example.com", b["title"])
+        self.assertIn(str(self.bare), self.p.js("document.querySelector('#pub-pill').title"))
+
+    def test_a_save_repolls_and_the_pill_counts_the_change(self):
+        self.wait_pill("All published")
+        self.hide_beta()
+        self.wait_pill("1 change to publish")                 # no window focus needed: the save re-polls
+        self.assertFalse(self.button()["disabled"])
+
+    def test_no_remote_disables_the_button_with_the_reason_as_its_tooltip(self):
+        F.git(self.tmp, "remote", "remove", "origin")
+        self.refocus()
+        self.wait_pill("No GitHub remote")
+        b = self.button()
+        self.assertTrue(b["disabled"])
+        self.assertIn("remote", b["title"].lower())
+
+    def test_unreachable_github(self):
+        F.git(self.tmp, "remote", "set-url", "origin", str(self.work / "gone.git"))
+        self.refocus()
+        self.wait_pill("Cannot reach GitHub")
+        self.assertEqual(self.button(), {"disabled": True, "title": "Cannot reach GitHub"})
+
+    def test_newer_commits_on_github_disable_the_button(self):
+        other = self.work / "other"
+        shutil.rmtree(str(other), ignore_errors=True)
+        F.git(self.work, "clone", "-q", str(self.bare), str(other))
+        F.git(other, "config", "user.name", "Else")
+        F.git(other, "config", "user.email", "else@example.invalid")
+        (other / "x.txt").write_text("x\n", encoding="utf-8")
+        F.git(other, "add", "-A")
+        F.git(other, "commit", "-q", "-m", "Newer")
+        F.git(other, "push", "-q", "origin", "HEAD:main")
+        self.refocus()
+        self.wait_pill("GitHub has newer commits")
+        b = self.button()
+        self.assertTrue(b["disabled"])
+        self.assertIn("merge them first", b["title"])
+
+    def test_commits_waiting_to_be_pushed_count_too(self):
+        (self.tmp / "note.txt").write_text("x\n", encoding="utf-8")
+        F.git(self.tmp, "add", "-A")
+        F.git(self.tmp, "commit", "-q", "-m", "Local only")
+        self.refocus()
+        self.wait_pill("1 change to publish")
+
+    def test_cancel_closes_the_dialog_and_publishes_nothing(self):
+        self.hide_beta()
+        self.wait_pill("1 change to publish")
+        self.p.js("document.querySelector('#btn-publish').click()")
+        self.wait("!document.querySelector('#pub-dialog').hidden")
+        text = self.p.js("document.querySelector('#pub-body').textContent")
+        self.assertIn("Publish to example.com?", text)
+        self.assertIn("This commits everything and pushes to GitHub, which puts it live.", text)
+        self.assertEqual(self.p.js("document.querySelector('#pub-msg').placeholder"), "Site update (edited in the site manager)")
+        self.p.js("document.querySelector('#pub-cancel').click()")
+        self.assertTrue(self.p.js("document.querySelector('#pub-dialog').hidden"))
+        self.assertEqual(self.cms.job_snapshot()["state"], "idle")
+        self.assertEqual(int(F.git(self.bare, "rev-list", "--count", "main")), 1)
+
+    def test_confirming_shows_the_steps_then_a_toast_with_the_commit_link(self):
+        self.hide_beta()
+        self.wait_pill("1 change to publish")
+        self.p.js("document.querySelector('#btn-publish').click()")
+        self.wait("!document.querySelector('#pub-dialog').hidden")
+        self.p.js("setInput('#pub-msg', 'Hide Beta (UI test)')")
+        with mock.patch.object(self.cms, "_origin_url", return_value="https://github.com/amrf-cc/riveraferran.com.git"):
+            self.p.js("document.querySelector('#pub-go').click()")
+            self.wait("!!document.querySelector('#pub-steps')")
+            steps = self.p.js("[...document.querySelectorAll('#pub-steps li')].map(x => x.textContent.replace(/^\\u2713 /, ''))")
+            self.assertEqual(steps, list(self.cms.PUBLISH_STEPS))
+            self.wait("/Live in about a minute\\./.test(document.querySelector('#toast').textContent)", 120)
+            toast = self.p.js("document.querySelector('#toast').textContent")
+            href = self.p.js("document.querySelector('#toast a').href")
+        self.assertIn("Published.", toast)
+        sha = F.git(self.tmp, "rev-parse", "--short", "HEAD")
+        self.assertEqual(href, "https://github.com/amrf-cc/riveraferran.com/commit/" + sha)
+        self.assertTrue(self.p.js("document.querySelector('#pub-dialog').hidden"))
+        self.assertEqual(F.git(self.bare, "log", "-1", "--format=%s", "main"), "Hide Beta (UI test)")
+        self.assertEqual(int(F.git(self.bare, "rev-list", "--count", "main")), 2)
+        self.wait_pill("All published")
+        self.assertEqual(F.git(self.tmp, "status", "--porcelain"), "")
+
+    def test_a_refused_publish_shows_the_reason_and_the_log(self):
+        hook = self.bare / "hooks" / "pre-receive"
+        hook.write_text("#!/bin/sh\necho 'pre-receive: not today' >&2\nexit 1\n")
+        hook.chmod(0o755)
+        self.hide_beta()
+        self.wait_pill("1 change to publish")
+        self.p.js("document.querySelector('#btn-publish').click()")
+        self.wait("!document.querySelector('#pub-dialog').hidden")
+        self.p.js("document.querySelector('#pub-go').click()")
+        self.wait("!!document.querySelector('#pub-reason')", 120)
+        self.assertIn("Not published.", self.p.js("document.querySelector('#pub-body').textContent"))
+        self.assertIn("GitHub did not accept the push", self.p.js("document.querySelector('#pub-reason').textContent"))
+        self.assertIn("not today", self.p.js("document.querySelector('#pub-log').textContent"))
+        self.p.js("document.querySelector('#pub-done').click()")
+        self.assertTrue(self.p.js("document.querySelector('#pub-dialog').hidden"))
+        self.wait_pill("1 change to publish")                  # the local commit is kept and still waiting
+        self.assertEqual(int(F.git(self.bare, "rev-list", "--count", "main")), 1)
 
 
 if __name__ == "__main__":
