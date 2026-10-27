@@ -112,7 +112,7 @@ driven by CSS custom properties at the top of `assets/css/styles.css`.
   carries the viewer markup.
 - **Masthead (homepage hero)** — a full-bleed photograph with the name passing
   BEHIND its subject. Three layers: `assets/img/<project>/NN.jpg` as the back plate,
-  the giant name, then `assets/img/masthead/front.webp` — the subject cut out with
+  the giant name, then `assets/img/masthead/tbs-desktop-front.webp` — the subject cut out with
   alpha — sitting ON TOP of the name (`z-index: 3`). The small labels sit above
   everything (`z-index: 4`). Both image layers use the same `cover` geometry, so the
   cut-out lands exactly over the subject in the back photo. To change the hero photo,
