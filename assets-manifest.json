@@ -1071,9 +1071,9 @@
     "rodowita-water": {
       "photos": [
         {
-          "full": "assets/img/rodowita-water/01.jpg",
-          "thumb": "assets/img/rodowita-water/thumbs/01.jpg",
-          "alt": "Rodowita bottle, studio photograph"
+          "full": "assets/img/rodowita-water/20.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/20.jpg",
+          "alt": "Rodowita AKC Premier Cup, 2026"
         },
         {
           "full": "assets/img/rodowita-water/02.jpg",
@@ -1082,19 +1082,24 @@
           "composite": true
         },
         {
+          "full": "assets/img/rodowita-water/01.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/01.jpg",
+          "alt": "Rodowita bottle, studio photograph"
+        },
+        {
+          "full": "assets/img/rodowita-water/18.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/18.jpg",
+          "alt": "Rodowita AKC Premier Cup, 2026"
+        },
+        {
           "full": "assets/img/rodowita-water/03.jpg",
           "thumb": "assets/img/rodowita-water/thumbs/03.jpg",
           "alt": "Rodowita still bottle with water droplets"
         },
         {
-          "full": "assets/img/rodowita-water/04.jpg",
-          "thumb": "assets/img/rodowita-water/thumbs/04.jpg",
-          "alt": "Forest floor plate"
-        },
-        {
-          "full": "assets/img/rodowita-water/23.jpg",
-          "thumb": "assets/img/rodowita-water/thumbs/23.jpg",
-          "alt": "Rodowita 1L still bottle, final"
+          "full": "assets/img/rodowita-water/19.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/19.jpg",
+          "alt": "Rodowita AKC Premier Cup, 2026"
         },
         {
           "full": "assets/img/rodowita-water/05.jpg",
@@ -1102,14 +1107,29 @@
           "alt": "Rodowita 1L bottle, studio reference"
         },
         {
+          "full": "assets/img/rodowita-water/17.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/17.jpg",
+          "alt": "Rodowita AKC Premier Cup, 2026"
+        },
+        {
           "full": "assets/img/rodowita-water/06.jpg",
           "thumb": "assets/img/rodowita-water/thumbs/06.jpg",
           "alt": "Rodowita 1L bottle, studio reference"
         },
         {
+          "full": "assets/img/rodowita-water/22.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/22.jpg",
+          "alt": "Rodowita AKC Premier Cup, 2026"
+        },
+        {
           "full": "assets/img/rodowita-water/07.jpg",
           "thumb": "assets/img/rodowita-water/thumbs/07.jpg",
           "alt": "Rodowita 1L bottle, studio reference"
+        },
+        {
+          "full": "assets/img/rodowita-water/21.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/21.jpg",
+          "alt": "Rodowita AKC Premier Cup, 2026"
         },
         {
           "full": "assets/img/rodowita-water/08.jpg",
@@ -1122,15 +1142,15 @@
           "alt": "Rodowita 1L bottle, studio reference"
         },
         {
-          "full": "assets/img/rodowita-water/10.jpg",
-          "thumb": "assets/img/rodowita-water/thumbs/10.jpg",
-          "alt": "AI-generated: 1L bottle on the forest floor",
+          "full": "assets/img/rodowita-water/16.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/16.jpg",
+          "alt": "AI-generated: top-down of two Rodowita bottles",
           "ai": true
         },
         {
-          "full": "assets/img/rodowita-water/11.jpg",
-          "thumb": "assets/img/rodowita-water/thumbs/11.jpg",
-          "alt": "AI-generated: Rodowita bottle",
+          "full": "assets/img/rodowita-water/10.jpg",
+          "thumb": "assets/img/rodowita-water/thumbs/10.jpg",
+          "alt": "AI-generated: 1L bottle on the forest floor",
           "ai": true
         },
         {
@@ -1156,42 +1176,6 @@
           "thumb": "assets/img/rodowita-water/thumbs/15.jpg",
           "alt": "AI-generated: hand holding a Rodowita bottle",
           "ai": true
-        },
-        {
-          "full": "assets/img/rodowita-water/16.jpg",
-          "thumb": "assets/img/rodowita-water/thumbs/16.jpg",
-          "alt": "AI-generated: top-down of two Rodowita bottles",
-          "ai": true
-        },
-        {
-          "full": "assets/img/rodowita-water/17.jpg",
-          "thumb": "assets/img/rodowita-water/thumbs/17.jpg",
-          "alt": "Rodowita AKC Premier Cup, 2026"
-        },
-        {
-          "full": "assets/img/rodowita-water/18.jpg",
-          "thumb": "assets/img/rodowita-water/thumbs/18.jpg",
-          "alt": "Rodowita AKC Premier Cup, 2026"
-        },
-        {
-          "full": "assets/img/rodowita-water/19.jpg",
-          "thumb": "assets/img/rodowita-water/thumbs/19.jpg",
-          "alt": "Rodowita AKC Premier Cup, 2026"
-        },
-        {
-          "full": "assets/img/rodowita-water/20.jpg",
-          "thumb": "assets/img/rodowita-water/thumbs/20.jpg",
-          "alt": "Rodowita AKC Premier Cup, 2026"
-        },
-        {
-          "full": "assets/img/rodowita-water/21.jpg",
-          "thumb": "assets/img/rodowita-water/thumbs/21.jpg",
-          "alt": "Rodowita AKC Premier Cup, 2026"
-        },
-        {
-          "full": "assets/img/rodowita-water/22.jpg",
-          "thumb": "assets/img/rodowita-water/thumbs/22.jpg",
-          "alt": "Rodowita AKC Premier Cup, 2026"
         }
       ],
       "videos": [],

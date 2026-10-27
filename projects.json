@@ -62,8 +62,8 @@
       "years": "2026–present",
       "location": "",
       "tags": [
-        "ai",
-        "product"
+        "product",
+        "ai"
       ],
       "brief": "Rodowita needed launch creative for the US market in a cool, desaturated forest look, across stills and motion, without the product drifting from what's on the shelf.",
       "did": [
@@ -73,7 +73,8 @@
       ],
       "scope": [],
       "result": "AI-assisted creative that ran live for the launch.",
-      "category": "food-beverage"
+      "category": "food-beverage",
+      "bts": ""
     },
     {
       "slug": "chef-mia-castro",
