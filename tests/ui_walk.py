@@ -251,7 +251,13 @@ with cdp.Browser(1440, 900) as b:
     open_pane(p, "about")
     ncred = len(state()["media"]["credits"])
     check("credits rows rendered", p.js("document.querySelectorAll('.rows-section')[1].querySelectorAll('.rowx').length") == ncred, ncred)
-    check("the long role is not clipped to nothing", p.js("document.querySelectorAll('.rows-section')[1].querySelector('[data-f=role]').getBoundingClientRect().width") > 250)
+    # Credits sit in an accordion that starts closed, and a closed section measures 0px: open it first.
+    check("the long role is not clipped to nothing", p.js("""(() => {
+      const role = document.querySelectorAll('.rows-section')[1].querySelector('[data-f=role]');
+      const acc = role.closest('.acc');
+      if (acc && !acc.classList.contains('open')) acc.querySelector('.acc-head').click();
+      return role.getBoundingClientRect().width;
+    })()""") > 250)
 
     # ---- J. new project, then delete it
     print("\n== J. new project and delete")
