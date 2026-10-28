@@ -537,8 +537,8 @@ function definePanes() {
   PageSections.add('ai', { id: 'live', title: 'Ran live', order: 4,
     sub: 'The heading over the live cards', hint: 'Which projects appear there is a switch in Visibility.',
     build: copying('ai', 'Ran live') });
-  PageSections.add('ai', { id: 'tools', title: 'Tools', order: 5,
-    sub: 'The AI-assisted disclosure sentence',
+  PageSections.add('ai', { id: 'tools', title: 'Tools: disclosure sentence', order: 5,
+    sub: 'The sentence that says every AI piece is marked',
     build: b => b.appendChild(copyRows('ai', copyCurrent(), { section: 'Tools' })) });
   PageSections.add('ai', { id: 'seo', title: 'SEO', order: 6, sub: 'The browser tab and search results',
     build: seoSection([{ key: 'ai', label: 'AI & Workflow page' }]) });

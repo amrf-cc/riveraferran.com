@@ -319,8 +319,8 @@ function contentProjectFields(grid, p) {
 function defineContentSections() {
   PageSections.add('ai', { id: 'process-steps', title: 'Process steps', order: 3.5,
     sub: 'The numbered list on the AI page', build: b => b.appendChild(processSection()) });
-  PageSections.add('ai', { id: 'tools-line', title: 'Tools paragraph', order: 5.5,
-    sub: 'The disclosure line under the process', build: b => b.appendChild(toolsSection()) });
+  PageSections.add('ai', { id: 'tools-line', title: 'Tools paragraph', order: 4.5,
+    sub: 'The paragraph about the tools, above the disclosure sentence', build: b => b.appendChild(toolsSection()) });
   PageSections.add('reels', { id: 'anatomy-note', title: 'Reel formats note', order: 4.5,
     sub: 'The paragraph inside the breakdown block', build: b => b.appendChild(anatomySection()) });
   PageSections.add('about', { id: 'credits-heading', title: 'Credits heading', order: 4.5,
