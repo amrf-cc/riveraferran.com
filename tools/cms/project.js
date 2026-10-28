@@ -46,6 +46,7 @@ function renderProject(p, isNew) {
   g.appendChild(field('Scope', 'scope', lines(p.scope), { full: true, area: true, rows: 3, hint: 'One line each: counts, formats, where it ran.' }));
   g.appendChild(field('Result', 'result', p.result, { full: true, area: true, rows: 3, hint: 'Only a result you can back up. Leave it empty rather than guess.' }));
   g.appendChild(field('Behind the scenes', 'bts', p.bts, { full: true, area: true, rows: 2 }));
+  if (typeof contentProjectFields === 'function') contentProjectFields(g, p);
   pane.appendChild(g);
 
   pane.appendChild(el('<div class="row"><button class="btn primary js-save" data-scope="form" id="save-proj">Save project</button>' +

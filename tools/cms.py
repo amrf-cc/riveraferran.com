@@ -25,6 +25,7 @@ API (JSON unless noted). Mutating calls carry the `version` the page was loaded 
     POST /api/media                          photos: add / remove / reorder / update
     PUT  /api/project/<slug>/videos          the whole video list, in order
     PUT  /api/project/<slug>/sets            the whole comparison-set list, in order
+    PUT  /api/paid                           the Paid Social intro and both ad lists, in order
     POST /api/upload?slug=&kind=&scope=&name=    raw image bytes -> derivatives
     POST /api/config                         site settings, showreel, hidden pages, AI page cards
     PUT  /api/lists/<name>                   reels, motion, credits, experience, side_projects
@@ -69,7 +70,9 @@ if _TOOLS_DIR not in sys.path:
     sys.path.insert(0, _TOOLS_DIR)   # cms.py is loaded by path in tests, so sibling imports need this
 
 import cms_sets  # noqa: E402  (needs _TOOLS_DIR on the path first)
+import cms_content  # noqa: E402  WS4: the Paid Social ad lists
 EXTENSIONS = (cms_sets,)  # noqa: E402  one module per feature; each owns one route
+EXTENSIONS += (cms_content,)  # noqa: E402  WS4: PUT /api/paid
 
 UI_DIR = TOOLS / "cms"
 BACKUPS = REPO / "tools" / "backups"
@@ -99,6 +102,9 @@ POSTER_DIR = {"reel": "posters/reels", "motion": "posters/motion", "showreel": "
 # pipeline crops it instead of resizing it: 1200x630, quality 82, centre-cropped.
 SHARE_W, SHARE_H, SHARE_Q = 1200, 630, 82
 SHARE_MIN = (600, 315)
+# Paid Social posters and stills live together, one folder for the whole page.
+POSTER_EDGE["paid"] = 1920
+POSTER_DIR["paid"] = "posters/paid"
 IMAGE_SUFFIXES = (".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif", ".tif", ".tiff", ".gif")
 RATIOS = ("9 / 16", "16 / 9", "4 / 5", "1 / 1")
 
@@ -436,10 +442,14 @@ def save_upload(q, body):
     if kind not in ("photo", "poster") or scope not in ("project", "reel", "motion", "showreel", "set",
                                                         "hero",
                                                         "cutout",
-                                                        "share"):
+                                                        "share",
+                                                        "paid"):
         bad("Unknown upload type.")
     if scope in ("hero", "cutout", "share"):
         # Masthead images and the share card belong to no project: always one file, never a thumb.
+        kind = "poster"
+    if scope == "paid":
+        # A paid-social poster or still is one image, never a photo pair.
         kind = "poster"
     name = q.get("name") or "upload"
     suffix = Path(name).suffix.lower()
@@ -546,10 +556,14 @@ def entry_files(entry):
 
 
 # --------------------------------------------------------------------------- projects
-TEXT = ["client", "title", "oneliner", "role", "years", "location", "brief", "result", "category", "bts"]
+TEXT = ["client", "title", "oneliner", "role", "years", "location", "brief", "result", "category", "bts",
+        "ai_steps", "demo"]        # the last two: WS4, the AI page's live card and the demo line
 LISTS = ["did", "scope", "tags"]
 NEW_ORDER = ["slug", "client", "featured", "title", "oneliner", "role", "years", "location",
-             "tags", "brief", "did", "scope", "result", "bts", "category"]
+             "tags", "brief", "did", "scope", "result", "bts", "category",
+             "ai_steps", "demo"]
+# Both are plain sentences under a card; 400 characters is already two of them.
+PROJECT_TEXT_MAX = {"ai_steps": 400, "demo": 400}
 
 
 def featured_order(value, current):
@@ -580,6 +594,12 @@ def clean_project(raw, existing=None, categories=None):
         if k in raw:
             v = raw[k]
             p[k] = v.replace("\r\n", "\n").strip() if isinstance(v, str) else ""
+            if k in PROJECT_TEXT_MAX:
+                if len(p[k]) > PROJECT_TEXT_MAX[k]:
+                    bad("%s is longer than %d characters." % (k, PROJECT_TEXT_MAX[k]))
+                if not p[k]:
+                    p.pop(k, None)      # an empty line is unset: no default is ever written into the data
+                    continue
     for k in LISTS:
         if k in raw:
             v = raw[k]
@@ -940,6 +960,13 @@ CONFIG_TEXT = ("name", "title", "headline", "subline", "based", "email", "instag
                "ai_label", "hero_caption", "cta", "education", "languages")
 CONFIG_ASSET = ("hero_image", "hero_image_phone", "hero_cutout")
 CONFIG_LINES = ("tools", "certifications", "bio")
+# The AI, Reels and About pages' own paragraphs live in media.json, not site-config: three one-block
+# strings and one list of numbered steps.
+MEDIA_TEXT = ("ai_tools_line", "reel_formats_note", "credits_note")
+MEDIA_LINES = ("ai_process",)
+MEDIA_TEXT_MAX = {"ai_tools_line": 400, "reel_formats_note": 400, "credits_note": 60}
+MEDIA_MAX_STEPS = 20
+MEDIA_STEP_MAX = 80
 INTRO_KEYS = ("work", "reels", "ai", "paid", "about")
 # Per-page SEO (site-config -> seo.pages.<page>): title and description caps, and the pages that are not
 # a copy-registry page of their own (the two legal documents, and the 404, which has a title only).
@@ -1135,6 +1162,30 @@ def save_config(raw):
             bad("ai_live must list existing project slugs.")
         media["ai_live"] = list(dict.fromkeys(live))
         touched.append("ai_live")
+    # media.json's own text: the AI page's process list and tools line, the Reels anatomy note, the
+    # About page's credits heading. Each key is written only when it is sent, so one section of one
+    # page never disturbs the others.
+    for k in MEDIA_TEXT:
+        if k in raw:
+            if not isinstance(raw[k], str):
+                bad("%s must be text." % k)
+            media[k] = raw[k].replace("\r\n", "\n").strip()
+            most = MEDIA_TEXT_MAX[k]
+            if len(media[k]) > most:
+                bad("That text is too long: %d characters at most." % most)
+            touched.append(k)
+    for k in MEDIA_LINES:
+        if k in raw:
+            lines = lines_of(raw[k], k)
+            if not lines:
+                bad("The AI page's process needs at least one step.")
+            if len(lines) > MEDIA_MAX_STEPS:
+                bad("The process takes at most %d steps." % MEDIA_MAX_STEPS)
+            long = [x for x in lines if len(x) > MEDIA_STEP_MAX]
+            if long:
+                bad("Each step is %d characters at most: %s" % (MEDIA_STEP_MAX, long[0][:40]))
+            media[k] = lines
+            touched.append(k)
     if not touched:
         bad("Nothing to save.")
     changed, res = commit({FILES["config"]: cfg, FILES["media"]: media})
@@ -1710,6 +1761,11 @@ def state():
         "media": {"reels": with_poster_token(media.get("reels", [])),
                   "motion": with_poster_token(media.get("motion", [])),
                   "credits": media.get("credits", []), "credits_note": media.get("credits_note", ""),
+                  # WS4: the media.json text with no other editor (AI process and tools, the Reels
+                  # anatomy note) — the page panes draw these in content.js.
+                  "ai_process": [str(x) for x in (media.get("ai_process") or [])],
+                  "ai_tools_line": media.get("ai_tools_line") or "",
+                  "reel_formats_note": media.get("reel_formats_note") or "",
                   "ai_live": list(sb.ai_live_slugs(media)), "paid_social": media.get("paid_social", {})},
         "formats": sorted({r.get("format", "") for r in media.get("reels", []) if r.get("format")}),
         "constants": {"ai_feature": sb.AI_FEATURE, "ai_live_default": list(sb.AI_LIVE),

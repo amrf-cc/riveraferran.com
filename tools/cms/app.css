@@ -616,3 +616,26 @@ input[type=number]:disabled { opacity: .5; }
 }
 .shot .flags .check { margin-top: 0; gap: 5px; font-size: 10.5px; letter-spacing: .02em; color: var(--muted); }
 .shot .flags input { width: 13px; height: 13px; }
+/* ---------- paid social: the static-ad editor ---------- */
+/* A still has no poster and no player: the picture is the row. Everything else matches .rowx. */
+.adrows { display: grid; gap: 10px; max-width: 1040px; margin-top: 14px; }
+.adrow {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  border: 1px solid var(--line); border-radius: 10px; padding: 9px; background: var(--surface);
+}
+.adrow .cell { flex: 1 1 var(--w, 160px); min-width: 0; }
+.adrow .cell input, .adrow .cell select { width: 100%; }
+.adrow .del { flex: 0 0 auto; border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 16px; }
+.adrow .del:hover { color: var(--accent-press); }
+.acell-img {
+  flex: 0 0 84px; width: 84px; height: 56px; border: 1px dashed var(--line); border-radius: 7px;
+  background: var(--line-soft); display: flex; align-items: center; justify-content: center;
+  overflow: hidden; cursor: pointer;
+}
+.acell-img:hover { border-color: var(--accent); }
+.acell-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.acell-img img[hidden] { display: none; }
+.acell-img .ph { font-size: 10.5px; font-weight: 700; color: var(--muted); letter-spacing: .04em; }
+.acell-img .ph[hidden] { display: none; }
+.cform-fields .field + .field { margin-top: 12px; }
+.cform .row { margin-top: 12px; }
