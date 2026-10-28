@@ -66,6 +66,33 @@ class TestWritingSets(SetsCase):
         for name, data in before.items():
             self.assertEqual((self.tmp / name).read_bytes(), data, name)
 
+    def test_a_save_that_changes_nothing_writes_nothing(self):
+        # The owner's real data keeps a flag only where it is true (the first step has no flag keys at
+        # all). Save on an untouched set must not add "ai": false / "composite": false to every step:
+        # that is a noisy manifest diff and a Publish button lit up for nothing.
+        path = self.tmp / "assets-manifest.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        data["projects"][ROD]["sets"][0]["steps"][0].pop("ai", None)
+        data["projects"][ROD]["sets"][0]["steps"][0].pop("composite", None)
+        path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        before = path.read_bytes()
+        st, d = self.put(ROD, self.as_rows())
+        self.assertEqual((st, d["changed"]), (200, False))
+        self.assertEqual(path.read_bytes(), before)
+
+    def test_a_flag_is_stored_only_while_it_is_ticked(self):
+        rows = self.as_rows()
+        self.assertTrue(rows[0]["steps"][1]["ai"], "the fixture's second step starts AI-assisted")
+        rows[0]["steps"][1]["ai"] = False                    # untick: the key must go, not turn false
+        rows[0]["steps"][0]["composite"] = True              # tick another
+        st, _d = self.put(ROD, rows)
+        self.assertEqual(st, 200)
+        steps = self.sets()[0]["steps"]
+        self.assertNotIn("ai", steps[1])
+        self.assertIs(steps[0]["composite"], True)
+        self.assertNotIn("ai", steps[0])
+        self.assertNotIn("composite", steps[1])
+
     def test_sets_reorder_and_keep_their_own_steps(self):
         first = self.sets()[0]
         st, _d = self.put(ROD, [a_set("A new second set", step("Second shot", SPARE)),
@@ -118,7 +145,8 @@ class TestWritingSets(SetsCase):
         self.assertEqual(st, 200)
         got = self.sets()
         self.assertEqual(len(got), 1)
-        self.assertEqual(sorted(got[0]["steps"][0]), ["ai", "composite", "image", "label"])
+        # A fresh step carries exactly what was given: unset flags are not stored (they were "false" keys once).
+        self.assertEqual(sorted(got[0]["steps"][0]), ["image", "label"])
 
     def test_the_same_from_index_is_used_once(self):
         st, d = self.put(ROD, [a_set("First", step("One", SHOT0, frm=0), frm=0),

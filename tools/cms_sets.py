@@ -74,8 +74,13 @@ def save_sets(api, slug, rows):
                 except api.ApiError:
                     api.bad("Step %d: that image does not exist." % m)
             kept["image"] = image
-            kept["ai"] = bool(step.get("ai"))
-            kept["composite"] = bool(step.get("composite"))
+            # A flag is stored only while it is ticked, exactly like a photo's: the owner's data holds real
+            # changes, so Save on an untouched set writes nothing and a ticked-then-cleared flag leaves no key.
+            for flag in ("ai", "composite"):
+                if step.get(flag):
+                    kept[flag] = True
+                else:
+                    kept.pop(flag, None)
             steps.append(kept)
         base["title"] = _text(api, row.get("title"), TITLE_MAX, "Set %d title" % n)
         base["steps"] = steps
