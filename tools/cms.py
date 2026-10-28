@@ -71,8 +71,10 @@ if _TOOLS_DIR not in sys.path:
 
 import cms_sets  # noqa: E402  (needs _TOOLS_DIR on the path first)
 import cms_content  # noqa: E402  WS4: the Paid Social ad lists
+import cms_taxonomy  # noqa: E402  work groups and skill chips
 EXTENSIONS = (cms_sets,)  # noqa: E402  one module per feature; each owns one route
 EXTENSIONS += (cms_content,)  # noqa: E402  WS4: PUT /api/paid
+EXTENSIONS += (cms_taxonomy,)  # noqa: E402  own line per module, so parallel edits never share one
 
 UI_DIR = TOOLS / "cms"
 BACKUPS = REPO / "tools" / "backups"
@@ -957,7 +959,7 @@ def save_list(name, rows):
 
 # --------------------------------------------------------------------------- site settings
 CONFIG_TEXT = ("name", "title", "headline", "subline", "based", "email", "instagram", "linkedin",
-               "ai_label", "hero_caption", "cta", "education", "languages")
+               "ai_label", "hero_caption", "cta", "education", "languages", "formspree_endpoint")
 CONFIG_ASSET = ("hero_image", "hero_image_phone", "hero_cutout")
 CONFIG_LINES = ("tools", "certifications", "bio")
 # The AI, Reels and About pages' own paragraphs live in media.json, not site-config: three one-block
@@ -1006,6 +1008,10 @@ def save_config(raw):
         bad("Name is required.")
     if "email" in raw and cfg["email"] and "@" not in cfg["email"]:
         bad("That does not look like an email address.")
+    if "formspree_endpoint" in raw:
+        ep = cfg.get("formspree_endpoint") or ""
+        if ep and not re.fullmatch(r"https://formspree\.io/f/[A-Za-z0-9]+", ep):
+            bad("Use the form's Formspree URL, like https://formspree.io/f/mgaoebdr.")
     for k in CONFIG_ASSET:
         if k in raw:
             cfg[k] = existing_asset(str(raw[k]).strip(), "Image") if str(raw[k]).strip() else ""

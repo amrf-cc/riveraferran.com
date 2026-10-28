@@ -639,3 +639,19 @@ input[type=number]:disabled { opacity: .5; }
 .acell-img .ph[hidden] { display: none; }
 .cform-fields .field + .field { margin-top: 12px; }
 .cform .row { margin-top: 12px; }
+/* ---------- work groups & skill chips (Site -> Categories & skills) ----------
+   One row per group or skill: grip, key/tag, label, line (skills), personal (groups), ✕.
+   The row borrows the video row's border, grip and delete styles and lays its cells out as a grid. */
+.taxsec { display: grid; gap: 10px; }
+.vids .taxrow { display: grid; align-items: center; gap: 8px; }
+.vids .taxrow.cat { grid-template-columns: 14px 152px minmax(150px, 1fr) 138px 26px; }
+.vids .taxrow.skill { grid-template-columns: 14px 128px minmax(150px, 1fr) minmax(200px, 1.15fr) 26px; }
+.taxrow[hidden] { display: none; }
+.taxrow .tkey {
+  font-family: var(--mono); font-size: 12px; color: var(--muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: help;
+}
+.taxrow input.tkey { font-family: var(--mono); font-size: 12px; color: var(--ink); cursor: text; }
+.taxrow .cell input { border-color: var(--line-soft); }
+.taxsec .notice { margin-top: 0; max-width: none; }
+.taxsec .notice[hidden] { display: none; }

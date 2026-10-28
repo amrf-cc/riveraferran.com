@@ -40,7 +40,8 @@ PAGES = [
     ("reels", "Reels"), ("ai", "AI & Workflow"), ("paid", "Paid Social"), ("about", "About"),
     ("contact", "Contact"), ("legal", "Legal & 404"),
 ]
-TITLES = dict([("identity", "Identity & sharing"), ("visibility", "Visibility")] + PAGES)
+TITLES = dict([("identity", "Identity & sharing"), ("visibility", "Visibility"),
+                ("taxonomy", "Categories & skills")] + PAGES)
 
 
 @unittest.skipUnless(cdp.available(), "needs Chrome and websocket-client")
@@ -121,10 +122,11 @@ class TestPagesUi(unittest.TestCase):
     def test_the_sidebar_lists_site_then_every_page(self):
         groups = self.p.js("[...document.querySelectorAll('#site-list li.group-head')].map(x => x.textContent)")
         self.assertEqual(groups, ["Site", "Pages"])
+        # WS5 adds one more SITE pane: the Work groups and the skill chips.
         self.assertEqual(self.p.js("[...document.querySelectorAll('#site-list li[data-pane]')].map(x => x.dataset.pane)"),
-                         ["identity", "visibility"] + [k for k, _ in PAGES])
+                         ["identity", "visibility", "taxonomy"] + [k for k, _ in PAGES])
         names = self.p.js("[...document.querySelectorAll('#site-list li[data-pane]')].map(x => x.querySelector('.name').textContent)")
-        self.assertEqual(names, ["Identity & sharing", "Visibility"] + [t for _, t in PAGES])
+        self.assertEqual(names, ["Identity & sharing", "Visibility", "Categories & skills"] + [t for _, t in PAGES])
 
     def test_every_page_pane_opens_with_its_sections_in_render_order(self):
         self.open_page("home")
