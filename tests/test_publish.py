@@ -281,6 +281,18 @@ class TestRefusals(PublishCase):
         self.assertEqual(self.publish()["state"], "failed")
         self.assert_nothing_published(head, origin)
 
+    def test_a_module_whose_name_only_resembles_a_browser_module_still_refuses(self):
+        # The prefix is "test_cms_ui_", not "test_cms_u": an upload or any other module must still block.
+        self.hide_beta()
+        self.write("tests/test_cms_uploads_extra.py",
+                   "import unittest\n\n\nclass TestExtra(unittest.TestCase):\n"
+                   "    def test_this_one_fails(self):\n        self.assertEqual(1, 2)\n")
+        head, origin = self.head(), self.origin_head()
+        j = self.publish()
+        self.assertEqual(j["state"], "failed")
+        self.assertIn("test_cms_uploads_extra.TestExtra", j["error"])
+        self.assert_nothing_published(head, origin)
+
     def test_a_secret_looking_file_is_refused_and_nothing_is_committed_or_left_staged(self):
         self.hide_beta()
         self.write(".env", "TOKEN=abc\n")
@@ -391,6 +403,17 @@ class TestPublishing(PublishCase):
         self.assertEqual(git(self.bare, "log", "-1", "--format=%s", "main"), "Site update (edited in the site manager)")
         self.hide_beta()                                      # already hidden: nothing changes
         self.assertEqual(self.status()["dirty"], False)
+
+    def test_a_failing_browser_module_never_blocks_a_publish(self):
+        # Every test_cms_ui_* module drives headless Chrome and tests the manager, not the site.
+        self.hide_beta()
+        self.write("tests/test_cms_ui_example.py",
+                   "import unittest\n\n\nclass TestBrowser(unittest.TestCase):\n"
+                   "    def test_a_flaky_browser_check(self):\n        self.assertEqual(1, 2)\n")
+        j = self.publish()
+        self.assertEqual((j["state"], j["error"]), ("done", ""), j["log"])
+        self.assertIn("Tests: passed", j["log"])
+        self.assertNotIn("test_a_flaky_browser_check", j["log"])
 
     def test_the_job_reports_each_step_in_order(self):
         seen = []
@@ -631,6 +654,13 @@ class TestSource(unittest.TestCase):
         self.assertEqual(CMS.PUBLISH_GATE_SKIP, ("test_cms_ui", "test_legacy_redirects", "test_publish"))
         for module in CMS.PUBLISH_GATE_SKIP:
             self.assertTrue((ROOT / "tests" / (module + ".py")).exists(), module)
+
+    def test_every_browser_module_in_the_repo_is_covered_by_the_skip_prefix(self):
+        self.assertEqual(CMS.PUBLISH_GATE_SKIP_PREFIX, ("test_cms_ui_",))
+        browser = sorted(p.stem for p in (ROOT / "tests").glob("test_cms_ui_*.py"))
+        self.assertTrue(browser, "the repo has browser modules, so the prefix has something to cover")
+        for module in browser:
+            self.assertTrue(module.startswith(CMS.PUBLISH_GATE_SKIP_PREFIX), module)
 
 
 if __name__ == "__main__":

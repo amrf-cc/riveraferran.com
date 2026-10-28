@@ -1245,10 +1245,12 @@ PUBLISH_MAX_BLOB = 50 * 1024 * 1024           # a staged blob this size or large
 PUBLISH_FETCH_TIMEOUT = 15                    # the quick fetch behind the status
 PUBLISH_PUSH_TIMEOUT = 900
 PUBLISH_LOG_CAP = 20000
-# Test modules the gate leaves out: test_cms_ui drives headless Chrome; test_legacy_redirects takes ~40 s
-# and checks the old food-site URLs, not anything the manager edits; test_publish tests this very code on
-# temp repos (it would run the gate inside the gate). Everything else must pass.
+# Test modules the gate leaves out: test_cms_ui and every test_cms_ui_* module drive headless Chrome and
+# test the manager, not the site (a slow or flaky browser must never block a publish); test_legacy_redirects
+# takes ~40 s and checks the old food-site URLs, not anything the manager edits; test_publish tests this very
+# code on temp repos (it would run the gate inside the gate). Everything else must pass.
 PUBLISH_GATE_SKIP = ("test_cms_ui", "test_legacy_redirects", "test_publish")
+PUBLISH_GATE_SKIP_PREFIX = ("test_cms_ui_",)
 PUBLISH_STEPS = ("Checking", "Fetching from GitHub", "Building the site", "Running the tests",
                  "Preparing the commit", "Committing", "Pushing to GitHub", "Checking it landed")
 SECRET_PATH = re.compile(r"^(?:\.env.*|.*settings\.local.*|.*token.*|.*secret.*|.*credential.*|"
@@ -1509,21 +1511,25 @@ def _run_tests():
     script = (
         "import sys, unittest\n"
         "skip = set(sys.argv[1].split(','))\n"
+        "pre = tuple(p for p in sys.argv[2].split(',') if p)\n"
         "def flat(s):\n"
         "    for t in s:\n"
         "        if isinstance(t, unittest.TestSuite):\n"
         "            yield from flat(t)\n"
         "        else:\n"
         "            yield t\n"
+        "def mod(t):\n"
+        "    return type(t).__module__.split('.')[0]\n"
         "suite = unittest.TestSuite(t for t in flat(unittest.defaultTestLoader.discover('tests'))\n"
-        "                           if type(t).__module__.split('.')[0] not in skip)\n"
+        "                           if mod(t) not in skip and not mod(t).startswith(pre))\n"
         "res = unittest.TextTestRunner(stream=sys.stdout, verbosity=1).run(suite)\n"
         "if res.testsRun == 0:\n"
         "    print('NO TESTS RAN')\n"
         "    sys.exit(2)\n"
         "sys.exit(0 if res.wasSuccessful() else 1)\n")
     try:
-        r = subprocess.run([sys.executable, "-c", script, ",".join(PUBLISH_GATE_SKIP)], cwd=str(REPO),
+        r = subprocess.run([sys.executable, "-c", script, ",".join(PUBLISH_GATE_SKIP),
+                            ",".join(PUBLISH_GATE_SKIP_PREFIX)], cwd=str(REPO),
                            capture_output=True, text=True, timeout=900, env=_git_env())
     except subprocess.TimeoutExpired:
         return False, [], "The tests took longer than 15 minutes and were stopped."
