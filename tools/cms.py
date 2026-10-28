@@ -95,6 +95,10 @@ POSTER_EDGE = {"project": 1920, "showreel": 1920, "reel": 1280, "motion": 1280,
 POSTER_DIR = {"reel": "posters/reels", "motion": "posters/motion", "showreel": "posters/showreel",
               "hero": "masthead",
               "cutout": "masthead"}
+# The share card is the one image whose exact size the page promises (og:image:width/height), so the
+# pipeline crops it instead of resizing it: 1200x630, quality 82, centre-cropped.
+SHARE_W, SHARE_H, SHARE_Q = 1200, 630, 82
+SHARE_MIN = (600, 315)
 IMAGE_SUFFIXES = (".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif", ".tif", ".tiff", ".gif")
 RATIOS = ("9 / 16", "16 / 9", "4 / 5", "1 / 1")
 
@@ -386,16 +390,56 @@ def make_png(src, dst, edge):
         bad("That file could not be converted to a PNG.")
 
 
+def share_crop(w, h):
+    """The centre crop (width, height) that matches the card's 1200:630 and fits inside w x h."""
+    if w * SHARE_H >= h * SHARE_W:      # wider than the card: the full height survives
+        return max(1, min(w, int(round(h * SHARE_W / float(SHARE_H))))), h
+    return w, max(1, min(h, int(round(w * SHARE_H / float(SHARE_W)))))
+
+
+def _sips(args, src, dst):
+    r = subprocess.run(["sips"] + list(args) + [str(src), "--out", str(dst)],
+                       capture_output=True, text=True)
+    return r.returncode == 0 and Path(dst).is_file()
+
+
+def make_share_jpeg(src, dst):
+    """1200x630 JPEG, centre-cropped. A share card is a designed image, so cropping beats letterboxing.
+
+    Two passes: crop to the card's aspect from the centre, then resample to exactly 1200x630, because
+    og:image:width/height are fixed constants and a card of another size would make them lie. A source
+    smaller than the card is enlarged on purpose — a half-size card would break the same promise."""
+    w, h = _dims(src)
+    if w < SHARE_MIN[0] or h < SHARE_MIN[1]:
+        bad("That image is too small for a share card (600\u00d7315 minimum).")
+    cw, ch = share_crop(w, h)
+    crop = Path(str(dst) + ".crop.jpg")
+    try:
+        # A phone photo carries its rotation in EXIF, so sips may hand the crop back transposed.
+        if not _sips(["-c", str(ch), str(cw)], src, crop) or _dims(crop) != (cw, ch):
+            if not _sips(["-c", str(cw), str(ch)], src, crop) or _dims(crop) != (ch, cw):
+                bad("That file could not be cropped for a share card.")
+        if not _sips(["-s", "format", "jpeg", "-s", "formatOptions", str(SHARE_Q),
+                      "-z", str(SHARE_H), str(SHARE_W)], crop, dst):
+            bad("That file could not be converted to a JPEG.")
+    except BaseException:
+        Path(dst).unlink(missing_ok=True)
+        raise
+    finally:
+        crop.unlink(missing_ok=True)
+
+
 def save_upload(q, body):
     """Raw image bytes -> full + thumb for a photo, or one poster. Does not touch the data files."""
     kind = q.get("kind") or "photo"
     scope = q.get("scope") or "project"
     if kind not in ("photo", "poster") or scope not in ("project", "reel", "motion", "showreel", "set",
                                                         "hero",
-                                                        "cutout"):
+                                                        "cutout",
+                                                        "share"):
         bad("Unknown upload type.")
-    if scope in ("hero", "cutout"):
-        # Masthead images belong to no project: always one file, always assets/img/masthead/.
+    if scope in ("hero", "cutout", "share"):
+        # Masthead images and the share card belong to no project: always one file, never a thumb.
         kind = "poster"
     name = q.get("name") or "upload"
     suffix = Path(name).suffix.lower()
@@ -407,6 +451,9 @@ def save_upload(q, body):
         if not SLUG.match(slug) or not any(p.get("slug") == slug for p in read(FILES["projects"])["projects"]):
             bad("Unknown project.")
         folder = REPO / "assets" / "img" / slug
+    elif scope == "share":
+        # The share card sits next to the shipped og-cover.jpg, in the root media folder.
+        folder = REPO / "assets" / "img"
     else:
         folder = REPO / "assets" / "img" / POSTER_DIR[scope]
     folder.mkdir(parents=True, exist_ok=True)
@@ -435,6 +482,10 @@ def save_upload(q, body):
             make_png(src, full, POSTER_EDGE[scope])
             made.append(full)
             return {"full": str(full.relative_to(REPO))}
+        if scope == "share":
+            make_share_jpeg(src, full)
+            made.append(full)
+            return {"full": str(full.relative_to(REPO)), "width": SHARE_W, "height": SHARE_H}
         make_jpeg(src, full, POSTER_EDGE[scope], POSTER_Q)
         made.append(full)
         return {"full": str(full.relative_to(REPO))}
@@ -683,7 +734,13 @@ def clean_photo(item):
     existing_asset(item["full"], "Photo")
     if item.get("thumb"):
         existing_asset(item["thumb"], "Thumbnail")
-    return {"full": item["full"], "thumb": item.get("thumb") or item["full"], "alt": str(item.get("alt") or "")}
+    out = {"full": item["full"], "thumb": item.get("thumb") or item["full"], "alt": str(item.get("alt") or "")}
+    # The badges (`ai`, `composite`) ride on the photo; a re-add must not lose them. Only a true flag is
+    # stored, so an unflagged photo stays byte-identical to what it was.
+    for flag in ("ai", "composite"):
+        if item.get(flag):
+            out[flag] = True
+    return out
 
 
 def photo_op(payload):
@@ -724,6 +781,13 @@ def photo_op(payload):
             bad("No such photo.")
         if "alt" in payload:
             photos[i]["alt"] = str(payload["alt"] or "")
+        # Two independent badges, both optional: a false (or absent) flag is not stored at all.
+        for flag in ("ai", "composite"):
+            if flag in payload:
+                if payload[flag]:
+                    photos[i][flag] = True
+                else:
+                    photos[i].pop(flag, None)
     else:
         bad("Unknown action.")
     changed, res = commit({FILES["manifest"]: manifest})
@@ -919,6 +983,14 @@ def save_config(raw):
         if k in raw:
             cfg[k] = existing_asset(str(raw[k]).strip(), "Image") if str(raw[k]).strip() else ""
             touched.append(k)
+    if "og_image" in raw:
+        # The share card: an empty value means the default the code already ships, so the key goes.
+        value = str(raw["og_image"] or "").strip()
+        if value:
+            cfg["og_image"] = existing_asset(value, "Share card")
+        else:
+            cfg.pop("og_image", None)
+        touched.append("og_image")
     if "domain" in raw:
         cfg["domain"] = clean_domain(raw["domain"])
         touched.append("domain")

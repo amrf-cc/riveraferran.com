@@ -120,7 +120,9 @@ ASSET_FILES = ["assets/img/hero.jpg", "assets/img/hero-cutout.png", "assets/img/
                "assets/img/alpha/thumbs/02.jpg", "assets/img/beta/01.jpg", "assets/img/beta/thumbs/01.jpg",
                "assets/img/rodowita-water/01.jpg", "assets/img/rodowita-water/02.jpg",
                "assets/img/rodowita-water/thumbs/01.jpg", "assets/img/rodowita-water/thumbs/02.jpg",
-               "assets/img/posters/reels/spare.jpg"]
+               "assets/img/posters/reels/spare.jpg",
+               # The share card the build falls back to (site-config has no og_image, as in the real site).
+               "assets/img/og-cover.jpg"]
 
 
 def make_site(tmp):

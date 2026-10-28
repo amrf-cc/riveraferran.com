@@ -604,3 +604,15 @@ input[type=number]:disabled { opacity: .5; }
 .imgfield .lstat { font-size: 12px; font-weight: 700; color: var(--muted); }
 .imgfield .lstat.ok { color: var(--ok); }
 .imgfield .lstat.bad { color: var(--accent-press); }
+
+/* ---------- the share card and the photo badges ---------- */
+/* The share card is 1.9:1 (1200x630); the box shows it whole, never cropped, so the owner sees exactly
+   what a link preview will contain. */
+.share-card img { width: 100%; max-width: 420px; max-height: none; aspect-ratio: 1200 / 630; }
+/* Two small toggles under a photo's alt text: they draw the badges the built site shows. */
+.shot .flags {
+  display: flex; gap: 10px; flex-wrap: wrap; padding: 5px 8px 7px;
+  border-top: 1px solid var(--line-soft);
+}
+.shot .flags .check { margin-top: 0; gap: 5px; font-size: 10.5px; letter-spacing: .02em; color: var(--muted); }
+.shot .flags input { width: 13px; height: 13px; }

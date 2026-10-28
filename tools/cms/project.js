@@ -170,7 +170,12 @@ function drawPhotos(section, p) {
       '<img src="' + esc(media(ph.thumb || ph.full, ph.v)) + '" alt="" loading="lazy" decoding="async" draggable="false">' +
       '<div class="bar"><span class="grip" title="Drag to reorder">⠿</span><span class="idx">' + String(i + 1).padStart(2, '0') + '</span>' +
       '<button class="del" title="Remove">✕</button></div>' +
-      '<input class="alt" placeholder="alt text" value="' + esc(ph.alt || '') + '"></div>');
+      '<input class="alt" placeholder="alt text" value="' + esc(ph.alt || '') + '">' +
+      '<div class="flags" title="Draws the AI-assisted badge on this photo wherever it appears. ' +
+      'Composite adds a second badge.">' +
+      '<label class="check"><input type="checkbox" data-flag="ai"' + (ph.ai ? ' checked' : '') + '>AI-assisted</label>' +
+      '<label class="check"><input type="checkbox" data-flag="composite"' + (ph.composite ? ' checked' : '') + '>Composite</label>' +
+      '</div></div>');
     $('.del', card).onclick = async () => {
       if (!confirm('Remove this photograph? It moves to tools/removed-media.')) return;
       try { await api('POST', 'api/media', { slug: p.slug, action: 'remove', index: i }); await redrawPhotos(p); toast('Photograph removed'); }
@@ -181,6 +186,23 @@ function drawPhotos(section, p) {
       try { await api('POST', 'api/media', { slug: p.slug, action: 'update', index: i, alt: alt.value }); ph.alt = alt.value; toast('Alt text saved'); }
       catch (e) { toast(e.message, true); }
     };
+    // Two independent badges, saved on the spot: the cover, the masonry tile and the lightbox read them.
+    const flag = name => $('[data-flag=' + name + ']', card);
+    [flag('ai'), flag('composite')].forEach(box => {
+      box.onchange = async () => {
+        const on = { ai: flag('ai').checked, composite: flag('composite').checked };
+        try {
+          const r = await api('POST', 'api/media', { slug: p.slug, action: 'update', index: i,
+            ai: on.ai, composite: on.composite });
+          ph.ai = on.ai;
+          ph.composite = on.composite;
+          // Only a change in the number of photos needs the list rebuilt; otherwise the DOM stays put,
+          // so an alt input being typed into does not lose its focus.
+          if (r.photos !== m.photos.length) await redrawPhotos(p);
+          toast('Badge updated');
+        } catch (e) { toast(e.message, true); }
+      };
+    });
     // A private MIME type keeps photo drags apart from project drags and from files dropped on a card.
     card.ondragstart = e => { e.dataTransfer.setData(PHOTO_MIME, String(i)); card.classList.add('dragging'); };
     card.ondragend = () => card.classList.remove('dragging');

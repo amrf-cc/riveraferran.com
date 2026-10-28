@@ -352,21 +352,6 @@ function imageField(o) {
   return d;
 }
 
-/* ---------------------------------------------------------------- share card */
-// Placeholder, deliberately: the share-image upload (crop to 1200x630, site-config.og_image) is WS3.
-// Until then the pane says which image every link preview uses now, read-only.
-function shareSection(body) {
-  const cfg = S.config || {};
-  const path = cfg.og_image || 'assets/img/og-cover.jpg';
-  body.appendChild(el('<p class="hint">Every page and every project shares one image in link previews, ' +
-    'and one set of Open Graph tags.</p>'));
-  body.appendChild(el('<div class="imgfield full" data-share-card="' + esc(path) + '">' +
-    '<div class="img-head"><span>Current share image</span><span class="img-path">' + esc(path) + '</span></div>' +
-    '<p class="hint" data-share-placeholder="ws3"><strong>Coming in the next update:</strong> replacing this ' +
-    'image from here — uploaded, cropped to 1200 × 630 and saved as the site\'s share card. Until then the ' +
-    'file above is what every link preview shows.</p></div>'));
-}
-
 /* ------------------------------------------------------------- page savebar */
 function firstTooLong(root) {
   let bad = null;
@@ -461,8 +446,7 @@ function definePanes() {
     sub: 'Who the site says you are', build: b => identityFields(b) });
   PageSections.add('identity', { id: 'resume', title: 'Résumé', order: 2,
     sub: 'The PDF behind the Résumé button', build: b => resumeSection(b) });
-  PageSections.add('identity', { id: 'share', title: 'Share card', order: 3,
-    sub: 'The image on every link preview', build: b => shareSection(b) });
+  // The Share card section is registered by share.js, which owns the upload and its own save.
 
   Pages.addPane({ group: 'site', key: 'visibility', title: 'Visibility',
     sub: 'What is on the site, and what is not', render: () => renderVisibility() });

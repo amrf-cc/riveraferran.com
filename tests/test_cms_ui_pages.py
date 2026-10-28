@@ -302,16 +302,16 @@ class TestPagesUi(unittest.TestCase):
         self.toast("Home saved")
         self.assertEqual(self.state()["config"]["hero_image_phone"], "")
 
-    def test_the_share_card_is_a_marked_placeholder(self):
+    def test_the_identity_pane_offers_the_share_card(self):
         self.open_page("identity")
+        self.assertIn("Share card", self.sections())
+        self.p.js("document.querySelector('#pane .acc[data-sec=\"share\"] .acc-head').click()")
         self.assertIn("assets/img/og-cover.jpg",
                       self.p.js("document.querySelector('[data-share-card] .img-path').textContent"))
-        note = self.p.js("document.querySelector('[data-share-placeholder]').textContent")
-        self.assertIn("Coming in the next update", note)
         self.assertEqual(self.p.js("document.querySelector('[data-share-card]').dataset.shareCard"),
                          "assets/img/og-cover.jpg")
-        self.assertFalse(self.p.js("!!document.querySelector('[data-share-card] input[type=file]')"),
-                         "the upload belongs to WS3, not here")
+        self.assertTrue(self.p.js("!!document.querySelector('[data-share-card] input[type=file]')"),
+                        "the share card is replaceable from here")
 
     # -- the rest of the manager ---------------------------------------------------------------
     def test_the_case_and_ai_panes_link_to_a_projects_comparison_sets(self):
