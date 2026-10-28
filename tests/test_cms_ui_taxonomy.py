@@ -206,8 +206,8 @@ class TestTaxonomyUi(unittest.TestCase):
         self.expect_errors = True                           # the browser logs the refused endpoint
         self.p.js("document.querySelector('#site-list [data-pane=contact]').click()")
         self.wait("document.querySelector('#pane h1').textContent === 'Contact'")
-        self.assertEqual(self.sections(), ["Head", "Form", "Messages", "SEO", "Form endpoint"])
-        self.expand(4)
+        self.assertEqual(self.sections(), ["Head", "Form", "Form endpoint", "Messages", "SEO"])
+        self.expand(2)
         self.assertEqual(self.p.js("document.querySelector('[data-endpoint]').value"), "https://formspree.io/f/test")
         self.assertEqual(self.p.js("document.querySelector('a[href=\"https://formspree.io/forms\"]').target"), "_blank")
 

@@ -237,7 +237,7 @@ PageSections.add('taxonomy', { id: 'skills', title: 'Skills', order: 20,
 // The contact form's only wiring (site-config.formspree_endpoint). Empty is allowed: the page then
 // opens the visitor's mail app instead. A wrong value loses inquiries silently, so the server only
 // accepts a Formspree form URL and this field shows its refusal as it comes.
-PageSections.add('contact', { id: 'endpoint', title: 'Form endpoint', order: 90,
+PageSections.add('contact', { id: 'endpoint', title: 'Form endpoint', order: 2.5,
   sub: 'Where the contact form sends messages',
   hint: 'Where the contact form sends messages. Empty = the form opens the visitor’s mail app instead.',
   build(body) {

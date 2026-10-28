@@ -314,22 +314,23 @@ function contentProjectFields(grid, p) {
 }
 
 /* ------------------------------------------------------------------- mount them */
-// Ids and orders only decide layout; the sections sit after the copy sections each pane already has.
+// Ids decide identity, orders decide layout: each section sits right after the copy section it belongs with
+// (pages.js orders are whole numbers, these are the halves between them), so SEO stays last on every page.
 function defineContentSections() {
-  PageSections.add('ai', { id: 'process-steps', title: 'Process steps', order: 30,
+  PageSections.add('ai', { id: 'process-steps', title: 'Process steps', order: 3.5,
     sub: 'The numbered list on the AI page', build: b => b.appendChild(processSection()) });
-  PageSections.add('ai', { id: 'tools-line', title: 'Tools paragraph', order: 40,
+  PageSections.add('ai', { id: 'tools-line', title: 'Tools paragraph', order: 5.5,
     sub: 'The disclosure line under the process', build: b => b.appendChild(toolsSection()) });
-  PageSections.add('reels', { id: 'anatomy-note', title: 'Anatomy of a reel', order: 40,
+  PageSections.add('reels', { id: 'anatomy-note', title: 'Reel formats note', order: 4.5,
     sub: 'The paragraph inside the breakdown block', build: b => b.appendChild(anatomySection()) });
-  PageSections.add('about', { id: 'credits-heading', title: 'Credits heading', order: 25,
+  PageSections.add('about', { id: 'credits-heading', title: 'Credits heading', order: 4.5,
     sub: 'The line over the production credits', build: b => b.appendChild(creditsHeadingSection()) });
-  PageSections.add('paid', { id: 'video-ads', title: 'Video ads', order: 10,
-    sub: 'The ad videos themselves', build: b => b.appendChild(videoAdsSection()) });
-  PageSections.add('paid', { id: 'static-ads', title: 'Static ads', order: 20,
-    sub: 'The stills themselves', build: b => b.appendChild(staticAdsSection()) });
-  PageSections.add('paid', { id: 'paid-intro', title: 'Intro', order: 30,
+  PageSections.add('paid', { id: 'paid-intro', title: 'Paid Social intro', order: 1.5,
     sub: 'The line used while the page introduction is empty', build: b => b.appendChild(paidIntroSection()) });
+  PageSections.add('paid', { id: 'video-ads', title: 'Video ads', order: 2.5,
+    sub: 'The ad videos themselves', build: b => b.appendChild(videoAdsSection()) });
+  PageSections.add('paid', { id: 'static-ads', title: 'Static ads', order: 3.5,
+    sub: 'The stills themselves', build: b => b.appendChild(staticAdsSection()) });
 }
 
 defineContentSections();

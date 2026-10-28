@@ -485,7 +485,7 @@ function definePanes() {
   PageSections.add('work', { id: 'filters', title: 'Filters', order: 2,
     sub: 'The group filter above the cards', build: copying('work', 'Filters') });
   PageSections.add('work', { id: 'groups', title: 'Groups', order: 3,
-    sub: 'Headings between the groups', hint: 'Group names themselves are edited in the Categories section of the taxonomy update.',
+    sub: 'Headings between the groups', hint: 'The group names themselves are edited under Site, in Categories & skills.',
     build: copying('work', 'Groups') });
   PageSections.add('work', { id: 'cards', title: 'Cards', order: 4,
     sub: 'The link on every project card', hint: 'Also on the Home page and on the AI page’s live cards.',
@@ -547,9 +547,9 @@ function definePanes() {
   paid.onSave = save;
   PageSections.add('paid', { id: 'head', title: 'Head', order: 1, sub: 'Kicker, heading and intro',
     build: b => { b.appendChild(copyRows('paid', copyCurrent(), { section: 'Head' })); introField(b, 'paid', 'Page intro'); } });
-  PageSections.add('paid', { id: 'video', title: 'Video ads', order: 2,
+  PageSections.add('paid', { id: 'video', title: 'Video ads: heading and sizes', order: 2,
     sub: 'The heading and the sizes the page promises', build: copying('paid', 'Video ads') });
-  PageSections.add('paid', { id: 'static', title: 'Static ads', order: 3,
+  PageSections.add('paid', { id: 'static', title: 'Static ads: heading', order: 3,
     sub: 'The heading over the stills', build: copying('paid', 'Static ads') });
   PageSections.add('paid', { id: 'seo', title: 'SEO', order: 4, sub: 'The browser tab and search results',
     build: seoSection([{ key: 'paid', label: 'Paid Social page' }]) });

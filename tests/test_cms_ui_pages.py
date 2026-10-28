@@ -141,6 +141,21 @@ class TestPagesUi(unittest.TestCase):
             self.assertEqual(self.p.js("document.querySelector('#pane h1').textContent"), title)
             self.assertTrue(self.p.js("document.querySelectorAll('#pane .acc').length") > 0, key)
 
+    def test_no_pane_repeats_a_section_title_and_every_seo_section_comes_last(self):
+        # Features register their own sections (share, content, taxonomy), so a new one can land after SEO
+        # or repeat a neighbour's title. The owner navigates by these titles: both are bugs.
+        for key, _ in PAGES:
+            self.open_page(key)
+            titles = self.sections()
+            self.assertEqual(len(titles), len(set(titles)), "%s repeats a title: %s" % (key, titles))
+            if "SEO" in titles:
+                self.assertEqual(titles[-1], "SEO", "%s: %s" % (key, titles))
+
+    def test_the_paid_pane_reads_in_the_order_the_page_does(self):
+        self.open_page("paid")
+        self.assertEqual(self.sections(), ["Head", "Paid Social intro", "Video ads: heading and sizes",
+                                           "Video ads", "Static ads: heading", "Static ads", "SEO"])
+
     def test_the_first_section_is_open_and_a_collapsed_one_opens_on_click(self):
         self.open_page("home")
         self.assertEqual(self.open_sections(), [True, False, False, False, False])
