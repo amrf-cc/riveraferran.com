@@ -51,8 +51,8 @@ def toast(p, pattern, timeout=40):
     return p.js("document.querySelector('#toast').textContent")
 
 
-def open_pane(p, index):
-    p.js("document.querySelectorAll('#site-list li')[%d].click()" % index)
+def open_pane(p, key):
+    p.js("document.querySelector('#site-list [data-pane=\"%s\"]').click()" % key)
     time.sleep(0.9)
 
 
@@ -170,24 +170,36 @@ with cdp.Browser(1440, 900) as b:
     toast(p, "Video list saved")
     check("removing the row and saving restores the list", len(state()["manifest"]["projects"]["chef-mia-castro"]["videos"]) == v0)
 
-    # ---- F. site settings
-    print("\n== F. site settings")
-    open_pane(p, 0)
-    check("settings pane shows the headline", len(p.js("document.querySelector('[data-k=headline]').value")) > 5)
+    # ---- F. identity and the home page
+    print("\n== F. identity & the home page")
+    open_pane(p, "identity")
+    check("identity pane shows the name", len(p.js("document.querySelector('[data-k=name]').value")) > 3)
+    old = state()["config"]["name"]
+    p.js("(()=>{const i=document.querySelector('[data-k=name]'); i.value=i.value+' [ui]'; i.dispatchEvent(new Event('input',{bubbles:true}));})()")
+    p.js("document.querySelector('#save-identity').click()")
+    toast(p, "saved")
+    check("name saved", state()["config"]["name"] == old + " [ui]")
+    check("a draft banner did not appear (still a release)", state()["build"]["ready"])
+    p.js("(()=>{const i=document.querySelector('[data-k=name]'); i.value=%s; i.dispatchEvent(new Event('input',{bubbles:true}));})()" % json.dumps(old))
+    p.js("document.querySelector('#save-identity').click()")
+    toast(p, "saved")
+    check("resume card lists the file", "Ferr" in p.js("document.querySelector('.res-file').textContent"), p.js("document.querySelector('.res-file').textContent"))
+    print("\n== F2. home page copy")
+    open_pane(p, "home")
+    check("home pane shows the headline", len(p.js("document.querySelector('[data-k=headline]').value")) > 5)
     old = state()["config"]["headline"]
     p.js("(()=>{const i=document.querySelector('[data-k=headline]'); i.value=i.value+' [ui]'; i.dispatchEvent(new Event('input',{bubbles:true}));})()")
-    p.js("document.querySelector('#save-site').click()")
-    toast(p, "Settings saved")
+    p.js("document.querySelector('#save-home').click()")
+    toast(p, "saved")
     check("headline saved", state()["config"]["headline"] == old + " [ui]")
     check("a draft banner did not appear (still a release)", state()["build"]["ready"])
     p.js("(()=>{const i=document.querySelector('[data-k=headline]'); i.value=%s; i.dispatchEvent(new Event('input',{bubbles:true}));})()" % json.dumps(old))
-    p.js("document.querySelector('#save-site').click()")
-    toast(p, "Settings saved")
-    check("resume card lists the file", "Ferr" in p.js("document.querySelector('.res-file').textContent"), p.js("document.querySelector('.res-file').textContent"))
+    p.js("document.querySelector('#save-home').click()")
+    toast(p, "saved")
 
     # ---- G. visibility pane switches
     print("\n== G. visibility pane")
-    open_pane(p, 1)
+    open_pane(p, "visibility")
     p.js("document.querySelectorAll('.vcard .switch input')[0].click()")           # showreel on
     toast(p, "Showreel is on")
     cfg = state()
@@ -217,7 +229,7 @@ with cdp.Browser(1440, 900) as b:
 
     # ---- H. reels
     print("\n== H. reels")
-    open_pane(p, 2)
+    open_pane(p, "reels")
     nreels = len(state()["media"]["reels"])
     p.js("document.querySelector('#rows-x, .rows-section [data-add]').click()")
     p.js("""(()=>{const sec=document.querySelectorAll('.rows-section')[0]; const r=[...sec.querySelectorAll('.rowx')].pop();
@@ -236,7 +248,7 @@ with cdp.Browser(1440, 900) as b:
 
     # ---- I. about and credits
     print("\n== I. about & credits")
-    open_pane(p, 3)
+    open_pane(p, "about")
     ncred = len(state()["media"]["credits"])
     check("credits rows rendered", p.js("document.querySelectorAll('.rows-section')[1].querySelectorAll('.rowx').length") == ncred, ncred)
     check("the long role is not clipped to nothing", p.js("document.querySelectorAll('.rows-section')[1].querySelector('[data-f=role]').getBoundingClientRect().width") > 250)

@@ -1,4 +1,6 @@
-/* Site panes (settings, visibility, reels, about), the rows editor they share with the video list, and boot. */
+/* The field groups the page panes mount (identity, hero, bio, introductions, collaborations, reels,
+   motion, experience, credits, side projects, education and the résumé card), the rows editor they share
+   with the video list, the Visibility pane, and boot. pages.js owns the panes; this file owns the fields. */
 'use strict';
 
 const ROW_MIME = 'application/x-site-row';
@@ -194,81 +196,81 @@ function sectionGrid(parent, title, hint) {
   return g;
 }
 
-function renderSite() {
-  const c = S.config;
-  pane.innerHTML = '';
-  pane.appendChild(el('<div><h1>Site settings</h1><p class="hint">The words and images that appear across the site. Everything on this page saves together.</p></div>'));
-  const form = el('<div class="form"></div>');
-  pane.appendChild(form);
+// Every builder below appends its group to a page pane's section body and tags each input with the
+// config path it writes (cfgField in pages.js), so a page's Save button sends only that page's changes.
 
-  let g = sectionGrid(form, 'Identity');
-  g.appendChild(field('Name', 'name', c.name));
-  g.appendChild(field('Role / title', 'title', c.title));
-  g.appendChild(field('Based', 'based', c.based));
-  g.appendChild(field('Email', 'email', c.email));
-  g.appendChild(field('Domain', 'domain', c.domain, { hint: 'No https://. Setting it writes the CNAME on the next build.' }));
-  g.appendChild(field('Instagram', 'instagram', c.instagram, { hint: 'A full link, or empty.' }));
-  g.appendChild(field('LinkedIn', 'linkedin', c.linkedin, { hint: 'A full link, or empty.' }));
-
-  g = sectionGrid(form, 'Home page');
-  g.appendChild(field('Headline', 'headline', c.headline, { full: true, area: true, rows: 2 }));
-  g.appendChild(field('Subline', 'subline', c.subline, { full: true, area: true, rows: 3 }));
-  [['Hero photograph (path in the repo)', 'hero_image'], ['Hero photograph, phone', 'hero_image_phone'],
-    ['Hero cut-out (subject with alpha)', 'hero_cutout']].forEach(([label, key]) => {
-    const f = field(label, key, c[key], { full: true });
-    const prev = el('<img class="hero-prev" alt="" hidden>');
-    const paint = () => { const v = $('input', f).value.trim(); prev.hidden = !v; if (v) prev.src = media(v); };
-    $('input', f).addEventListener('input', paint);
-    prev.onerror = () => { prev.hidden = true; };
-    f.appendChild(prev);
-    paint();
-    g.appendChild(f);
-  });
-  g.appendChild(field('Hero caption', 'hero_caption', c.hero_caption, { full: true, hint: 'Read aloud by screen readers.' }));
-  (c.masthead_labels || ['', '', '']).forEach((v, i) => g.appendChild(field('Masthead label ' + (i + 1), 'label' + i, v)));
-
-  g = sectionGrid(form, 'Bio and closing line');
-  g.appendChild(field('Bio (one paragraph per blank line)', 'bio', (c.bio || []).join('\n\n'), { full: true, area: true, rows: 8 }));
-  g.appendChild(field('Closing line', 'cta', c.cta, { full: true, area: true, rows: 2 }));
-
-  g = sectionGrid(form, 'Page introductions', 'The line under each page title.');
-  const intros = c.page_intros || {};
-  [['work', 'Work'], ['reels', 'Reels'], ['ai', 'AI & Workflow'], ['paid', 'Paid Social'], ['about', 'About']].forEach(([k, label]) =>
-    g.appendChild(field(label, 'intro-' + k, intros[k], { full: true, area: true, rows: 2 })));
-
-  g = sectionGrid(form, 'Collaborations');
-  const collab = c.collaborations || {};
-  g.appendChild(field('Heading', 'collab-label', collab.label, { full: true }));
-  g.appendChild(field('Brands (one per line)', 'collab-names', lines(collab.names), { full: true, area: true, rows: 6 }));
-
-  g = sectionGrid(form, 'AI label');
-  g.appendChild(field('Badge text on AI-assisted work', 'ai_label', c.ai_label, { hint: 'Shown on every AI-assisted piece.' }));
-
-  pane.appendChild(el('<div class="savebar"><button class="btn primary js-save" data-scope="form" id="save-site">Save settings</button>' +
-    '<span class="hint">Cmd+S saves too.</span></div>'));
-  $('#save-site').onclick = saveSite;
-  pane.appendChild(resumeCard());
+// SITE -> Identity & sharing
+function identityFields(parent) {
+  const c = S.config || {};
+  const g = el('<div class="grid"></div>');
+  g.appendChild(cfgField('Name', 'name', c.name));
+  g.appendChild(cfgField('Role / title', 'title', c.title));
+  g.appendChild(cfgField('Based', 'based', c.based));
+  g.appendChild(cfgField('Email', 'email', c.email));
+  g.appendChild(cfgField('Domain', 'domain', c.domain, { hint: 'No https://. Setting it writes the CNAME on the next build.' }));
+  g.appendChild(cfgField('Instagram', 'instagram', c.instagram, { hint: 'A full link, or empty.' }));
+  g.appendChild(cfgField('LinkedIn', 'linkedin', c.linkedin, { hint: 'A full link, or empty.' }));
+  g.appendChild(cfgField('AI label', 'ai_label', c.ai_label, { hint: 'Shown on every AI-assisted piece.' }));
+  parent.appendChild(g);
 }
 
-async function saveSite() {
-  const body = { page_intros: {}, collaborations: {}, masthead_labels: [] };
-  $$('[data-k]', pane).forEach(inp => {
-    const k = inp.dataset.k;
-    if (k === 'bio') body.bio = inp.value.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean);
-    else if (k.startsWith('label')) body.masthead_labels[+k.slice(5)] = inp.value;
-    else if (k.startsWith('intro-')) body.page_intros[k.slice(6)] = inp.value;
-    else if (k === 'collab-label') body.collaborations.label = inp.value;
-    else if (k === 'collab-names') body.collaborations.names = toLines(inp.value);
-    else body[k] = inp.value;
-  });
-  try {
-    const r = await api('POST', 'api/config', body);
-    await refresh();
-    renderSidebar();
-    renderCurrent();
-    toast(r.changed ? 'Settings saved' : 'Nothing changed');
-  } catch (e) { toast(e.message, true); }
+// Home -> Hero: the headline, the two lines, the three masthead images and their labels.
+function mastheadFields(parent) {
+  const c = S.config || {};
+  const g = el('<div class="grid"></div>');
+  g.appendChild(cfgField('Headline', 'headline', c.headline, { full: true, area: true, rows: 2 }));
+  g.appendChild(cfgField('Subline', 'subline', c.subline, { full: true, area: true, rows: 3 }));
+  g.appendChild(imageField({
+    label: 'Hero photograph', key: 'hero_image', value: c.hero_image, scope: 'hero',
+    hint: 'The wide masthead image. Anything larger than 2400 px on the long edge is shrunk, never stretched. ' +
+      'It is also the cover of any project that uses it as photo 01.',
+  }));
+  g.appendChild(imageField({
+    label: 'Hero photograph, phone', key: 'hero_image_phone', value: c.hero_image_phone, scope: 'hero',
+    hint: 'Shown on narrow screens. A portrait crop works best.',
+  }));
+  g.appendChild(imageField({
+    label: 'Hero cut-out', key: 'hero_cutout', value: c.hero_cutout, scope: 'cutout',
+    hint: 'PNG with transparency: the subject standing in front of the photo. A JPEG cut-out would show a black box.',
+  }));
+  g.appendChild(cfgField('Hero caption', 'hero_caption', c.hero_caption, { full: true, hint: 'Read aloud by screen readers.' }));
+  const labels = Array.isArray(c.masthead_labels) ? c.masthead_labels.slice(0, 3) : [];
+  for (let i = 0; i < 3; i++) {
+    g.appendChild(cfgField('Masthead label ' + (i + 1), 'masthead_labels.' + i, labels[i] || '',
+      { hint: i === 0 ? 'One word under each masthead image.' : '' }));
+  }
+  parent.appendChild(g);
 }
+
+// Home -> About block and About -> Bio: the same two values close both pages.
+function bioFields(parent) {
+  const c = S.config || {};
+  const g = el('<div class="grid"></div>');
+  g.appendChild(cfgField('Bio (one paragraph per blank line)', 'bio', (c.bio || []).join('\n\n'),
+    { full: true, area: true, rows: 8 }));
+  g.appendChild(cfgField('Closing line', 'cta', c.cta, { full: true, area: true, rows: 2 }));
+  parent.appendChild(g);
+}
+
+// Each page's intro: the line under the page title.
+function introField(parent, pageKey, label) {
+  const intros = (S.config || {}).page_intros || {};
+  const g = el('<div class="grid"></div>');
+  g.appendChild(cfgField(label || 'Page intro', 'page_intros.' + pageKey, intros[pageKey],
+    { full: true, area: true, rows: 2, hint: 'The line under the page title.' }));
+  parent.appendChild(g);
+}
+
+// Home -> Collaborations
+function collaborationsFields(parent) {
+  const collab = (S.config || {}).collaborations || {};
+  const g = el('<div class="grid"></div>');
+  g.appendChild(cfgField('Heading', 'collaborations.label', collab.label, { full: true }));
+  g.appendChild(cfgField('Brands (one per line)', 'collaborations.names', lines(collab.names),
+    { full: true, area: true, rows: 6, kind: 'lines' }));
+  parent.appendChild(g);
+}
+
 
 function resumeCard() {
   const r = S.resume || {};
@@ -295,6 +297,10 @@ function resumeCard() {
     } catch (err) { toast(err.message, true); }
   };
   return d;
+}
+
+function resumeSection(parent) {
+  parent.appendChild(resumeCard());
 }
 
 /* -------------------------------------------------------------- visibility */
@@ -401,12 +407,13 @@ function renderVisibility() {
 }
 
 /* ----------------------------------------------------------- reels, motion */
-function renderReels() {
-  pane.innerHTML = '';
-  pane.appendChild(el('<div><h1>Reels & motion</h1><p class="hint">The Reels page: short-form video, then animation. Videos play from Livid, so each needs its link. Order here is the order on the page.</p></div>'));
-  pane.appendChild(el('<datalist id="dl-formats">' + S.formats.map(f => '<option value="' + esc(f) + '">').join('') + '</datalist>'));
-
-  pane.appendChild(rowsEditor({
+// The two lists the Reels page is built from. Each keeps its own Save button and unsaved marker; the
+// copy around them saves with the page.
+function reelsList() {
+  const wrap = el('<div></div>');
+  wrap.appendChild(el('<datalist id="dl-formats">' +
+    (S.formats || []).map(f => '<option value="' + esc(f) + '">').join('') + '</datalist>'));
+  wrap.appendChild(rowsEditor({
     id: 'reels', title: 'Reels',
     hint: 'Format groups the filter pills on the Reels page. Link a reel to a project to show it on that project\'s page. Nothing changes until you click Save reels.',
     rowsOf: () => S.media.reels || [],
@@ -424,8 +431,11 @@ function renderReels() {
     save: rows => api('PUT', 'api/lists/reels', { rows }),
     addLabel: '+ Add reel', saveLabel: 'Save reels', savedMsg: 'Reels saved',
   }));
+  return wrap;
+}
 
-  pane.appendChild(rowsEditor({
+function motionList() {
+  return rowsEditor({
     id: 'motion', title: 'Motion',
     hint: 'Animation work, shown under the reels. Nothing changes until you click Save motion.',
     rowsOf: () => S.media.motion || [],
@@ -440,16 +450,13 @@ function renderReels() {
     poster: { scope: 'motion' },
     save: rows => api('PUT', 'api/lists/motion', { rows }),
     addLabel: '+ Add motion piece', saveLabel: 'Save motion', savedMsg: 'Motion saved',
-  }));
+  });
 }
 
 /* --------------------------------------------------------- about & credits */
-function renderAbout() {
-  const c = S.config;
-  pane.innerHTML = '';
-  pane.appendChild(el('<div><h1>About & credits</h1><p class="hint">What the About page lists. Production credits are facts: change a role only to something you can stand behind.</p></div>'));
-
-  pane.appendChild(rowsEditor({
+// Experience, credits and side projects keep their own Save buttons; the headings over them are copy.
+function experienceList() {
+  return rowsEditor({
     id: 'experience', title: 'Experience',
     hint: 'Newest first. Nothing changes until you click Save experience.',
     rowsOf: () => S.config.experience || [],
@@ -461,9 +468,11 @@ function renderAbout() {
     ],
     save: rows => api('PUT', 'api/lists/experience', { rows }),
     addLabel: '+ Add job', saveLabel: 'Save experience', savedMsg: 'Experience saved',
-  }));
+  });
+}
 
-  pane.appendChild(rowsEditor({
+function creditsList() {
+  return rowsEditor({
     id: 'credits', title: 'Production credits',
     hint: 'One row per credit, as it should read on the About page. Nothing changes until you click Save credits.',
     rowsOf: () => S.media.credits || [],
@@ -475,9 +484,11 @@ function renderAbout() {
     ],
     save: rows => api('PUT', 'api/lists/credits', { rows }),
     addLabel: '+ Add credit', saveLabel: 'Save credits', savedMsg: 'Credits saved',
-  }));
+  });
+}
 
-  pane.appendChild(rowsEditor({
+function sideProjectsList() {
+  return rowsEditor({
     id: 'side_projects', title: 'Side projects',
     hint: 'Nothing changes until you click Save side projects.',
     rowsOf: () => S.config.side_projects || [],
@@ -488,29 +499,23 @@ function renderAbout() {
     ],
     save: rows => api('PUT', 'api/lists/side_projects', { rows }),
     addLabel: '+ Add side project', saveLabel: 'Save side projects', savedMsg: 'Side projects saved',
-  }));
+  });
+}
 
-  pane.appendChild(el('<h2>Education, languages, tools</h2>'));
-  const g = el('<div class="grid"></div>');
-  g.appendChild(field('Education', 'education', c.education, { full: true }));
-  g.appendChild(field('Languages', 'languages', c.languages, { full: true }));
-  g.appendChild(field('Tools (one per line)', 'tools', lines(c.tools), { area: true, rows: 8 }));
-  g.appendChild(field('Certifications (one per line)', 'certifications', lines(c.certifications), { area: true, rows: 8 }));
-  pane.appendChild(g);
-  pane.appendChild(el('<div class="row"><button class="btn primary js-save" data-scope="form" id="save-about">Save these</button></div>'));
-  $('#save-about').onclick = async () => {
-    const body = {};
-    $$('[data-k]', pane).forEach(inp => {
-      const k = inp.dataset.k;
-      body[k] = (k === 'tools' || k === 'certifications') ? toLines(inp.value) : inp.value;
-    });
-    try {
-      const r = await api('POST', 'api/config', body);
-      await refresh();
-      renderCurrent();
-      toast(r.changed ? 'Saved' : 'Nothing changed');
-    } catch (e) { toast(e.message, true); }
-  };
+// Tools, education, certifications, languages: one plain config value each, under its copy heading.
+const ABOUT_VALUES = {
+  tools: ['Tools (one per line)', 8, 'lines'],
+  education: ['Education', 2, 'text'],
+  certifications: ['Certifications (one per line)', 8, 'lines'],
+  languages: ['Languages', 2, 'text'],
+};
+
+function aboutValueField(kind) {
+  const c = S.config || {};
+  const spec = ABOUT_VALUES[kind];
+  const linesMode = spec[2] === 'lines';
+  return cfgField(spec[0], kind, linesMode ? lines(c[kind]) : c[kind],
+    { full: true, area: true, rows: spec[1], kind: linesMode ? 'lines' : 'text' });
 }
 
 /* --------------------------------------------------------------------- boot */

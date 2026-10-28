@@ -9,21 +9,16 @@ const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const pane = $('#pane');
 
 const SHAPES = [['9 / 16', 'Vertical 9:16'], ['16 / 9', 'Horizontal 16:9'], ['4 / 5', 'Portrait 4:5'], ['1 / 1', 'Square 1:1']];
-const SITE_PANES = [
-  ['__site', 'Site settings', 'Name, hero, bio, contact'],
-  ['__vis', 'Visibility', 'What is on the site, and what is not'],
-  ['__reels', 'Reels & motion', 'Short-form video and animation'],
-  ['__about', 'About & credits', 'Experience, credits, tools'],
-];
+// The sidebar's SITE and PAGES tree lives in pages.js (Pages.addPane); this file renders and routes it.
 
 const EYE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
 const EYE_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.6 6.6A17.4 17.4 0 0 0 2 12s3.6 7 10 7a9.8 9.8 0 0 0 4-.8"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
 
 let S = {                        // server state
   version: '', config: {}, categories: [], projects: [], manifest: { projects: {} },
-  media: {}, formats: [], constants: {}, resume: {}, build: {},
+  media: {}, formats: [], constants: {}, resume: {}, build: {}, copy_registry: { pages: [], keys: [] },
 };
-let sel = null;                  // project slug | '__site' | '__vis' | '__reels' | '__about' | '__draft'
+let sel = null;                  // project slug | a Pages pane key ('home', 'identity', …) | '__draft'
 let draft = null;                // an unsaved new project
 let dirty = false;               // unsaved edits in the open form
 const dirtyLists = new Set();    // rows editors with unsaved edits (video list, reels, ...)
@@ -146,11 +141,11 @@ async function refresh() {       // re-read the server without touching the pane
   S = Object.assign(S, {
     version: d.version, config: d.config, categories: d.categories, projects: d.projects,
     manifest: d.manifest, media: d.media, formats: d.formats, constants: d.constants,
-    resume: d.resume, build: d.build,
+    resume: d.resume, build: d.build, copy_registry: d.copy_registry,
   });
 }
 
-const firstSel = () => (S.projects.length ? S.projects[0].slug : '__site');
+const firstSel = () => (S.projects.length ? S.projects[0].slug : 'identity');
 
 async function load() {
   await refresh();
@@ -215,11 +210,18 @@ function renderSidebar() {
   $('#proj-count').textContent = S.projects.length;
   const site = $('#site-list');
   site.innerHTML = '';
-  SITE_PANES.forEach(([key, name, sub]) => {
-    const li = el('<li' + (sel === key ? ' class="sel"' : '') + '><div class="meta"><div class="name">' + esc(name) +
-      '</div><div class="sub">' + esc(sub) + '</div></div></li>');
-    li.onclick = () => select(key);
-    site.appendChild(li);
+  const current = Pages.keyOf(sel);
+  PANE_GROUPS.forEach(([name, label]) => {
+    const panes = Pages.group(name);
+    if (!panes.length) return;
+    site.appendChild(el('<li class="group-head side-group" data-group="' + name + '">' + esc(label) + '</li>'));
+    panes.forEach(p => {
+      const li = el('<li data-pane="' + esc(p.key) + '"' + (current === p.key ? ' class="sel"' : '') + '>' +
+        '<div class="meta"><div class="name">' + esc(p.title) + '</div>' +
+        (p.sub ? '<div class="sub">' + esc(p.sub) + '</div>' : '') + '</div></li>');
+      li.onclick = () => select(p.key);
+      site.appendChild(li);
+    });
   });
 
   const list = $('#proj-list');
@@ -352,20 +354,14 @@ function orderAfterMove(items, from, target, after) {
 }
 
 /* ----------------------------------------------------------------- routing */
-function paneFor(which) {
-  if (which === '__site') return renderSite;
-  if (which === '__vis') return renderVisibility;
-  if (which === '__reels') return renderReels;
-  if (which === '__about') return renderAbout;
-  return null;
-}
-
+// A page pane is any key Pages knows; the four old keys ('__site', '__vis', '__reels', '__about') still
+// select the pane they always did, through Pages.keyOf.
 function renderCurrent() {
   dirty = false;
   dirtyLists.clear();
   renderStatus();
-  const fn = paneFor(sel);
-  if (fn) return fn();
+  const key = Pages.keyOf(sel);
+  if (Pages.pane(key)) return Pages.render(key);
   if (sel === '__draft') return renderProject(draft, true);
   const p = S.projects.find(x => x.slug === sel);
   if (p) return renderProject(p, false);

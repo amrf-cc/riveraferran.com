@@ -95,11 +95,13 @@ class TestUi(unittest.TestCase):
         self.p.js("document.querySelector('#proj-list [data-vis-slug=\"%s\"]').closest('li').click()" % slug)
         self.wait("(document.querySelector('#pane .slug')||{textContent:''}).textContent.startsWith('%s')" % slug)
 
-    PANES = ["Site settings", "Visibility", "Reels & motion", "About & credits"]
+    PANES = {"identity": "Identity & sharing", "visibility": "Visibility", "home": "Home",
+             "reels": "Reels", "about": "About"}
 
-    def open_pane(self, index):
-        self.p.js("document.querySelectorAll('#site-list li')[%d].click()" % index)
-        self.wait("document.querySelector('#pane h1') && document.querySelector('#pane h1').textContent === %s" % json.dumps(self.PANES[index]))
+    def open_pane(self, key):
+        self.p.js("document.querySelector('#site-list [data-pane=\"%s\"]').click()" % key)
+        self.wait("document.querySelector('#pane h1') && document.querySelector('#pane h1').textContent === %s"
+                  % json.dumps(self.PANES[key]))
 
     def dirty(self):
         return "Unsaved changes" in self.p.js("document.querySelector('#status').textContent")
@@ -270,21 +272,28 @@ class TestUi(unittest.TestCase):
 
     # -- the site panes -------------------------------------------------------------------------
     def test_site_settings_save_together_and_the_resume_card_lists_the_file(self):
-        self.open_pane(0)
-        self.assertEqual(self.p.js("document.querySelector('[data-k=headline]').value"), "Headline.")
-        self.p.js("setInput('[data-k=headline]', 'A new headline.')")
-        self.p.js("document.querySelector('#save-site').click()")
-        self.toast("Settings saved")
-        self.assertEqual(self.state()["config"]["headline"], "A new headline.")
+        self.open_pane("identity")
+        self.assertEqual(self.p.js("document.querySelector('[data-k=name]').value"), "Test Person")
+        self.p.js("setInput('[data-k=name]', 'A New Name')")
+        self.p.js("document.querySelector('#save-identity').click()")
+        self.toast("saved")
+        self.assertEqual(self.state()["config"]["name"], "A New Name")
         self.assertIn("Resume.pdf", self.p.js("document.querySelector('.res-file').textContent"))
         self.p.js("setInput('[data-k=domain]', 'not a domain')")
-        self.p.js("document.querySelector('#save-site').click()")
+        self.p.js("document.querySelector('#save-identity').click()")
         self.expect_errors = True                       # the browser logs the refused request
         self.toast("domain")
         self.assertEqual(self.state()["config"]["domain"], "example.com")
+        # The headline moved to its own page pane; it still saves in that page's one request.
+        self.open_pane("home")
+        self.assertEqual(self.p.js("document.querySelector('[data-k=headline]').value"), "Headline.")
+        self.p.js("setInput('[data-k=headline]', 'A new headline.')")
+        self.p.js("document.querySelector('#save-home').click()")
+        self.toast("Home saved")
+        self.assertEqual(self.state()["config"]["headline"], "A new headline.")
 
     def test_the_visibility_pane_switches_pages_sections_and_cards(self):
-        self.open_pane(1)
+        self.open_pane("visibility")
         sw = "document.querySelectorAll('.vcard .switch input')"
         self.p.js(sw + "[0].click()")
         self.toast("Showreel is on")
@@ -310,7 +319,7 @@ class TestUi(unittest.TestCase):
         self.assertTrue(self.p.js("document.querySelector('.vrow[data-vis-row=\"gamma\"]').classList.contains('is-hidden')"))
 
     def test_reels_and_credits_are_editable_lists(self):
-        self.open_pane(2)
+        self.open_pane("reels")
         sec = "document.querySelectorAll('.rows-section')[0]"
         self.p.js(sec + ".querySelector('[data-add]').click()")
         self.p.js("""(()=>{const r=[...document.querySelectorAll('.rows-section')[0].querySelectorAll('.rowx')].pop();
@@ -320,8 +329,8 @@ class TestUi(unittest.TestCase):
         self.toast("Reels saved")
         reels = self.state()["media"]["reels"]
         self.assertEqual((len(reels), reels[-1]["slug"], reels[-1]["project"], reels[0]["ai"]), (2, "ui-test-reel", "gamma", True))
-        self.open_pane(3)
-        self.p.js("setInput('.rows-section:nth-of-type(2) [data-f=role]', 'Director')")
+        self.open_pane("about")
+        self.p.js("setInput('[data-f=role]', 'Director', document.querySelectorAll('.rows-section')[1])")
         self.p.js("document.querySelectorAll('.rows-section')[1].querySelector('.js-save').click()")
         self.toast("Credits saved")
         self.assertEqual(self.state()["media"]["credits"][0]["role"], "Director")
@@ -331,7 +340,7 @@ class TestUi(unittest.TestCase):
         self.wait("!document.querySelector('#sheet').hidden")
         self.assertIn("Release-ready", self.p.js("document.querySelector('#sheet-body').textContent"))
         self.p.js("document.querySelector('#sheet-close').click()")
-        self.open_pane(1)
+        self.open_pane("visibility")
         self.p.js("document.querySelectorAll('.vcard .switch input')[0].click()")
         self.toast("Showreel is on")
         self.p.js("document.querySelector('#pill-release').click()")
