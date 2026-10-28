@@ -1,9 +1,9 @@
 <section class="page-head">
   <div class="wrap">
-    <span class="kicker">Work</span>
-    <h1>Work</h1>
+    <span class="kicker">${WORK_KICKER}</span>
+    <h1>${WORK_HEADING}</h1>
     ${INTRO}
-    <nav class="filters" aria-label="Filter by group" data-filter-group>
+    <nav class="filters" aria-label="${WORK_FILTER_LABEL}" data-filter-group>
 ${FILTERS}
     </nav>
   </div>
@@ -13,6 +13,6 @@ ${FILTERS}
     <div class="grid work-grid">
 ${CARDS}
     </div>
-    <p class="filter-empty" hidden>No projects in this group yet.</p>
+    <p class="filter-empty" hidden>${WORK_EMPTY}</p>
   </div>
 </section>

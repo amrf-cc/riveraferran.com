@@ -89,8 +89,12 @@ FULL_EDGE, FULL_Q = 2000, 72
 THUMB_EDGE, THUMB_Q = 1280, 55
 POSTER_Q = 70
 POSTER_EDGE = {"project": 1920, "showreel": 1920, "reel": 1280, "motion": 1280,
-               "set": 1920}
-POSTER_DIR = {"reel": "posters/reels", "motion": "posters/motion", "showreel": "posters/showreel"}
+               "set": 1920,
+               "hero": 2400,
+               "cutout": 2000}
+POSTER_DIR = {"reel": "posters/reels", "motion": "posters/motion", "showreel": "posters/showreel",
+              "hero": "masthead",
+              "cutout": "masthead"}
 IMAGE_SUFFIXES = (".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif", ".tif", ".tiff", ".gif")
 RATIOS = ("9 / 16", "16 / 9", "4 / 5", "1 / 1")
 
@@ -370,12 +374,29 @@ def make_jpeg(src, dst, edge, quality):
         bad("That file could not be converted to a JPEG.")
 
 
+def make_png(src, dst, edge):
+    """PNG, shrunk to `edge` on the long side and never enlarged. The alpha channel survives, which is
+    the whole point: a masthead cut-out saved as JPEG would show a black box over the photo."""
+    w, h = _dims(src)
+    cmd = ["sips", "-s", "format", "png"]
+    if max(w, h) > edge:
+        cmd += ["-Z", str(edge)]
+    r = subprocess.run(cmd + [str(src), "--out", str(dst)], capture_output=True, text=True)
+    if r.returncode != 0 or not Path(dst).is_file():
+        bad("That file could not be converted to a PNG.")
+
+
 def save_upload(q, body):
     """Raw image bytes -> full + thumb for a photo, or one poster. Does not touch the data files."""
     kind = q.get("kind") or "photo"
     scope = q.get("scope") or "project"
-    if kind not in ("photo", "poster") or scope not in ("project", "reel", "motion", "showreel", "set"):
+    if kind not in ("photo", "poster") or scope not in ("project", "reel", "motion", "showreel", "set",
+                                                        "hero",
+                                                        "cutout"):
         bad("Unknown upload type.")
+    if scope in ("hero", "cutout"):
+        # Masthead images belong to no project: always one file, always assets/img/masthead/.
+        kind = "poster"
     name = q.get("name") or "upload"
     suffix = Path(name).suffix.lower()
     if suffix not in IMAGE_SUFFIXES:
@@ -392,15 +413,16 @@ def save_upload(q, body):
     thumbs = folder / "thumbs"
     if kind == "photo":
         thumbs.mkdir(exist_ok=True)
+    ext = ".png" if scope == "cutout" else ".jpg"      # a cut-out keeps its alpha as a PNG
     base, n = stem, 1
-    while (folder / (stem + ".jpg")).exists() or (kind == "photo" and (thumbs / (stem + ".jpg")).exists()):
+    while (folder / (stem + ext)).exists() or (kind == "photo" and (thumbs / (stem + ".jpg")).exists()):
         n += 1
         stem = "%s-%d" % (base, n)
     src = folder / (".incoming-%s%s" % (stamp(), suffix))
     src.write_bytes(body)
     made = []
     try:
-        full = folder / (stem + ".jpg")
+        full = folder / (stem + ext)
         if kind == "photo":
             make_jpeg(src, full, FULL_EDGE, FULL_Q)
             made.append(full)
@@ -409,6 +431,10 @@ def save_upload(q, body):
             made.append(thumb)
             return {"full": str(full.relative_to(REPO)), "thumb": str(thumb.relative_to(REPO)),
                     "alt": q.get("alt", "")}
+        if scope == "cutout":
+            make_png(src, full, POSTER_EDGE[scope])
+            made.append(full)
+            return {"full": str(full.relative_to(REPO))}
         make_jpeg(src, full, POSTER_EDGE[scope], POSTER_Q)
         made.append(full)
         return {"full": str(full.relative_to(REPO))}
@@ -851,6 +877,12 @@ CONFIG_TEXT = ("name", "title", "headline", "subline", "based", "email", "instag
 CONFIG_ASSET = ("hero_image", "hero_image_phone", "hero_cutout")
 CONFIG_LINES = ("tools", "certifications", "bio")
 INTRO_KEYS = ("work", "reels", "ai", "paid", "about")
+# Per-page SEO (site-config -> seo.pages.<page>): title and description caps, and the pages that are not
+# a copy-registry page of their own (the two legal documents, and the 404, which has a title only).
+SEO_FIELDS = ("title", "description")
+SEO_MAX = {"title": 70, "description": 160}
+SEO_EXTRA_PAGES = ("legal.privacy", "legal.terms", "notfound")
+SEO_NO_DESCRIPTION = ("notfound",)
 
 
 def clean_domain(v):
@@ -894,6 +926,88 @@ def save_config(raw):
         if k in raw:
             cfg[k] = lines_of(raw[k], k)
             touched.append(k)
+    if "copy" in raw:
+        touched.append("copy")
+        if not isinstance(raw["copy"], dict):
+            bad("copy must be an object of text field -> text.")
+        limits = sb.copy_limits()
+        store = cfg.get("copy")
+        if not isinstance(store, dict):
+            store = {}
+        for key in sorted(raw["copy"]):
+            value = raw["copy"][key]
+            if key not in limits:
+                bad("Unknown text field: %s." % key)
+            if not isinstance(value, str):
+                bad("That text field takes text: %s." % key)
+            if "\r" in value:
+                bad("Line breaks are not allowed in editable text.")
+            v = value.strip()
+            if len(v) >= 2 and v.startswith("[") and v.endswith("]"):
+                bad("Square brackets are reserved for 'to add' boxes.")
+            limit = limits[key][1]
+            if limit and len(v) > limit:
+                bad("That text is too long: %d characters at most." % limit)
+            if v:
+                store[key] = v
+            else:
+                store.pop(key, None)
+        if store:
+            cfg["copy"] = store
+        else:
+            cfg.pop("copy", None)
+    if "seo" in raw:
+        touched.append("seo")
+        block = raw["seo"]
+        if not isinstance(block, dict) or not isinstance(block.get("pages"), dict):
+            bad('seo must be an object with a "pages" object.')
+        known = (set(sb.copy_pages()) - {"everypage", "legal"}) | set(SEO_EXTRA_PAGES)
+        seo = cfg.get("seo")
+        if not isinstance(seo, dict):
+            seo = {}
+        pages_cfg = seo.get("pages")
+        if not isinstance(pages_cfg, dict):
+            pages_cfg = {}
+        for page_key in sorted(block["pages"]):
+            if page_key not in known:
+                bad("Unknown page for SEO: %s." % page_key)
+            given = block["pages"][page_key]
+            if not isinstance(given, dict):
+                bad("SEO for %s must be an object with title and description." % page_key)
+            entry = pages_cfg.get(page_key)
+            if not isinstance(entry, dict):
+                entry = {}
+            for field in sorted(given):
+                if field not in SEO_FIELDS:
+                    bad("Unknown SEO field: %s." % field)
+                if field == "description" and page_key in SEO_NO_DESCRIPTION:
+                    bad("The 404 page has a title only.")
+                value = given[field]
+                if not isinstance(value, str):
+                    bad("SEO %s for %s must be text." % (field, page_key))
+                if "\r" in value:
+                    bad("Line breaks are not allowed in SEO text.")
+                v = value.strip()
+                if len(v) > SEO_MAX[field]:
+                    bad("That SEO %s is too long: %d characters at most."
+                        % (field, SEO_MAX[field]))
+                if v:
+                    entry[field] = v
+                else:
+                    entry.pop(field, None)
+            if entry:
+                pages_cfg[page_key] = entry
+            else:
+                pages_cfg.pop(page_key, None)
+        if pages_cfg:
+            seo["pages"] = pages_cfg
+            cfg["seo"] = seo
+        else:
+            seo.pop("pages", None)
+            if seo:
+                cfg["seo"] = seo
+            else:
+                cfg.pop("seo", None)
     if "masthead_labels" in raw:
         labels = raw["masthead_labels"]
         if not isinstance(labels, list):
@@ -1489,6 +1603,20 @@ def with_poster_token(rows):
     return [dict(r, v=file_token(r["poster"])) if r.get("poster") else dict(r) for r in rows]
 
 
+def copy_registry_from_file():
+    """templates/copy.json as the manager reads it. The UI renders its pages,
+    sections and fields from this, so no copy key is ever hard-coded in JS.
+    An unreadable file leaves the manager running with no copy forms."""
+    try:
+        with open(REPO / "templates" / "copy.json", encoding="utf-8") as f:
+            reg = json.load(f)
+    except (OSError, ValueError):
+        return {"pages": [], "keys": []}
+    if not isinstance(reg, dict):
+        return {"pages": [], "keys": []}
+    return reg
+
+
 def state():
     cfg, media = read(FILES["config"]), read(FILES["media"])
     sb = site_build()
@@ -1504,6 +1632,7 @@ def state():
     return {
         "ok": True, "version": data_version(),
         "config": cfg, "categories": cfg.get("categories", []),
+        "copy_registry": copy_registry_from_file(),
         "projects": read(FILES["projects"])["projects"],
         "manifest": {"projects": ui_manifest(read(FILES["manifest"]).get("projects", {}))},
         "media": {"reels": with_poster_token(media.get("reels", [])),

@@ -35,15 +35,15 @@ ${REEL_SECTION}<section id="work">
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <span class="kicker">Selected work</span>
-        <h2>Featured projects</h2>
+        <span class="kicker">${SELECTED_KICKER}</span>
+        <h2>${SELECTED_HEADING}</h2>
       </div>
     </div>
 ${FEATURE}
     <div class="grid featured-grid">
 ${FEATURED_CARDS}
     </div>
-    <p class="see-all"><a class="link-arrow" href="${ROOT_PREFIX}work.html">See all work</a></p>
+    <p class="see-all"><a class="link-arrow" href="${ROOT_PREFIX}work.html">${SEE_ALL}</a></p>
   </div>
 </section>
 
@@ -51,8 +51,8 @@ ${FEATURED_CARDS}
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <span class="kicker">Capabilities</span>
-        <h2>What I do</h2>
+        <span class="kicker">${CAPS_KICKER}</span>
+        <h2>${CAPS_HEADING}</h2>
       </div>
     </div>
     <div class="caps">
@@ -66,13 +66,13 @@ ${COLLABS}
 <section class="about" id="about">
   <div class="wrap about-grid">
     <div>
-      <span class="kicker">About</span>
+      <span class="kicker">${ABOUT_KICKER}</span>
       <h2>${NAME}</h2>
     </div>
     <div class="body">
 ${BIO_PARAGRAPHS}
       <p class="cta">${CTA}</p>
-      <p class="actions"><a class="btn" href="${ROOT_PREFIX}contact.html">Get in touch</a><a class="link-arrow" href="${ROOT_PREFIX}about.html">More about me</a></p>
+      <p class="actions"><a class="btn" href="${ROOT_PREFIX}contact.html">${ABOUT_CTA}</a><a class="link-arrow" href="${ROOT_PREFIX}about.html">${ABOUT_MORE}</a></p>
     </div>
   </div>
 </section>

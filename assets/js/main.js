@@ -173,40 +173,48 @@
 })();
 
 // Contact form: Formspree AJAX when configured, mailto fallback when not.
+// The four status messages can be edited in the site manager; the build then
+// carries them as data-msg-* attributes on the form. Without an override there
+// is no attribute and these defaults are what the page shows.
 document.querySelectorAll('form.contact').forEach(function (form) {
+  function msg(name, fallback) {
+    var v = form.getAttribute(name);
+    return v && v.trim() ? v : fallback;
+  }
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var status = form.querySelector('.form-status');
     var endpoint = form.getAttribute('data-endpoint');
-    var email = form.getAttribute('data-email');
+    var email = form.getAttribute('data-email') || '';
     var fd = new FormData(form);
     if (!endpoint) {
       var body = 'Name: ' + fd.get('name') + '\nEmail: ' + fd.get('email') + '\n\n' + fd.get('message');
       window.location.href = 'mailto:' + email +
         '?subject=' + encodeURIComponent('Portfolio inquiry') +
         '&body=' + encodeURIComponent(body);
-      status.textContent = 'Opening your mail app…';
+      status.textContent = msg('data-msg-opening', 'Opening your mail app…');
       status.className = 'form-status ok';
       return;
     }
-    status.textContent = 'Sending…';
+    status.textContent = msg('data-msg-sending', 'Sending…');
     status.className = 'form-status';
     fetch(endpoint, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
       .then(function (res) {
         if (res.ok) {
           form.reset();
-          status.textContent = "Thanks. Your message is in. I'll reply within 24 hours.";
+          status.textContent = msg('data-msg-sent', "Thanks. Your message is in. I'll reply within 24 hours.");
           status.className = 'form-status ok';
         } else {
           return res.json().then(function (j) {
-            var msg = (j.errors || []).map(function (x) { return x.message; }).join(', ');
-            status.textContent = msg || 'Something went wrong. Email adrian@riveraferran.com directly.';
+            var err = msg('data-msg-error', 'Something went wrong. Email ' + email + ' directly.');
+            var detail = (j.errors || []).map(function (x) { return x.message; }).join(', ');
+            status.textContent = detail || err;
             status.className = 'form-status err';
           });
         }
       })
       .catch(function () {
-        status.textContent = 'Something went wrong. Email adrian@riveraferran.com directly.';
+        status.textContent = msg('data-msg-error', 'Something went wrong. Email ' + email + ' directly.');
         status.className = 'form-status err';
       });
   });

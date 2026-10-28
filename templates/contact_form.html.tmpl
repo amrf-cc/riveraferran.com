@@ -1,13 +1,13 @@
-    <form class="contact" id="contact-form" data-endpoint="${FORMSPREE_ENDPOINT}" data-email="${EMAIL}" action="#" method="POST">
-      <label for="cf-name">Name</label>
+    <form class="contact" id="contact-form" data-endpoint="${FORMSPREE_ENDPOINT}" data-email="${EMAIL}" action="#" method="POST"${MSG_ATTRS}>
+      <label for="cf-name">${LABEL_NAME}</label>
       <input id="cf-name" type="text" name="name" required autocomplete="name">
-      <label for="cf-email">Email</label>
+      <label for="cf-email">${LABEL_EMAIL}</label>
       <input id="cf-email" type="email" name="email" required autocomplete="email">
-      <label for="cf-message">Message</label>
+      <label for="cf-message">${LABEL_MESSAGE}</label>
       <textarea id="cf-message" name="message" required></textarea>
       <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
       <input type="hidden" name="_subject" value="${SUBJECT}">
-      <p class="form-note">Your name, email, and message are sent through Formspree so I can reply. See the <a href="${ROOT_PREFIX}privacy.html">Privacy Notice</a>.</p>
-      <button type="submit">Send message</button>
+      <p class="form-note">${FORM_NOTE}</p>
+      <button type="submit">${FORM_SUBMIT}</button>
       <p class="form-status" role="status"></p>
     </form>

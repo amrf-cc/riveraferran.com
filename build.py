@@ -25,14 +25,15 @@ ROOT = Path(__file__).resolve().parent
 
 DATA_FILES = ("site-config.json", "projects.json", "media.json", "assets-manifest.json")
 
-# Nav order: (page_key, label, file). Labels are already HTML-escaped.
+# Nav order: (page_key, copy_key, file). The label is editable copy (registry
+# key), escaped when it is rendered.
 NAV_ITEMS = (
-    ("work", "Work", "work.html"),
-    ("reels", "Reels", "reels.html"),
-    ("ai", "AI &amp; Workflow", "ai.html"),
-    ("paid", "Paid Social", "paid-social.html"),
-    ("about", "About", "about.html"),
-    ("contact", "Contact", "contact.html"),
+    ("work", "nav.work", "work.html"),
+    ("reels", "nav.reels", "reels.html"),
+    ("ai", "nav.ai", "ai.html"),
+    ("paid", "nav.paid", "paid-social.html"),
+    ("about", "nav.about", "about.html"),
+    ("contact", "nav.contact", "contact.html"),
 )
 
 # AI & Workflow page: the feature project and the "Ran live" projects, by slug.
@@ -81,6 +82,50 @@ PERSONAL_LABEL = "Personal work"
 # the one the case study and the AI page share.
 COMPOSITE_LABEL = "Composite"
 COMPARE_HEADING = "Real shot → AI step → final"
+
+
+# ---------------------------------------------------------------------------
+# Editable copy (templates/copy.json)
+# ---------------------------------------------------------------------------
+# Every heading, button and sentence an owner may want to edit lives in the
+# registry with its page, section, label, default and maximum length. The
+# default is the literal this file used to hard-code, so a site with no
+# overrides builds byte for byte what it built before. An override is stored
+# in site-config.json -> copy (handled by the Site Manager, which validates
+# against this same registry).
+
+COPY_PATH = ROOT / "templates" / "copy.json"
+_COPY = {}
+
+
+def copy_registry():
+    """The editable-copy registry: {"pages": [...], "keys": [...]}. Cached."""
+    if "registry" not in _COPY:
+        with open(COPY_PATH, encoding="utf-8") as f:
+            _COPY["registry"] = json.load(f)
+    return _COPY["registry"]
+
+
+def copy_defaults():
+    """{key: default} from the registry. Cached."""
+    if "defaults" not in _COPY:
+        _COPY["defaults"] = {row["key"]: row["default"]
+                             for row in copy_registry().get("keys") or []}
+    return _COPY["defaults"]
+
+
+def copy_limits():
+    """{key: (page, max)} from the registry. Cached."""
+    if "limits" not in _COPY:
+        _COPY["limits"] = {row["key"]: (row.get("page", ""), int(row.get("max") or 0))
+                           for row in copy_registry().get("keys") or []}
+    return _COPY["limits"]
+
+
+def copy_pages():
+    """The registry's page keys, in order (the manager renders them in this
+    order)."""
+    return [p["key"] for p in copy_registry().get("pages") or []]
 
 
 # ---------------------------------------------------------------------------
@@ -277,10 +322,63 @@ class Site(object):
         self.hidden_pages = {x for x in (self.config.get("hidden_pages") or [])
                              if x in HIDEABLE_PAGES}
         self.live_slugs = ai_live_slugs(self.media)
+        # Editable copy: the owner's overrides from site-config -> copy, and
+        # every registry key this build actually rendered (tests use it).
+        self.copy = self.config.get("copy") or {}
+        if not isinstance(self.copy, dict):
+            self.copy = {}
+        self.used_copy = set()
         # Placeholders the templates had to invent (no data string behind
         # them). They block a release exactly like data placeholders.
         self.generated = []
         self.pages = {}
+
+    # -- editable copy ------------------------------------------------------
+
+    def copy_override(self, key):
+        """The owner's override for one registry key, or '' when none is set."""
+        v = self.copy.get(key)
+        return v if isinstance(v, str) and v.strip() else ""
+
+    def t(self, key, **fields):
+        """Editable copy: the owner's override when set, else the registry
+        default. {placeholders} are filled by the caller (an address, a count).
+        The result is plain text; the caller escapes it."""
+        self.used_copy.add(key)
+        v = self.copy_override(key) or copy_defaults().get(key, "")
+        for k, val in fields.items():
+            v = v.replace("{%s}" % k, str(val))
+        return v
+
+    def t_text(self, key, **fields):
+        """Editable copy escaped for element content. < and & are escaped;
+        quotes and apostrophes stay as typed, which is what the committed pages
+        carry ("Let's work together" is not "Let&#x27;s work together"). Only an
+        attribute needs them escaped, and that path uses esc() directly."""
+        return html.escape(self.t(key, **fields), quote=False)
+
+    def t_html(self, key, **fields):
+        """Editable copy whose {placeholders} are markup the build generates
+        (a badge, a link). The text itself is escaped first, so an override can
+        never inject HTML; only the placeholders carry tags."""
+        self.used_copy.add(key)
+        v = esc(self.copy_override(key) or copy_defaults().get(key, ""))
+        for k, val in fields.items():
+            v = v.replace("{%s}" % k, str(val))
+        return v
+
+    def seo(self, page_key, default_title, default_desc):
+        """(title, description) for a page: site-config -> seo when the owner
+        set one, else the value this build computed as the default."""
+        pages = (self.config.get("seo") or {}).get("pages") or {}
+        entry = pages.get(page_key) or {}
+        if not isinstance(entry, dict):
+            entry = {}
+        out = []
+        for field, default in (("title", default_title), ("description", default_desc)):
+            v = entry.get(field)
+            out.append(v.strip() if isinstance(v, str) and v.strip() else default)
+        return out[0], out[1]
 
     # -- small render helpers ---------------------------------------------
 
@@ -360,7 +458,7 @@ class Site(object):
         return c["key"] if c else ""
 
     def personal_note(self):
-        return '<span class="personal-note">%s</span>' % esc(PERSONAL_LABEL)
+        return '<span class="personal-note">%s</span>' % esc(self.t("work.personal"))
 
     def cat_label_html(self, p, href=None):
         """Category label for cards and case studies, plus the personal note
@@ -516,7 +614,8 @@ class Site(object):
             lines.append("          " + confirm)
         if extra:
             lines.append("          " + extra)
-        lines.append('          <p class="more"><a class="link-arrow" href="%s">View project</a></p>' % href)
+        lines.append('          <p class="more"><a class="link-arrow" href="%s">%s</a></p>'
+                     % (href, esc(self.t("card.view"))))
         return ('      <article class="%s" data-tags="%s">\n        %s\n        <div class="meta">\n'
                 '%s\n        </div>\n      </article>'
                 % (cls, esc(self.cat_key(p)), self.cover_html(p, rp, use_full), "\n".join(lines)))
@@ -566,10 +665,11 @@ class Site(object):
             return ""
         return '    <div class="compare-list">\n%s\n    </div>' % "\n".join(figures)
 
-    def sets_section_html(self, slug, root_prefix, heading=COMPARE_HEADING):
+    def sets_section_html(self, slug, root_prefix, heading=None):
         inner = self.compare_list_html(slug, root_prefix)
         if not inner:
             return ""
+        heading = self.t("case.compare") if heading is None else heading
         return ('<section class="compare-sets" id="compare">\n  <div class="wrap">\n'
                 '    <p class="kicker">%s</p>\n%s\n  </div>\n</section>'
                 % (self.txt(heading), inner))
@@ -592,7 +692,8 @@ class Site(object):
         confirm = self.confirm_pill(p.get("confirm"))
         if confirm:
             lines.append("        " + confirm)
-        lines.append('        <p class="more"><a class="link-arrow" href="%s">View project</a></p>' % href)
+        lines.append('        <p class="more"><a class="link-arrow" href="%s">%s</a></p>'
+                     % (href, esc(self.t("card.view"))))
         return ('    <article class="feature" data-tags="%s">\n      %s\n      <div class="feature-body">\n'
                 '%s\n      </div>\n    </article>'
                 % (esc(self.cat_key(p)), self.cover_html(p, rp, True), "\n".join(lines)))
@@ -632,42 +733,48 @@ class Site(object):
 
     def nav_html(self, rp, page_key):
         links = []
-        for key, label, href in NAV_ITEMS:
+        for key, copy_key, href in NAV_ITEMS:
             if self.page_hidden(href):
                 continue
             active = (key == page_key) or (key == "work" and page_key == "project")
             attrs = ' class="active" aria-current="page"' if active else ""
-            links.append('      <a href="%s%s"%s>%s</a>' % (rp, href, attrs, label))
+            links.append('      <a href="%s%s"%s>%s</a>'
+                         % (rp, href, attrs, esc(self.t(copy_key))))
         resume = self.config.get("resume_pdf") or ""
+        label = esc(self.t("nav.resume"))
         if resume:
             href = resume if is_remote(resume) else rp + resume
-            links.append('      <a class="btn" href="%s">Résumé</a>' % esc(href))
+            links.append('      <a class="btn" href="%s">%s</a>' % (esc(href), label))
         else:
-            links.append('      <a class="btn" href="%sabout.html#resume">Résumé'
-                         '<span class="ph-chip ph-chip-btn">To add</span></a>' % rp)
+            links.append('      <a class="btn" href="%sabout.html#resume">%s'
+                         '<span class="ph-chip ph-chip-btn">To add</span></a>' % (rp, label))
         return tmpl("nav.html.tmpl").safe_substitute(
             ROOT_PREFIX=rp, NAME=esc(self.config.get("name", "")),
+            NAV_MENU=esc(self.t("nav.menu")), NAV_LANDMARK=esc(self.t("nav.landmark")),
             NAV_LINKS="\n".join(links))
 
     def footer_html(self, rp):
         c = self.config
         social = ""
-        for key, label in (("instagram", "Instagram"), ("linkedin", "LinkedIn")):
+        for key, copy_key in (("instagram", "footer.instagram"), ("linkedin", "footer.linkedin")):
             if c.get(key):
-                social += ' · <a href="%s" rel="noopener">%s</a>' % (esc(c[key]), label)
+                social += ' · <a href="%s" rel="noopener">%s</a>' % (esc(c[key]), esc(self.t(copy_key)))
         return tmpl("footer.html.tmpl").safe_substitute(
             ROOT_PREFIX=rp, NAME=esc(c.get("name", "")), BASED=esc(plain(c.get("based", ""))),
+            YEAR=esc(self.t("footer.year")), RIGHTS=esc(self.t("footer.rights")),
+            PRIVACY=esc(self.t("footer.privacy")), TERMS=esc(self.t("footer.terms")),
             EMAIL=esc(c.get("email", "")), SOCIAL_LINKS=social)
 
     def head_html(self, rp, title, description, og_path, og_type):
         domain = (self.config.get("domain") or "").strip().rstrip("/")
+        og_rel = self.config.get("og_image") or "assets/img/og-cover.jpg"
         if domain:
             site_url = "https://" + domain
-            og_image = site_url + "/assets/img/og-cover.jpg"
+            og_image = site_url + "/" + og_rel
             og_url = '<meta property="og:url" content="%s">\n' % esc(site_url + "/" + og_path)
         else:
             # No domain yet: omit og:url and use a relative og:image.
-            og_image = rp + "assets/img/og-cover.jpg"
+            og_image = rp + og_rel
             og_url = ""
         return tmpl("head.html.tmpl").safe_substitute(
             ROOT_PREFIX=rp, HARDENING=hardening_meta(), PAGE_TITLE=esc(title),
@@ -690,11 +797,34 @@ class Site(object):
             FOOTER=self.footer_html(rp))
 
     def contact_form(self, rp):
+        """The form, plus the four status messages as data-msg-* attributes —
+        only for the ones the owner overrode, so an untouched site emits no new
+        attribute (the JS falls back to the same text)."""
+        email = self.config.get("email", "")
+        attrs = ""
+        for copy_key, attr in (("contact.msg.opening", "data-msg-opening"),
+                               ("contact.msg.sending", "data-msg-sending"),
+                               ("contact.msg.sent", "data-msg-sent"),
+                               ("contact.msg.error", "data-msg-error")):
+            if self.copy_override(copy_key):
+                attrs += ' %s="%s"' % (attr, esc(self.t(copy_key, email=email)))
+        privacy = '<a href="%sprivacy.html">Privacy Notice</a>' % rp
         return tmpl("contact_form.html.tmpl").safe_substitute(
-            ROOT_PREFIX=rp,
+            ROOT_PREFIX=rp, MSG_ATTRS=attrs,
             FORMSPREE_ENDPOINT=esc(self.config.get("formspree_endpoint", "")),
-            EMAIL=esc(self.config.get("email", "")),
-            SUBJECT=esc("Portfolio inquiry — %s" % self.config.get("name", "")))
+            EMAIL=esc(email),
+            SUBJECT=esc("%s — %s" % (self.t("contact.form.subject"), self.config.get("name", ""))),
+            LABEL_NAME=esc(self.t("contact.form.name")),
+            LABEL_EMAIL=esc(self.t("contact.form.email")),
+            LABEL_MESSAGE=esc(self.t("contact.form.message")),
+            FORM_NOTE=self.t_html("contact.form.note", privacy=privacy),
+            FORM_SUBMIT=esc(self.t("contact.form.submit")))
+
+    def lightbox_html(self):
+        """The photo viewer, with its four aria labels from the registry."""
+        return tmpl("lightbox.html.tmpl").safe_substitute(
+            LB_LABEL=esc(self.t("lightbox.label")), LB_CLOSE=esc(self.t("lightbox.close")),
+            LB_PREV=esc(self.t("lightbox.prev")), LB_NEXT=esc(self.t("lightbox.next")))
 
     def page_intro(self, key):
         v = (self.config.get("page_intros") or {}).get(key, "")
@@ -753,14 +883,18 @@ class Site(object):
 
     def hero_actions(self):
         see = 'href="${ROOT_PREFIX}work.html"'
+        see_work = esc(self.t("home.hero.see_work"))
         if self.reel_hidden():
-            return '<a class="btn" %s>See work</a>' % see
-        return '<a class="btn" href="#reel">Watch reel</a><a class="btn btn-ghost" %s>See work</a>' % see
+            return '<a class="btn" %s>%s</a>' % (see, see_work)
+        return ('<a class="btn" href="#reel">%s</a><a class="btn btn-ghost" %s>%s</a>'
+                % (esc(self.t("home.hero.watch_reel")), see, see_work))
 
     def reel_section(self):
         if self.reel_hidden():
             return ""
-        return tmpl("home.reel.tmpl").safe_substitute(SHOWREEL=self.showreel_html("")) + "\n"
+        return tmpl("home.reel.tmpl").safe_substitute(
+            SHOWREEL=self.showreel_html(""),
+            REEL_KICKER=esc(self.t("home.showreel.kicker"))) + "\n"
 
     def build_home(self):
         c = self.config
@@ -801,11 +935,19 @@ class Site(object):
             COLLABS=collabs,
             NAME=esc(c.get("name", "")),
             BIO_PARAGRAPHS="\n".join("      " + self.para(b) for b in c.get("bio", [])),
-            CTA=self.txt(c.get("cta")))
-        self.page("index.html", main,
-                  "%s — %s" % (c.get("name", ""), plain(c.get("title", ""))),
-                  plain(c.get("headline") or c.get("title", "")),
-                  "home", body_class="has-masthead")
+            CTA=self.txt(c.get("cta")),
+            SELECTED_KICKER=esc(self.t("home.selected.kicker")),
+            SELECTED_HEADING=esc(self.t("home.selected.heading")),
+            SEE_ALL=esc(self.t("home.selected.all")),
+            CAPS_KICKER=esc(self.t("home.capabilities.kicker")),
+            CAPS_HEADING=esc(self.t("home.capabilities.heading")),
+            ABOUT_KICKER=esc(self.t("home.about.kicker")),
+            ABOUT_CTA=esc(self.t("home.about.cta")),
+            ABOUT_MORE=esc(self.t("home.about.more")))
+        title, desc = self.seo("home",
+                               "%s — %s" % (c.get("name", ""), plain(c.get("title", ""))),
+                               plain(c.get("headline") or c.get("title", "")))
+        self.page("index.html", main, title, desc, "home", body_class="has-masthead")
 
     def build_work(self):
         """Filter pills = All + each category with a visible project. The All
@@ -813,7 +955,8 @@ class Site(object):
         headings carry data-tags too, so the shared filter JS shows only the
         active group's heading. Projects with no group come last, All only."""
         groups = self.work_groups()
-        filters = ['      <a class="filter active" href="#all" data-filter="all" aria-pressed="true">All</a>']
+        filters = ['      <a class="filter active" href="#all" data-filter="all" aria-pressed="true">%s</a>'
+                   % esc(self.t("work.filter.all"))]
         blocks = []
         for c, members in groups:
             if c is not None:
@@ -825,16 +968,21 @@ class Site(object):
                            % (key, self.txt(c.get("label") or c["key"]), note))
             else:
                 heading = ('      <h2 class="work-group work-group-other" data-tags="" data-filter-heading>%s</h2>'
-                           % esc(OTHER_WORK_LABEL))
+                           % esc(self.t("work.other")))
             blocks.append(heading)
             blocks.extend(self.card_html(p, "") for p in members)
         main = tmpl("work.main.tmpl").safe_substitute(
             INTRO=self.page_intro("work"),
             FILTERS="\n".join(filters),
-            CARDS="\n".join(blocks))
+            CARDS="\n".join(blocks),
+            WORK_KICKER=esc(self.t("work.kicker")),
+            WORK_HEADING=esc(self.t("work.heading")),
+            WORK_FILTER_LABEL=esc(self.t("work.filter.label")),
+            WORK_EMPTY=esc(self.t("work.empty")))
         intro = (self.config.get("page_intros") or {}).get("work", "")
-        self.page("work.html", main, "Work — %s" % self.config.get("name", ""),
-                  plain(intro) or "Work by %s" % self.config.get("name", ""), "work")
+        title, desc = self.seo("work", "Work — %s" % self.config.get("name", ""),
+                               plain(intro) or "Work by %s" % self.config.get("name", ""))
+        self.page("work.html", main, title, desc, "work")
 
     def build_case(self, idx, p):
         rp = "../"
@@ -853,15 +1001,15 @@ class Site(object):
                             % lead_html)
         # Body: brief / did / scope / result, else description.
         if p.get("brief"):
-            blocks = [("The brief", self.para(p["brief"]))]
+            blocks = [(self.t("case.brief"), self.para(p["brief"]))]
             if p.get("did"):
-                blocks.append(("What I did", "<ul>%s</ul>" % "".join(
+                blocks.append((self.t("case.did"), "<ul>%s</ul>" % "".join(
                     "<li>%s</li>" % self.txt(d) for d in p["did"])))
             if p.get("scope"):
-                blocks.append(("Scope", "<ul>%s</ul>" % "".join(
+                blocks.append((self.t("case.scope"), "<ul>%s</ul>" % "".join(
                     "<li>%s</li>" % self.txt(s) for s in p["scope"])))
             if p.get("result"):
-                blocks.append(("Result", self.para(p["result"])))
+                blocks.append((self.t("case.result"), self.para(p["result"])))
             body = "\n".join(
                 '    <div class="case-block">\n      <h2 class="kicker">%s</h2>\n'
                 '      <div class="case-copy">%s</div>\n    </div>' % (esc(h), b) for h, b in blocks)
@@ -884,32 +1032,36 @@ class Site(object):
         reel_cards = [c for c in (self.reel_card_html(r, rp) for r in reels) if c]
         if reel_cards:
             sections.append('<section class="case-reels">\n  <div class="wrap">\n'
-                            '    <p class="kicker">Reels</p>\n    <div class="reel-row">\n%s\n    </div>\n'
-                            '  </div>\n</section>' % "\n".join(reel_cards))
+                            '    <p class="kicker">%s</p>\n    <div class="reel-row">\n%s\n    </div>\n'
+                            '  </div>\n</section>'
+                            % (esc(self.t("case.reels")), "\n".join(reel_cards)))
         # Photos (masonry + lightbox)
         has_photos = bool(data.get("photos"))
         if has_photos:
             shots = "\n".join(self.photo_button_html(ph, rp) for ph in data["photos"])
             sections.append('<section class="case-photos">\n  <div class="wrap">\n'
-                            '    <p class="kicker">Photos</p>\n    <div class="photos">\n%s\n    </div>\n'
-                            '  </div>\n</section>' % shots)
+                            '    <p class="kicker">%s</p>\n    <div class="photos">\n%s\n    </div>\n'
+                            '  </div>\n</section>' % (esc(self.t("case.photos")), shots))
         # Behind the scenes
         if p.get("bts"):
             bts = self.box(p["bts"]) if is_ph(p["bts"]) else '<p class="desc">%s</p>' % esc(p["bts"])
             sections.append('<section class="case-bts">\n  <div class="wrap">\n'
-                            '    <p class="kicker">Behind the scenes</p>\n    %s\n  </div>\n</section>' % bts)
+                            '    <p class="kicker">%s</p>\n    %s\n  </div>\n</section>'
+                            % (esc(self.t("case.bts")), bts))
         # Previous / next, in the Work page's grouped order, wrapping around.
         order = [q for _, members in self.work_groups() for q in members]
         idx = next((i for i, q in enumerate(order) if q.get("slug") == p.get("slug")), idx)
         n = len(order)
         prev_p, next_p = order[(idx - 1) % n], order[(idx + 1) % n]
-        pager = ('<nav class="case-nav" aria-label="More projects">\n'
-                 '      <a class="prev" href="%s.html"><span class="kicker">← Previous</span>'
+        pager = ('<nav class="case-nav" aria-label="%s">\n'
+                 '      <a class="prev" href="%s.html"><span class="kicker">%s</span>'
                  '<span class="cn-title">%s</span></a>\n'
-                 '      <a class="next" href="%s.html"><span class="kicker">Next →</span>'
+                 '      <a class="next" href="%s.html"><span class="kicker">%s</span>'
                  '<span class="cn-title">%s</span></a>\n'
-                 '    </nav>' % (esc(prev_p["slug"]), self.txt(prev_p.get("client")),
-                                  esc(next_p["slug"]), self.txt(next_p.get("client"))))
+                 '    </nav>' % (esc(self.t("case.pager")), esc(prev_p["slug"]),
+                                  esc(self.t("case.prev")), self.txt(prev_p.get("client")),
+                                  esc(next_p["slug"]), esc(self.t("case.next")),
+                                  self.txt(next_p.get("client"))))
         cat = self.category(p)
         cat_html = ('<p class="kicker case-cat">%s</p>'
                     % self.cat_label_html(p, href="%swork.html#%s" % (rp, cat["key"]))) if cat else ""
@@ -923,12 +1075,17 @@ class Site(object):
             PILLS=self.pills(p.get("tags"), rp),
             CONFIRM=self.confirm_pill(p.get("confirm")),
             SECTIONS="\n".join(sections),
-            PAGER=pager)
+            PAGER=pager,
+            CASE_BACK=esc(self.t("case.back")),
+            CASE_NEXT_KICKER=esc(self.t("case.next_kicker")),
+            CASE_NEXT_HEADING=esc(self.t("case.next_heading")),
+            CASE_NEXT_CTA=esc(self.t("case.next_cta")))
         desc = plain(p.get("oneliner") or p.get("description") or p.get("brief") or p.get("title", ""))
-        after = tmpl("lightbox.html.tmpl").template if has_photos else ""
-        self.page("work/%s.html" % slug, main,
-                  "%s — %s" % (plain(p.get("client", "")), self.config.get("name", "")),
-                  desc, "project", og_type="article", after_main=after)
+        title, desc = self.seo("case", "%s — %s" % (plain(p.get("client", "")),
+                                                    self.config.get("name", "")), desc)
+        after = self.lightbox_html() if has_photos else ""
+        self.page("work/%s.html" % slug, main, title, desc, "project",
+                  og_type="article", after_main=after)
 
     def intro_desc(self, key, fallback):
         intro = (self.config.get("page_intros") or {}).get(key, "")
@@ -951,7 +1108,8 @@ class Site(object):
                 order.append(key)
                 groups[key] = (r.get("format", ""), [])
             groups[key][1].append(r)
-        filters = ['      <a class="filter active" href="#all" data-filter="all" aria-pressed="true">All</a>']
+        filters = ['      <a class="filter active" href="#all" data-filter="all" aria-pressed="true">%s</a>'
+                   % esc(self.t("reels.filter.all"))]
         for key in order:
             filters.append('      <a class="filter" href="#%s" data-filter="%s" aria-pressed="false">%s</a>'
                            % (esc(key), esc(key), self.txt(groups[key][0])))
@@ -966,9 +1124,10 @@ class Site(object):
         blocks = ['      <div class="reel-grid">\n%s\n      </div>' % "\n".join(items)] if items else []
         note = self.media.get("reel_formats_note")
         if note:
-            anatomy = ('    <div class="reel-anatomy">\n      <p class="kicker">Anatomy of a reel</p>\n'
-                       '      %s\n    </div>' % (self.box(note) if is_ph(note)
-                                                  else '<p class="desc">%s</p>' % esc(note)))
+            anatomy = ('    <div class="reel-anatomy">\n      <p class="kicker">%s</p>\n'
+                       '      %s\n    </div>'
+                       % (esc(self.t("reels.anatomy")), self.box(note) if is_ph(note)
+                          else '<p class="desc">%s</p>' % esc(note)))
         else:
             anatomy = ""
         motion = []
@@ -980,14 +1139,18 @@ class Site(object):
         motion_html = ""
         if motion:
             motion_html = ('<section class="motion" id="motion">\n  <div class="wrap">\n'
-                           '    <div class="sec-head">\n      <div>\n        <h2>Motion</h2>\n'
+                           '    <div class="sec-head">\n      <div>\n        <h2>%s</h2>\n'
                            '      </div>\n    </div>\n    <div class="motion-grid">\n%s\n    </div>\n'
-                           '  </div>\n</section>' % "\n".join(motion))
+                           '  </div>\n</section>' % (esc(self.t("reels.motion")), "\n".join(motion)))
         main = tmpl("reels.main.tmpl").safe_substitute(
             INTRO=self.page_intro("reels"), FILTERS="\n".join(filters),
-            GROUPS="\n".join(blocks), ANATOMY=anatomy, MOTION=motion_html)
-        self.page("reels.html", main, "Reels — %s" % self.config.get("name", ""),
-                  self.intro_desc("reels", "Reels"), "reels")
+            GROUPS="\n".join(blocks), ANATOMY=anatomy, MOTION=motion_html,
+            REELS_KICKER=esc(self.t("reels.kicker")),
+            REELS_HEADING=esc(self.t("reels.heading")),
+            REELS_FILTER_LABEL=esc(self.t("reels.filter.label")))
+        title, desc = self.seo("reels", "Reels — %s" % self.config.get("name", ""),
+                               self.intro_desc("reels", "Reels"))
+        self.page("reels.html", main, title, desc, "reels")
 
     def ai_feature_html(self):
         """The AI page feature. A standalone feature project has no case
@@ -1012,16 +1175,18 @@ class Site(object):
             copy.append('        <ul class="did">%s</ul>' % "".join(
                 "<li>%s</li>" % self.txt(d) for d in p["did"]))
         if standalone and p.get("scope"):
-            copy.append('        <div class="ai-scope"><p class="kicker">Scope</p><ul class="did">%s</ul></div>'
-                        % "".join("<li>%s</li>" % self.txt(x) for x in p["scope"]))
+            copy.append('        <div class="ai-scope"><p class="kicker">%s</p><ul class="did">%s</ul></div>'
+                        % (esc(self.t("ai.scope")),
+                           "".join("<li>%s</li>" % self.txt(x) for x in p["scope"])))
         if standalone and p.get("result"):
-            copy.append('        <div class="ai-result"><p class="kicker">Result</p>%s</div>'
-                        % self.para(p["result"], "desc"))
+            copy.append('        <div class="ai-result"><p class="kicker">%s</p>%s</div>'
+                        % (esc(self.t("ai.result")), self.para(p["result"], "desc")))
         confirm = self.confirm_pill(p.get("confirm"))
         if confirm:
             copy.append("        " + confirm)
         if href:
-            copy.append('        <p class="more"><a class="link-arrow" href="%s">View project</a></p>' % href)
+            copy.append('        <p class="more"><a class="link-arrow" href="%s">%s</a></p>'
+                        % (href, esc(self.t("card.view"))))
         media = [b for b in (self.video_block_html(v, "") for v in
                              self.manifest.get(p["slug"], {}).get("videos", [])) if b]
         if p.get("demo"):
@@ -1044,8 +1209,9 @@ class Site(object):
         process = ""
         if steps:
             process = ('<section class="ai-process" id="process">\n  <div class="wrap">\n'
-                       '    <div class="sec-head">\n      <div>\n        <h2>Process</h2>\n      </div>\n    </div>\n'
-                       '    <ol class="process">\n%s\n    </ol>\n  </div>\n</section>' % steps)
+                       '    <div class="sec-head">\n      <div>\n        <h2>%s</h2>\n      </div>\n    </div>\n'
+                       '    <ol class="process">\n%s\n    </ol>\n  </div>\n</section>'
+                       % (esc(self.t("ai.process")), steps))
         live = []
         for slug in self.live_slugs:
             p = self.project(slug)
@@ -1087,23 +1253,25 @@ class Site(object):
                     parts.append('    <div class="live-set">\n%s%s\n    </div>'
                                  % (head if named else "", inner))
                 live_sets_html = ('    <div class="live-sets">\n      <p class="kicker">%s</p>\n%s\n    </div>\n'
-                                  % (self.txt(COMPARE_HEADING), "\n".join(parts)))
+                                  % (self.txt(self.t("case.compare")), "\n".join(parts)))
             live_html = ('<section class="ai-live" id="ran-live">\n  <div class="wrap">\n'
-                         '    <div class="sec-head">\n      <div>\n        <h2>Ran live</h2>\n      </div>\n    </div>\n'
+                         '    <div class="sec-head">\n      <div>\n        <h2>%s</h2>\n      </div>\n    </div>\n'
                          '    <div class="live-grid">\n%s\n    </div>\n%s  </div>\n</section>'
-                         % ("\n".join(live), live_sets_html))
+                         % (esc(self.t("ai.live")), "\n".join(live), live_sets_html))
         tools = []
         if self.media.get("ai_tools_line"):
             tools.append("    " + self.para(self.media["ai_tools_line"], "lede"))
         if label:
-            tools.append('    <p class="ai-mark">Every AI-assisted piece on this site is marked %s.</p>' % badge)
+            tools.append('    <p class="ai-mark">%s</p>' % self.t_html("ai.tools_mark", label=badge))
         tools_html = ('<section class="ai-tools">\n  <div class="wrap">\n%s\n  </div>\n</section>'
                       % "\n".join(tools)) if tools else ""
         main = tmpl("ai.main.tmpl").safe_substitute(
             INTRO=self.page_intro("ai"), FEATURE=self.ai_feature_html(), PROCESS=process,
-            LIVE=live_html, TOOLS=tools_html)
-        self.page("ai.html", main, "AI & Workflow — %s" % c.get("name", ""),
-                  self.intro_desc("ai", "AI & Workflow"), "ai")
+            LIVE=live_html, TOOLS=tools_html,
+            AI_KICKER=esc(self.t("ai.kicker")), AI_HEADING=esc(self.t("ai.heading")))
+        title, desc = self.seo("ai", "AI & Workflow — %s" % c.get("name", ""),
+                               self.intro_desc("ai", "AI & Workflow"))
+        self.page("ai.html", main, title, desc, "ai")
 
     def ad_card_html(self, ad):
         """A paid-social item in its placement ratio: video (Livid or local
@@ -1128,22 +1296,26 @@ class Site(object):
     def build_paid(self):
         ps = self.media.get("paid_social") or {}
         sections = []
-        for key, heading, anchor in (("video_ads", "Video ads", "video-ads"),
-                                     ("static_ads", "Static ads", "static-ads")):
+        for key, copy_key, anchor in (("video_ads", "paid.video_ads", "video-ads"),
+                                      ("static_ads", "paid.static_ads", "static-ads")):
+            heading = self.t(copy_key)
             cards = [c for c in (self.ad_card_html(a) for a in ps.get(key) or []) if c]
             if cards:
                 body = '    <div class="ad-grid">\n%s\n    </div>' % "\n".join(cards)
             else:
                 body = "    " + self.gen_box("paid-social.html#%s" % anchor,
-                                             "[%s to add, in the sizes they ran: %s]" % (heading, AD_SIZES))
+                                             "[%s to add, in the sizes they ran: %s]"
+                                             % (heading, self.t("paid.sizes")))
             sections.append('<section class="paid-section" id="%s">\n  <div class="wrap">\n'
                             '    <div class="sec-head">\n      <div>\n        <h2>%s</h2>\n      </div>\n    </div>\n'
                             '%s\n  </div>\n</section>' % (anchor, esc(heading), body))
         intro = (self.config.get("page_intros") or {}).get("paid") or ps.get("intro") or ""
         main = tmpl("paid.main.tmpl").safe_substitute(
-            INTRO=self.para(intro, "lede") if intro else "", SECTIONS="\n".join(sections))
-        self.page("paid-social.html", main, "Paid Social — %s" % self.config.get("name", ""),
-                  plain(intro) or "Paid Social", "paid")
+            INTRO=self.para(intro, "lede") if intro else "", SECTIONS="\n".join(sections),
+            PAID_KICKER=esc(self.t("paid.kicker")), PAID_HEADING=esc(self.t("paid.heading")))
+        title, desc = self.seo("paid", "Paid Social — %s" % self.config.get("name", ""),
+                               plain(intro) or "Paid Social")
+        self.page("paid-social.html", main, title, desc, "paid")
 
     def build_about(self):
         c = self.config
@@ -1162,7 +1334,7 @@ class Site(object):
                        % (self.txt(e.get("role", "")), org,
                           ('<span class="x-meta">%s</span>' % when) if when else ""))
         if exp:
-            block("Experience", '<ul class="xp">%s</ul>' % "".join(exp))
+            block(esc(self.t("about.experience")), '<ul class="xp">%s</ul>' % "".join(exp))
         credits = self.media.get("credits", [])
         if credits:
             rows = "".join("<tr>%s</tr>" % "".join("<td>%s</td>" % self.txt(cr.get(k, ""))
@@ -1170,19 +1342,23 @@ class Site(object):
                            for cr in credits)
             pill = self.confirm_pill(["credits"]) if self.media.get("credits_confirm") else ""
             table = ('<div class="credits-wrap"><table class="credits"><thead><tr>'
-                     '<th scope="col">Artist</th><th scope="col">Work</th><th scope="col">Role</th>'
-                     '<th scope="col">Year</th></tr></thead><tbody>%s</tbody></table></div>%s' % (rows, pill))
+                     '<th scope="col">%s</th><th scope="col">%s</th><th scope="col">%s</th>'
+                     '<th scope="col">%s</th></tr></thead><tbody>%s</tbody></table></div>%s'
+                     % (esc(self.t("about.credits_col_artist")),
+                        esc(self.t("about.credits_col_work")),
+                        esc(self.t("about.credits_col_role")),
+                        esc(self.t("about.credits_col_year")), rows, pill))
             block(self.txt(self.media.get("credits_note") or "Production credits"), table)
         if c.get("tools"):
-            block("Tools", '<ul class="inline-list">%s</ul>' % "".join(
+            block(esc(self.t("about.tools")), '<ul class="inline-list">%s</ul>' % "".join(
                 "<li>%s</li>" % self.txt(t) for t in c["tools"]))
         if c.get("education"):
-            block("Education", self.para(c["education"]))
+            block(esc(self.t("about.education")), self.para(c["education"]))
         if c.get("certifications"):
-            block("Certifications", "<ul>%s</ul>" % "".join(
+            block(esc(self.t("about.certifications")), "<ul>%s</ul>" % "".join(
                 "<li>%s</li>" % self.txt(x) for x in c["certifications"]))
         if c.get("languages"):
-            block("Languages", self.para(c["languages"]))
+            block(esc(self.t("about.languages")), self.para(c["languages"]))
         sides = []
         for sp in c.get("side_projects", []):
             label = self.txt(sp.get("label", ""))
@@ -1192,45 +1368,67 @@ class Site(object):
             line = (' <span class="sp-line">%s</span>' % self.txt(sp["line"])) if sp.get("line") else ""
             sides.append('<li><span class="sp-label">%s</span>%s</li>' % (label, line))
         if sides:
-            block("Side projects", '<ul class="side-projects">%s</ul>' % "".join(sides))
+            block(esc(self.t("about.side")), '<ul class="side-projects">%s</ul>' % "".join(sides))
         resume = c.get("resume_pdf") or ""
         if resume:
-            resume_html = ('<p><a class="btn" href="%s" download>Download résumé (PDF)</a></p>' % esc(resume))
+            resume_html = ('<p><a class="btn" href="%s" download>%s</a></p>'
+                           % (esc(resume), esc(self.t("about.resume_download"))))
         else:
             resume_html = self.gen_box("about.html#resume", "[Résumé PDF: brand version pending]")
-        block("Résumé", resume_html, anchor="resume")
+        block(esc(self.t("about.resume")), resume_html, anchor="resume")
         bio = "\n".join("      " + self.para(b) for b in c.get("bio", []))
         main = tmpl("about.main.tmpl").safe_substitute(
             NAME=esc(c.get("name", "")), INTRO=self.page_intro("about"), BIO=bio,
-            BLOCKS="\n".join(blocks))
-        self.page("about.html", main, "About — %s" % c.get("name", ""),
-                  self.intro_desc("about", "About %s" % c.get("name", "")), "about")
+            BLOCKS="\n".join(blocks), ABOUT_KICKER=esc(self.t("about.kicker")))
+        title, desc = self.seo("about", "About — %s" % c.get("name", ""),
+                               self.intro_desc("about", "About %s" % c.get("name", "")))
+        self.page("about.html", main, title, desc, "about")
 
     def build_contact(self):
         c = self.config
+        email = c.get("email", "")
+        lede = self.t_html("contact.lede",
+                           email='<a href="mailto:%s">%s</a>' % (esc(email), esc(email)))
         main = tmpl("contact.main.tmpl").safe_substitute(
-            EMAIL=esc(c.get("email", "")), CONTACT_FORM=self.contact_form(""))
-        self.page("contact.html", main, "Contact — %s" % c.get("name", ""),
-                  "Contact %s, %s in %s." % (c.get("name", ""), plain(c.get("title", "")),
-                                             plain(c.get("based", ""))), "contact")
+            EMAIL=esc(email), CONTACT_FORM=self.contact_form(""), CONTACT_LEDE=lede,
+            CONTACT_KICKER=esc(self.t("contact.kicker")),
+            CONTACT_HEADING=self.t_text("contact.heading"))
+        title, desc = self.seo("contact", "Contact — %s" % c.get("name", ""),
+                               "Contact %s, %s in %s." % (c.get("name", ""), plain(c.get("title", "")),
+                                                          plain(c.get("based", ""))))
+        self.page("contact.html", main, title, desc, "contact")
 
     def build_legal(self):
+        """Privacy and Terms: title, meta description and effective date are
+        editable copy (registry `legal.*`), and each document has its own SEO
+        entry (`legal.privacy` / `legal.terms`)."""
         legal = (
-            ("privacy", "Privacy Notice", "How this site handles your information."),
-            ("terms", "Terms of Use", "Copyright, permitted use, and the no-AI-training terms for this site."),
+            ("privacy", "legal.privacy.title", "legal.privacy.description", "legal.privacy.effective"),
+            ("terms", "legal.terms.title", "legal.terms.description", "legal.terms.effective"),
         )
-        for slug, title, desc in legal:
+        for slug, title_key, desc_key, date_key in legal:
+            title = self.t(title_key)
             body = Template((ROOT / "templates" / "legal" / (slug + ".body.html"))
                             .read_text(encoding="utf-8")).safe_substitute(
                 NAME=esc(self.config.get("name", "")), EMAIL=esc(self.config.get("email", "")),
-                BASED=esc(plain(self.config.get("based", ""))))
+                BASED=esc(plain(self.config.get("based", ""))),
+                EFFECTIVE=esc(self.t(date_key)))
             main = tmpl("legal.main.tmpl").safe_substitute(LEGAL_TITLE=esc(title), LEGAL_BODY=body)
-            self.page(slug + ".html", main, "%s — %s" % (title, self.config.get("name", "")),
-                      desc, "legal")
+            page_title, desc = self.seo("legal." + slug,
+                                        "%s — %s" % (title, self.config.get("name", "")),
+                                        self.t(desc_key))
+            self.page(slug + ".html", main, page_title, desc, "legal")
 
     def build_404(self):
+        """The 404 has no meta description; its title, code, message and back
+        link are editable copy (`notfound.*`), the title with its own SEO
+        entry."""
+        title = self.seo("notfound", self.t("notfound.title"), "")[0]
         self.pages["404.html"] = tmpl("404.html.tmpl").safe_substitute(
-            HARDENING=hardening_meta(), NAME=esc(self.config.get("name", "")))
+            HARDENING=hardening_meta(), NAME=esc(self.config.get("name", "")),
+            NF_TITLE=esc(title), NF_CODE=esc(self.t("notfound.code")),
+            NF_MESSAGE=esc(self.t("notfound.message")),
+            NF_BACK=esc(self.t("notfound.back")))
 
     def build_all(self):
         self.build_home()
