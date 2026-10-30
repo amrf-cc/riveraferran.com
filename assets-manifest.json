@@ -1209,11 +1209,13 @@
             },
             {
               "label": "Forest floor plate",
-              "image": "assets/img/rodowita-water/04.jpg"
+              "image": "assets/img/rodowita-water/04.jpg",
+              "ai": true
             },
             {
               "label": "Final",
-              "image": "assets/img/rodowita-water/23.jpg"
+              "image": "assets/img/rodowita-water/02-2.jpg",
+              "composite": true
             }
           ]
         },
