@@ -1066,6 +1066,26 @@
           "ratio": "16 / 9",
           "mp4": ""
         }
+      ],
+      "sets": [
+        {
+          "title": "Studio Shot → AI Plate → Composite",
+          "steps": [
+            {
+              "label": "",
+              "image": "assets/img/ai-production-assistant/01.jpg"
+            },
+            {
+              "label": "",
+              "image": "assets/img/ai-production-assistant/04.jpg",
+              "ai": true
+            },
+            {
+              "label": "",
+              "image": "assets/img/ai-production-assistant/02.jpg"
+            }
+          ]
+        }
       ]
     },
     "rodowita-water": {
